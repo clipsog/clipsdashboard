@@ -1389,6 +1389,17 @@ class DashboardHandler(BaseHTTPRequestHandler):
             progress = self.load_progress()
             campaigns_changed = False
             
+            # Rebuild campaign videos from progress.json (ensure persistence after restarts)
+            # This ensures videos with campaign_id in progress.json are added to campaigns
+            for video_url, video_data in progress.items():
+                campaign_id = video_data.get('campaign_id')
+                if campaign_id and campaign_id in campaigns:
+                    if 'videos' not in campaigns[campaign_id]:
+                        campaigns[campaign_id]['videos'] = []
+                    if video_url not in campaigns[campaign_id]['videos']:
+                        campaigns[campaign_id]['videos'].append(video_url)
+                        campaigns_changed = True
+            
             # Calculate financial data for each campaign
             for campaign_id, campaign_data in campaigns.items():
                 # Backfill defaults for older campaigns (goals + speed)
@@ -1444,6 +1455,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 total_earned = (total_views / 1000.0) * cpm if cpm > 0 else 0
                 profit = total_earned - total_spent
                 roi = (profit / total_spent * 100) if total_spent > 0 else 0
+                
+                # Remove videos that no longer exist in progress
+                campaign_data['videos'] = [v for v in video_urls if v in progress]
+                if len(campaign_data['videos']) != len(video_urls):
+                    campaigns_changed = True
                 
                 campaign_data['financial'] = {
                     'total_spent': round(total_spent, 2),
@@ -2969,20 +2985,31 @@ class DashboardHandler(BaseHTTPRequestHandler):
             position: fixed;
             bottom: 30px;
             right: 30px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            font-size: 1.5em;
+            background: #2a2a2a;
+            color: #b0b0b0;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            width: 48px;
+            height: 48px;
             cursor: pointer;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-            transition: transform 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
         }
         
         .refresh-btn:hover {
-            transform: scale(1.1);
+            background: #333;
+            color: #fff;
+            border-color: rgba(255,255,255,0.2);
+            transform: rotate(90deg);
+        }
+        
+        .refresh-btn svg {
+            width: 18px;
+            height: 18px;
         }
         
         .empty-state {
@@ -3573,7 +3600,14 @@ class DashboardHandler(BaseHTTPRequestHandler):
         </div>
     </div>
     
-    <button class="refresh-btn" onclick="loadDashboard(true)" title="Refresh">🔄</button>
+    <button class="refresh-btn" onclick="loadDashboard(true)" title="Refresh">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+            <path d="M21 3v5h-5"></path>
+            <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+            <path d="M3 21v-5h5"></path>
+        </svg>
+    </button>
     
     <script>
         function formatNumber(num) {
@@ -4527,15 +4561,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     const durH = (campaign.target_duration_hours !== undefined) ? campaign.target_duration_hours : 24;
                     const durM = (campaign.target_duration_minutes !== undefined) ? campaign.target_duration_minutes : 0;
                     
-                    html += `<div class="campaign-card-clickable" data-campaign-id="${campaignId}" style="background: #2a2a2a; border-radius: 8px; padding: 15px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: all 0.2s; position: relative;" onmouseover="this.style.borderColor='rgba(102,126,234,0.5)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.transform='translateY(0)';">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-right: 80px;">
+                    html += `<div class="campaign-card-clickable" data-campaign-id="${campaignId}" style="background: #2a2a2a; border-radius: 8px; padding: 15px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: all 0.2s; position: relative; display: flex; flex-direction: column;" onmouseover="this.style.borderColor='rgba(102,126,234,0.5)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.transform='translateY(0)';">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                             <h4 style="margin: 0; color: #fff; font-size: 1.1em; font-weight: 600;">${campaign.name || 'Unnamed Campaign'}</h4>
                             ${campaign.cpm > 0 ? `<span style="color: #667eea; font-size: 0.9em;">CPM: $${campaign.cpm.toFixed(2)}</span>` : '<span style="color: #888; font-size: 0.9em;">No CPM set</span>'}
-                        </div>
-                        <div style="position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; z-index: 10; flex-wrap: wrap;">
-                            <button class="edit-campaign-btn" data-campaign-id="${campaignId}" onclick="event.stopPropagation(); showEditCampaignModal('${campaignId}');" style="background: #2a2a2a; color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;" onmouseover="this.style.background='#333';" onmouseout="this.style.background='#2a2a2a';">Edit</button>
-                            <button class="add-video-to-campaign-btn" data-campaign-id="${campaignId}" onclick="event.stopPropagation(); showAddVideoToCampaignModal('${campaignId}');" style="background: #2a2a2a; color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;" onmouseover="this.style.background='#333';" onmouseout="this.style.background='#2a2a2a';">Add Video</button>
-                            ${campaign.status !== 'ended' ? `<button class="end-campaign-btn" data-campaign-id="${campaignId}" onclick="event.stopPropagation(); endCampaign('${campaignId}');" style="background: #2a2a2a; color: #ef4444; border: 1px solid rgba(239,68,68,0.3); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;" onmouseover="this.style.background='#333'; this.style.borderColor='rgba(239,68,68,0.5)';" onmouseout="this.style.background='#2a2a2a'; this.style.borderColor='rgba(239,68,68,0.3)';">End Campaign</button>` : '<span style="color: #888; font-size: 11px; padding: 6px 12px;">Ended</span>'}
                         </div>
                         <div style="color: #b0b0b0; font-size: 0.85em; margin-bottom: 10px;">
                             <div>Goals/post: ${formatNumber(goalViews)} views · ${formatNumber(goalLikes)} likes · ${formatNumber(goalComments)} comments · ${formatNumber(goalCommentLikes)} comment likes</div>
@@ -4568,6 +4597,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 <span style="color: #b0b0b0; font-size: 0.85em;">ROI:</span>
                                 <span style="color: ${roi >= 0 ? '#10b981' : '#ef4444'}; font-weight: 600;">${roi >= 0 ? '+' : ''}${roi.toFixed(1)}%</span>
                             </div>` : ''}
+                        </div>
+                        <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px; margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button class="edit-campaign-btn" data-campaign-id="${campaignId}" onclick="event.stopPropagation(); showEditCampaignModal('${campaignId}');" style="flex: 1; min-width: 80px; background: #2a2a2a; color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;" onmouseover="this.style.background='#333'; this.style.borderColor='rgba(255,255,255,0.3)';" onmouseout="this.style.background='#2a2a2a'; this.style.borderColor='rgba(255,255,255,0.2)';">Edit</button>
+                            <button class="add-video-to-campaign-btn" data-campaign-id="${campaignId}" onclick="event.stopPropagation(); showAddVideoToCampaignModal('${campaignId}');" style="flex: 1; min-width: 100px; background: #2a2a2a; color: #667eea; border: 1px solid rgba(102,126,234,0.3); padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;" onmouseover="this.style.background='#333'; this.style.borderColor='rgba(102,126,234,0.5)';" onmouseout="this.style.background='#2a2a2a'; this.style.borderColor='rgba(102,126,234,0.3)';">Add Video</button>
+                            ${campaign.status !== 'ended' ? `<button class="end-campaign-btn" data-campaign-id="${campaignId}" onclick="event.stopPropagation(); endCampaign('${campaignId}');" style="flex: 1; min-width: 120px; background: #2a2a2a; color: #ef4444; border: 1px solid rgba(239,68,68,0.3); padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;" onmouseover="this.style.background='#333'; this.style.borderColor='rgba(239,68,68,0.5)';" onmouseout="this.style.background='#2a2a2a'; this.style.borderColor='rgba(239,68,68,0.3)';">End Campaign</button>` : '<span style="flex: 1; color: #888; font-size: 11px; padding: 8px 12px; text-align: center;">Ended</span>'}
                         </div>
                     </div>`;
                 }

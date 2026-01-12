@@ -624,7 +624,19 @@ class DashboardHandler(BaseHTTPRequestHandler):
             del progress[video_url]
             self.save_progress(progress)
             
-            print(f"SUCCESS: Removed video {video_url} from progress")
+            # Also remove video from all campaigns
+            campaigns = self.load_campaigns()
+            campaigns_changed = False
+            for campaign_id, campaign_data in campaigns.items():
+                if 'videos' in campaign_data and video_url in campaign_data['videos']:
+                    campaign_data['videos'].remove(video_url)
+                    campaigns_changed = True
+                    print(f"Removed video from campaign {campaign_id}")
+            
+            if campaigns_changed:
+                self.save_campaigns(campaigns)
+            
+            print(f"SUCCESS: Removed video {video_url} from progress and campaigns")
             
             response_data = json.dumps({'success': True, 'message': 'Video removed successfully'})
             self.send_response(200)
@@ -756,11 +768,15 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 campaigns = self.load_campaigns()
                 if campaign_id in campaigns:
                     campaign = campaigns.get(campaign_id, {})
+                    # CRITICAL: Set campaign_id FIRST before adding to campaign
+                    # This ensures rebuild logic can restore the video if needed
                     progress[video_url]['campaign_id'] = campaign_id
                     # Add to campaign's video list
-                    existing = set(campaign.get('videos', []))
-                    existing.add(video_url)
-                    campaign['videos'] = list(existing)
+                    if 'videos' not in campaign:
+                        campaign['videos'] = []
+                    if video_url not in campaign['videos']:
+                        campaign['videos'].append(video_url)
+                        print(f"[ADD VIDEO] Added {video_url[:50]}... to campaign {campaign_id}")
 
                     # Apply goals
                     progress[video_url]['target_views'] = int(campaign.get('target_views', 4000) or 4000)
@@ -1392,6 +1408,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             # Rebuild campaign videos from progress.json (ensure persistence after restarts)
             # This ensures videos with campaign_id in progress.json are added to campaigns
             # This is critical for persistence - if server restarts, videos are restored
+            # This runs EVERY TIME campaigns are loaded to ensure videos never disappear
             for video_url, video_data in progress.items():
                 campaign_id = video_data.get('campaign_id')
                 if campaign_id and campaign_id in campaigns:
@@ -1402,7 +1419,13 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     if video_url not in campaigns[campaign_id]['videos']:
                         campaigns[campaign_id]['videos'].append(video_url)
                         campaigns_changed = True
-                        print(f"Rebuilt: Added video {video_url[:50]}... to campaign {campaign_id}")
+                        print(f"[REBUILD] Added video {video_url[:50]}... to campaign {campaign_id}")
+            
+            # Ensure all campaigns have a videos list (even if empty)
+            for campaign_id, campaign_data in campaigns.items():
+                if 'videos' not in campaign_data:
+                    campaign_data['videos'] = []
+                    campaigns_changed = True
             
             # Calculate financial data for each campaign
             for campaign_id, campaign_data in campaigns.items():
@@ -1460,12 +1483,18 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 profit = total_earned - total_spent
                 roi = (profit / total_spent * 100) if total_spent > 0 else 0
                 
-                # Clean up: Remove videos that no longer exist in progress
-                # But keep videos that have campaign_id set (they'll be rebuilt)
-                original_count = len(video_urls)
-                campaign_data['videos'] = [v for v in video_urls if v in progress]
-                if len(campaign_data['videos']) != original_count:
-                    campaigns_changed = True
+                # IMPORTANT: Do NOT remove videos from campaigns here!
+                # The rebuild logic above already handles adding videos back.
+                # Removing videos here causes them to disappear if there's any timing issue
+                # or if progress.json is temporarily incomplete.
+                # Videos should only be removed when explicitly deleted via /api/remove-video
+                # or when reassigned to a different campaign.
+                # 
+                # Note: We keep all videos in the campaign's list, even if temporarily not in progress.
+                # The rebuild logic will add them back if they have campaign_id set.
+                # 
+                # DO NOT DO THIS: campaign_data['videos'] = [v for v in video_urls if v in progress]
+                # This was causing videos to disappear!
                 
                 campaign_data['financial'] = {
                     'total_spent': round(total_spent, 2),

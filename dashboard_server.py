@@ -2472,7 +2472,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: #0f0f0f;
             min-height: 100vh;
-            padding: 20px;
+            padding: 8px;
             color: #e0e0e0;
         }
         
@@ -2482,10 +2482,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
         }
         
         .header {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            border-radius: 16px;
+            background: #1a1a1a;
+            border-radius: 0;
             padding: 40px;
-            margin-bottom: 30px;
+            margin-bottom: 16px;
             box-shadow: 0 8px 32px rgba(0,0,0,0.4);
             border: 1px solid rgba(255,255,255,0.1);
         }
@@ -2503,9 +2503,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
         }
         
         .video-card {
-            background: linear-gradient(135deg, #1a1a1a 0%, #252525 100%);
-            border-radius: 16px;
-            padding: 30px;
+            background: #1a1a1a;
+            border-radius: 0;
+            padding: 10px;
             margin-bottom: 25px;
             box-shadow: 0 8px 32px rgba(0,0,0,0.3);
             border: 1px solid rgba(255,255,255,0.1);
@@ -2522,7 +2522,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             width: 100%;
             max-width: 400px;
             margin: 20px 0;
-            border-radius: 12px;
+            border-radius: 0;
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
@@ -2551,7 +2551,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
             flex-wrap: wrap;
         }
         
@@ -2569,10 +2569,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
         
         .remove-video-btn {
             padding: 8px 16px;
-            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            background: #1a1a1a;
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 0;
             font-size: 0.9em;
             font-weight: 600;
             cursor: pointer;
@@ -2584,7 +2584,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
         .remove-video-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            background: #1a1a1a;
         }
         
         .remove-video-btn:active {
@@ -2593,7 +2593,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
         
         .status-badge {
             padding: 8px 16px;
-            border-radius: 20px;
+            border-radius: 0;
             font-weight: 600;
             font-size: 0.9em;
         }
@@ -2604,9 +2604,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
         .status-early { background: #ef4444; color: white; }
         
         .target-time-section {
-            background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
-            border-radius: 12px;
-            padding: 20px;
+            background: #1a1a1a;
+            border-radius: 0;
+            padding: 8px;
             margin-bottom: 25px;
             border: 1px solid rgba(255,255,255,0.1);
         }
@@ -2628,7 +2628,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
         .target-input-group input[type="datetime-local"] {
             padding: 12px 16px;
             border: 2px solid rgba(255,255,255,0.2);
-            border-radius: 8px;
+            border-radius: 0;
             font-size: 1em;
             flex: 1;
             min-width: 200px;
@@ -2645,10 +2645,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
         
         .target-input-group button {
             padding: 12px 24px;
-            background: linear-gradient(135deg, #667eea 0%, #5568d3 100%);
+            background: #1a1a1a;
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 0;
             font-size: 1em;
             cursor: pointer;
             font-weight: 600;
@@ -2667,9 +2667,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
         
         .target-display {
             margin-top: 15px;
-            padding: 15px;
+            padding: 10px;
             background: rgba(0,0,0,0.3);
-            border-radius: 8px;
+            border-radius: 0;
             color: #e0e0e0;
             border-left: 4px solid #667eea;
         }
@@ -2682,12 +2682,12 @@ class DashboardHandler(BaseHTTPRequestHandler):
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
         
         .metric {
-            background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
-            border-radius: 12px;
+            background: #1a1a1a;
+            border-radius: 0;
             padding: 25px;
             border: 1px solid rgba(255,255,255,0.1);
             transition: all 0.2s;
@@ -2721,7 +2721,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
         
         .progress-bar-container {
             background: rgba(0,0,0,0.3);
-            border-radius: 10px;
+            border-radius: 0;
             height: 24px;
             overflow: hidden;
             margin-top: 12px;
@@ -2730,8 +2730,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
         
         .progress-bar {
             height: 100%;
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-            border-radius: 10px;
+            background: #1a1a1a;
+            border-radius: 0;
             transition: width 0.3s ease;
             display: flex;
             align-items: center;
@@ -2744,8 +2744,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
         .growth-chart-section {
             margin-top: 30px;
             padding: 25px;
-            background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
-            border-radius: 12px;
+            background: #1a1a1a;
+            border-radius: 0;
             border: 1px solid rgba(255,255,255,0.1);
         }
         
@@ -2781,14 +2781,14 @@ class DashboardHandler(BaseHTTPRequestHandler):
         .chart-legend-color {
             width: 20px;
             height: 20px;
-            border-radius: 4px;
+            border-radius: 0;
         }
         
         .milestones-section {
             margin-top: 30px;
             padding: 25px;
-            background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
-            border-radius: 12px;
+            background: #1a1a1a;
+            border-radius: 0;
             border: 1px solid rgba(255,255,255,0.1);
         }
         
@@ -2801,8 +2801,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
         
         .milestone-card {
             background: rgba(0,0,0,0.3);
-            border-radius: 10px;
-            padding: 20px;
+            border-radius: 0;
+            padding: 8px;
             margin-bottom: 15px;
             border-left: 4px solid #555;
             transition: all 0.2s;
@@ -2843,7 +2843,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
         .milestone-status {
             font-size: 12px;
             padding: 6px 12px;
-            border-radius: 6px;
+            border-radius: 0;
             background: rgba(255,255,255,0.1);
             color: #e0e0e0;
             font-weight: 600;
@@ -2880,16 +2880,16 @@ class DashboardHandler(BaseHTTPRequestHandler):
             margin: 5px 0;
             padding: 8px;
             background: rgba(0,0,0,0.3);
-            border-radius: 6px;
+            border-radius: 0;
             color: #d0d0d0;
             border-left: 2px solid rgba(102, 126, 234, 0.5);
         }
         
         .milestone-username {
             margin-top: 10px;
-            padding: 12px;
+            padding: 8px;
             background: rgba(102, 126, 234, 0.2);
-            border-radius: 6px;
+            border-radius: 0;
             color: #e0e0e0;
             border-left: 3px solid #667eea;
         }
@@ -2901,8 +2901,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
         .comments-editor-section {
             margin-top: 30px;
             padding: 25px;
-            background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
-            border-radius: 12px;
+            background: #1a1a1a;
+            border-radius: 0;
             border: 1px solid rgba(255,255,255,0.1);
         }
         
@@ -2928,9 +2928,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
         .comments-textarea {
             width: 100%;
             min-height: 200px;
-            padding: 15px;
+            padding: 10px;
             border: 2px solid rgba(255,255,255,0.2);
-            border-radius: 10px;
+            border-radius: 0;
             font-family: inherit;
             font-size: 14px;
             line-height: 1.6;
@@ -2962,10 +2962,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
         .comments-save-btn {
             margin-top: 15px;
             padding: 12px 24px;
-            background: linear-gradient(135deg, #667eea 0%, #5568d3 100%);
+            background: #1a1a1a;
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 0;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
@@ -2989,7 +2989,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             background: #2a2a2a;
             color: #fff;
             border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 8px;
+            border-radius: 0;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
@@ -3002,8 +3002,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
         
         .comments-save-status {
             margin-top: 12px;
-            padding: 12px;
-            border-radius: 8px;
+            padding: 8px;
+            border-radius: 0;
             font-size: 13px;
             display: none;
         }
@@ -3030,8 +3030,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
         }
         
         .info-item {
-            background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
-            border-radius: 10px;
+            background: #1a1a1a;
+            border-radius: 0;
             padding: 18px;
             border: 1px solid rgba(255,255,255,0.1);
             transition: all 0.2s;
@@ -3063,7 +3063,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             background: #2a2a2a;
             color: #b0b0b0;
             border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 8px;
+            border-radius: 0;
             width: 48px;
             height: 48px;
             cursor: pointer;
@@ -3115,9 +3115,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
         }
         
         .video-card-mini {
-            background: linear-gradient(135deg, #1a1a1a 0%, #252525 100%);
-            border-radius: 16px;
-            padding: 20px;
+            background: #1a1a1a;
+            border-radius: 0;
+            padding: 8px;
             box-shadow: 0 8px 32px rgba(0,0,0,0.3);
             border: 1px solid rgba(255,255,255,0.1);
             transition: all 0.3s ease;
@@ -3172,14 +3172,14 @@ class DashboardHandler(BaseHTTPRequestHandler):
             margin-top: 8px;
             height: 4px;
             background: rgba(0,0,0,0.3);
-            border-radius: 2px;
+            border-radius: 0;
             overflow: hidden;
         }
         
         .mini-stat-progress-bar {
             height: 100%;
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-            border-radius: 2px;
+            background: #1a1a1a;
+            border-radius: 0;
         }
         
         .back-button {
@@ -3187,13 +3187,13 @@ class DashboardHandler(BaseHTTPRequestHandler):
             align-items: center;
             gap: 8px;
             padding: 10px 20px;
-            background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
+            background: #1a1a1a;
             color: #ffffff;
             border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 8px;
+            border-radius: 0;
             text-decoration: none;
             font-weight: 600;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
             transition: all 0.2s;
             cursor: pointer;
         }
@@ -3215,7 +3215,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
         .video-embed-mini {
             width: 100%;
             height: 400px;
-            border-radius: 12px;
+            border-radius: 0;
             overflow: hidden;
             margin-bottom: 15px;
             border: 1px solid rgba(255,255,255,0.1);
@@ -3234,7 +3234,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             margin-bottom: 16px;
             padding: 8px 12px;
             background: #1a1a1a;
-            border-radius: 6px;
+            border-radius: 0;
             border: 1px solid rgba(255,255,255,0.06);
             flex-wrap: wrap;
             align-items: center;
@@ -3269,7 +3269,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
         .tab-navigation {
             display: flex;
             gap: 8px;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
         
@@ -3306,9 +3306,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
         
         /* Search and Filter Bar */
         .controls-bar {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            border-radius: 12px;
-            padding: 20px;
+            background: #1a1a1a;
+            border-radius: 0;
+            padding: 8px;
             margin-bottom: 25px;
             display: flex;
             gap: 15px;
@@ -3322,7 +3322,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             min-width: 200px;
             padding: 12px 16px;
             border: 2px solid rgba(255,255,255,0.2);
-            border-radius: 8px;
+            border-radius: 0;
             background: #1a1a1a;
             color: #e0e0e0;
             font-size: 14px;
@@ -3338,7 +3338,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
         .filter-select {
             padding: 12px 16px;
             border: 2px solid rgba(255,255,255,0.2);
-            border-radius: 8px;
+            border-radius: 0;
             background: #1a1a1a;
             color: #e0e0e0;
             font-size: 14px;
@@ -3357,7 +3357,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             background: #2a2a2a;
             color: #fff;
             border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 8px;
+            border-radius: 0;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
@@ -3373,7 +3373,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             background: #2a2a2a;
             color: #fff;
             border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 8px;
+            border-radius: 0;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
@@ -3389,7 +3389,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             background: #2a2a2a;
             color: #fff;
             border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 8px;
+            border-radius: 0;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
@@ -3407,7 +3407,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             }
             
             .header {
-                padding: 20px;
+                padding: 8px;
             }
             
             .header h1 {
@@ -3415,7 +3415,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             }
             
             .video-card {
-                padding: 15px;
+                padding: 10px;
             }
             
             .video-header {
@@ -3547,17 +3547,17 @@ class DashboardHandler(BaseHTTPRequestHandler):
         </div>
         
         <!-- Campaign Management Bar -->
-        <div id="campaign-bar" style="display: none; background: #2a2a2a; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1);">
+        <div id="campaign-bar" style="display: none; background: #2a2a2a; padding: 10px; border-radius: 0; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1);">
             <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
                 <div style="flex: 1; min-width: 200px;">
                     <div style="color: #b0b0b0; font-size: 0.85em; margin-bottom: 5px;">Selected: <span id="selected-count">0</span> video(s)</div>
                     <div style="display: flex; gap: 10px;">
-                        <select id="campaign-selector" style="flex: 1; padding: 8px 12px; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: #fff; font-size: 14px;">
+                        <select id="campaign-selector" style="flex: 1; padding: 8px 12px; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.2); border-radius: 0; color: #fff; font-size: 14px;">
                             <option value="">Select Campaign...</option>
                         </select>
-                        <button id="new-campaign-btn-bar" style="background: #10b981; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px;">➕ New Campaign</button>
-                        <button onclick="assignToCampaign()" id="assign-campaign-btn" style="background: #667eea; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px;" disabled>Assign</button>
-                        <button onclick="clearSelection()" style="background: #444; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px;">Clear</button>
+                        <button id="new-campaign-btn-bar" style="background: #10b981; color: white; border: none; padding: 8px 16px; border-radius: 0; cursor: pointer; font-weight: 600; font-size: 14px;">➕ New Campaign</button>
+                        <button onclick="assignToCampaign()" id="assign-campaign-btn" style="background: #667eea; color: white; border: none; padding: 8px 16px; border-radius: 0; cursor: pointer; font-weight: 600; font-size: 14px;" disabled>Assign</button>
+                        <button onclick="clearSelection()" style="background: #444; color: white; border: none; padding: 8px 16px; border-radius: 0; cursor: pointer; font-size: 14px;">Clear</button>
                     </div>
                 </div>
             </div>
@@ -3568,149 +3568,149 @@ class DashboardHandler(BaseHTTPRequestHandler):
         
         <!-- Add Video Modal -->
         <div id="add-video-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000; align-items: center; justify-content: center;">
-            <div style="background: #1a1a1a; border-radius: 16px; padding: 30px; max-width: 500px; width: 90%; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 8px 32px rgba(0,0,0,0.5);">
+            <div style="background: #1a1a1a; border-radius: 0; padding: 10px; max-width: 500px; width: 90%; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 8px 32px rgba(0,0,0,0.5);">
                 <h2 style="margin: 0 0 20px 0; color: #fff; font-size: 24px;">➕ Add Video to Campaign</h2>
-                <p style="color: #b0b0b0; margin-bottom: 20px; font-size: 14px;">Enter a TikTok video URL to start tracking it in your campaign.</p>
+                <p style="color: #b0b0b0; margin-bottom: 12px; font-size: 14px;">Enter a TikTok video URL to start tracking it in your campaign.</p>
                 <div style="margin-bottom: 12px;">
                     <label style="display: block; color: #fff; margin-bottom: 8px; font-weight: 600;">Assign to Campaign (optional)</label>
                     <div style="display: flex; gap: 10px;">
-                        <select id="add-video-campaign-selector" style="flex: 1; padding: 10px 12px; background: #252525; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; font-size: 14px;">
+                        <select id="add-video-campaign-selector" style="flex: 1; padding: 10px 12px; background: #252525; border: 1px solid rgba(255,255,255,0.2); border-radius: 0; color: #fff; font-size: 14px;">
                             <option value="">No campaign</option>
                         </select>
-                        <button id="add-video-new-campaign-btn" style="background: #10b981; color: white; border: none; padding: 10px 14px; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 13px;">➕ New</button>
+                        <button id="add-video-new-campaign-btn" style="background: #10b981; color: white; border: none; padding: 10px 14px; border-radius: 0; cursor: pointer; font-weight: 700; font-size: 13px;">➕ New</button>
                     </div>
                     <div style="color: #888; font-size: 12px; margin-top: 6px;">If you choose a campaign, we’ll apply that campaign’s goals & speed to this post.</div>
                 </div>
-                <textarea id="new-video-url" placeholder="Enter one or more TikTok URLs (one per line)&#10;https://www.tiktok.com/@username/video/1234567890&#10;https://www.tiktok.com/@username/video/0987654321" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: #252525; color: #fff; font-size: 14px; margin-bottom: 12px; box-sizing: border-box; min-height: 120px; resize: vertical; font-family: monospace;"></textarea>
+                <textarea id="new-video-url" placeholder="Enter one or more TikTok URLs (one per line)&#10;https://www.tiktok.com/@username/video/1234567890&#10;https://www.tiktok.com/@username/video/0987654321" style="width: 100%; padding: 8px; border-radius: 0; border: 1px solid rgba(255,255,255,0.2); background: #252525; color: #fff; font-size: 14px; margin-bottom: 12px; box-sizing: border-box; min-height: 120px; resize: vertical; font-family: monospace;"></textarea>
                 <div style="color: #888; font-size: 12px; margin-bottom: 12px;">💡 Tip: Paste multiple URLs, one per line</div>
                 <div id="add-video-progress" style="display: none; margin-bottom: 15px;">
                     <div style="color: #667eea; font-size: 13px; margin-bottom: 8px;">Adding videos...</div>
-                    <div style="background: #252525; border-radius: 8px; padding: 12px; max-height: 200px; overflow-y: auto;">
+                    <div style="background: #252525; border-radius: 0; padding: 8px; max-height: 200px; overflow-y: auto;">
                         <div id="add-video-progress-list" style="color: #b0b0b0; font-size: 12px; font-family: monospace;"></div>
                     </div>
-                    <div style="background: #252525; height: 4px; border-radius: 2px; margin-top: 8px; overflow: hidden;">
-                        <div id="add-video-progress-bar" style="background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); height: 100%; width: 0%; transition: width 0.3s;"></div>
+                    <div style="background: #252525; height: 4px; border-radius: 0; margin-top: 8px; overflow: hidden;">
+                        <div id="add-video-progress-bar" style="background: #1a1a1a; height: 100%; width: 0%; transition: width 0.3s;"></div>
                     </div>
                 </div>
                 <div id="add-video-error" style="color: #ff4444; font-size: 13px; margin-bottom: 15px; display: none;"></div>
                 <div id="add-video-success" style="color: #10b981; font-size: 13px; margin-bottom: 15px; display: none;"></div>
                 <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                    <button onclick="hideAddVideoModal()" id="add-video-cancel-btn" style="padding: 10px 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: #fff; cursor: pointer; font-size: 14px;">Cancel</button>
-                    <button onclick="addVideo()" id="add-video-submit-btn" style="padding: 10px 20px; border-radius: 8px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; cursor: pointer; font-weight: 600; font-size: 14px;">Add Video(s)</button>
+                    <button onclick="hideAddVideoModal()" id="add-video-cancel-btn" style="padding: 10px 20px; border-radius: 0; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: #fff; cursor: pointer; font-size: 14px;">Cancel</button>
+                    <button onclick="addVideo()" id="add-video-submit-btn" style="padding: 10px 20px; border-radius: 0; border: none; background: #1a1a1a; color: white; cursor: pointer; font-weight: 600; font-size: 14px;">Add Video(s)</button>
                 </div>
             </div>
         </div>
 
         <!-- Create Campaign Modal -->
         <div id="create-campaign-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10002; align-items: center; justify-content: center;">
-            <div style="background: #1a1a1a; border-radius: 16px; padding: 30px; max-width: 500px; width: 90%; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 8px 32px rgba(0,0,0,0.5);">
+            <div style="background: #1a1a1a; border-radius: 0; padding: 10px; max-width: 500px; width: 90%; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 8px 32px rgba(0,0,0,0.5);">
                 <h2 style="margin: 0 0 20px 0; color: #fff; font-size: 24px;">📊 Create New Campaign</h2>
-                <p style="color: #b0b0b0; margin-bottom: 20px; font-size: 14px;">Create a new campaign to group videos and track financial performance.</p>
-                <div style="margin-bottom: 20px;">
+                <p style="color: #b0b0b0; margin-bottom: 12px; font-size: 14px;">Create a new campaign to group videos and track financial performance.</p>
+                <div style="margin-bottom: 12px;">
                     <label style="display: block; color: #fff; margin-bottom: 8px; font-weight: 600;">Campaign Name</label>
-                    <input type="text" id="new-campaign-name" placeholder="e.g., Q1 2026 Campaign" style="width: 100%; padding: 12px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; font-size: 14px; box-sizing: border-box;">
+                    <input type="text" id="new-campaign-name" placeholder="e.g., Q1 2026 Campaign" style="width: 100%; padding: 8px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 0; color: #fff; font-size: 14px; box-sizing: border-box;">
                 </div>
-                <div style="margin-bottom: 20px;">
+                <div style="margin-bottom: 12px;">
                     <label style="display: block; color: #fff; margin-bottom: 8px; font-weight: 600;">CPM (Cost Per Mille)</label>
                     <p style="color: #b0b0b0; font-size: 12px; margin-bottom: 8px;">How much you get paid per 1,000 views (e.g., 2.50 = $2.50 per 1000 views)</p>
-                    <input type="number" id="new-campaign-cpm" placeholder="0.00" step="0.01" min="0" style="width: 100%; padding: 12px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; font-size: 14px; box-sizing: border-box;">
+                    <input type="number" id="new-campaign-cpm" placeholder="0.00" step="0.01" min="0" style="width: 100%; padding: 8px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 0; color: #fff; font-size: 14px; box-sizing: border-box;">
                 </div>
-                <div style="margin-bottom: 20px;">
+                <div style="margin-bottom: 12px;">
                     <label style="display: block; color: #fff; margin-bottom: 8px; font-weight: 600;">Goals per Post</label>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                         <div>
                             <div style="color: #b0b0b0; font-size: 12px; margin-bottom: 6px;">Views goal</div>
-                            <input type="number" id="new-campaign-target-views" placeholder="4000" min="0" step="1" style="width: 100%; padding: 10px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; font-size: 14px; box-sizing: border-box;">
+                            <input type="number" id="new-campaign-target-views" placeholder="4000" min="0" step="1" style="width: 100%; padding: 10px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 0; color: #fff; font-size: 14px; box-sizing: border-box;">
                         </div>
                         <div>
                             <div style="color: #b0b0b0; font-size: 12px; margin-bottom: 6px;">Likes goal</div>
-                            <input type="number" id="new-campaign-target-likes" placeholder="125" min="0" step="1" style="width: 100%; padding: 10px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; font-size: 14px; box-sizing: border-box;">
+                            <input type="number" id="new-campaign-target-likes" placeholder="125" min="0" step="1" style="width: 100%; padding: 10px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 0; color: #fff; font-size: 14px; box-sizing: border-box;">
                         </div>
                         <div>
                             <div style="color: #b0b0b0; font-size: 12px; margin-bottom: 6px;">Comments goal</div>
-                            <input type="number" id="new-campaign-target-comments" placeholder="7" min="0" step="1" style="width: 100%; padding: 10px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; font-size: 14px; box-sizing: border-box;">
+                            <input type="number" id="new-campaign-target-comments" placeholder="7" min="0" step="1" style="width: 100%; padding: 10px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 0; color: #fff; font-size: 14px; box-sizing: border-box;">
                         </div>
                         <div>
                             <div style="color: #b0b0b0; font-size: 12px; margin-bottom: 6px;">Comment likes goal</div>
-                            <input type="number" id="new-campaign-target-comment-likes" placeholder="15" min="0" step="1" style="width: 100%; padding: 10px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; font-size: 14px; box-sizing: border-box;">
+                            <input type="number" id="new-campaign-target-comment-likes" placeholder="15" min="0" step="1" style="width: 100%; padding: 10px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 0; color: #fff; font-size: 14px; box-sizing: border-box;">
                         </div>
                     </div>
                 </div>
-                <div style="margin-bottom: 20px;">
+                <div style="margin-bottom: 12px;">
                     <label style="display: block; color: #fff; margin-bottom: 8px; font-weight: 600;">Growth Speed</label>
                     <p style="color: #b0b0b0; font-size: 12px; margin-bottom: 8px;">How long each post should take to reach the goal (used to set the target completion time).</p>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                         <div>
                             <div style="color: #b0b0b0; font-size: 12px; margin-bottom: 6px;">Hours</div>
-                            <input type="number" id="new-campaign-duration-hours" placeholder="24" min="0" step="1" style="width: 100%; padding: 10px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; font-size: 14px; box-sizing: border-box;">
+                            <input type="number" id="new-campaign-duration-hours" placeholder="24" min="0" step="1" style="width: 100%; padding: 10px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 0; color: #fff; font-size: 14px; box-sizing: border-box;">
                         </div>
                         <div>
                             <div style="color: #b0b0b0; font-size: 12px; margin-bottom: 6px;">Minutes</div>
-                            <input type="number" id="new-campaign-duration-minutes" placeholder="0" min="0" step="1" style="width: 100%; padding: 10px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; font-size: 14px; box-sizing: border-box;">
+                            <input type="number" id="new-campaign-duration-minutes" placeholder="0" min="0" step="1" style="width: 100%; padding: 10px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 0; color: #fff; font-size: 14px; box-sizing: border-box;">
                         </div>
                     </div>
                 </div>
                 <div id="create-campaign-error" style="color: #ef4444; margin-bottom: 15px; font-size: 14px; display: none;"></div>
                 <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                    <button onclick="hideCreateCampaignModal()" style="background: #444; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">Cancel</button>
-                    <button onclick="createCampaign()" style="background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600;">Create Campaign</button>
+                    <button onclick="hideCreateCampaignModal()" style="background: #444; color: white; border: none; padding: 10px 20px; border-radius: 0; cursor: pointer;">Cancel</button>
+                    <button onclick="createCampaign()" style="background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 0; cursor: pointer; font-weight: 600;">Create Campaign</button>
                 </div>
             </div>
         </div>
         
         <!-- Edit Campaign Modal -->
         <div id="edit-campaign-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10003; align-items: center; justify-content: center;">
-            <div style="background: #1a1a1a; border-radius: 16px; padding: 30px; max-width: 500px; width: 90%; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 8px 32px rgba(0,0,0,0.5);">
+            <div style="background: #1a1a1a; border-radius: 0; padding: 10px; max-width: 500px; width: 90%; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 8px 32px rgba(0,0,0,0.5);">
                 <h2 style="margin: 0 0 20px 0; color: #fff; font-size: 24px;">Edit Campaign</h2>
-                <p style="color: #b0b0b0; margin-bottom: 20px; font-size: 14px;">Update campaign CPM and goals.</p>
-                <div style="margin-bottom: 20px;">
+                <p style="color: #b0b0b0; margin-bottom: 12px; font-size: 14px;">Update campaign CPM and goals.</p>
+                <div style="margin-bottom: 12px;">
                     <label style="display: block; color: #fff; margin-bottom: 8px; font-weight: 600;">Campaign Name</label>
-                    <input type="text" id="edit-campaign-name" placeholder="e.g., Q1 2026 Campaign" style="width: 100%; padding: 12px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; font-size: 14px; box-sizing: border-box;">
+                    <input type="text" id="edit-campaign-name" placeholder="e.g., Q1 2026 Campaign" style="width: 100%; padding: 8px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 0; color: #fff; font-size: 14px; box-sizing: border-box;">
                 </div>
-                <div style="margin-bottom: 20px;">
+                <div style="margin-bottom: 12px;">
                     <label style="display: block; color: #fff; margin-bottom: 8px; font-weight: 600;">CPM (Cost Per Mille)</label>
                     <p style="color: #b0b0b0; font-size: 12px; margin-bottom: 8px;">How much you get paid per 1,000 views (e.g., 2.50 = $2.50 per 1000 views)</p>
-                    <input type="number" id="edit-campaign-cpm" placeholder="0.00" step="0.01" min="0" style="width: 100%; padding: 12px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; font-size: 14px; box-sizing: border-box;">
+                    <input type="number" id="edit-campaign-cpm" placeholder="0.00" step="0.01" min="0" style="width: 100%; padding: 8px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 0; color: #fff; font-size: 14px; box-sizing: border-box;">
                 </div>
-                <div style="margin-bottom: 20px;">
+                <div style="margin-bottom: 12px;">
                     <label style="display: block; color: #fff; margin-bottom: 8px; font-weight: 600;">Goals per Post</label>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                         <div>
                             <div style="color: #b0b0b0; font-size: 12px; margin-bottom: 6px;">Views goal</div>
-                            <input type="number" id="edit-campaign-target-views" placeholder="4000" min="0" step="1" style="width: 100%; padding: 10px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; font-size: 14px; box-sizing: border-box;">
+                            <input type="number" id="edit-campaign-target-views" placeholder="4000" min="0" step="1" style="width: 100%; padding: 10px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 0; color: #fff; font-size: 14px; box-sizing: border-box;">
                         </div>
                         <div>
                             <div style="color: #b0b0b0; font-size: 12px; margin-bottom: 6px;">Likes goal</div>
-                            <input type="number" id="edit-campaign-target-likes" placeholder="125" min="0" step="1" style="width: 100%; padding: 10px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; font-size: 14px; box-sizing: border-box;">
+                            <input type="number" id="edit-campaign-target-likes" placeholder="125" min="0" step="1" style="width: 100%; padding: 10px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 0; color: #fff; font-size: 14px; box-sizing: border-box;">
                         </div>
                         <div>
                             <div style="color: #b0b0b0; font-size: 12px; margin-bottom: 6px;">Comments goal</div>
-                            <input type="number" id="edit-campaign-target-comments" placeholder="7" min="0" step="1" style="width: 100%; padding: 10px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; font-size: 14px; box-sizing: border-box;">
+                            <input type="number" id="edit-campaign-target-comments" placeholder="7" min="0" step="1" style="width: 100%; padding: 10px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 0; color: #fff; font-size: 14px; box-sizing: border-box;">
                         </div>
                         <div>
                             <div style="color: #b0b0b0; font-size: 12px; margin-bottom: 6px;">Comment likes goal</div>
-                            <input type="number" id="edit-campaign-target-comment-likes" placeholder="15" min="0" step="1" style="width: 100%; padding: 10px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; font-size: 14px; box-sizing: border-box;">
+                            <input type="number" id="edit-campaign-target-comment-likes" placeholder="15" min="0" step="1" style="width: 100%; padding: 10px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 0; color: #fff; font-size: 14px; box-sizing: border-box;">
                         </div>
                     </div>
                 </div>
-                <div style="margin-bottom: 20px;">
+                <div style="margin-bottom: 12px;">
                     <label style="display: block; color: #fff; margin-bottom: 8px; font-weight: 600;">Growth Speed</label>
                     <p style="color: #b0b0b0; font-size: 12px; margin-bottom: 8px;">How long each post should take to reach the goal (used to set the target completion time).</p>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                         <div>
                             <div style="color: #b0b0b0; font-size: 12px; margin-bottom: 6px;">Hours</div>
-                            <input type="number" id="edit-campaign-duration-hours" placeholder="24" min="0" step="1" style="width: 100%; padding: 10px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; font-size: 14px; box-sizing: border-box;">
+                            <input type="number" id="edit-campaign-duration-hours" placeholder="24" min="0" step="1" style="width: 100%; padding: 10px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 0; color: #fff; font-size: 14px; box-sizing: border-box;">
                         </div>
                         <div>
                             <div style="color: #b0b0b0; font-size: 12px; margin-bottom: 6px;">Minutes</div>
-                            <input type="number" id="edit-campaign-duration-minutes" placeholder="0" min="0" step="1" style="width: 100%; padding: 10px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; font-size: 14px; box-sizing: border-box;">
+                            <input type="number" id="edit-campaign-duration-minutes" placeholder="0" min="0" step="1" style="width: 100%; padding: 10px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 0; color: #fff; font-size: 14px; box-sizing: border-box;">
                         </div>
                     </div>
                 </div>
                 <div id="edit-campaign-error" style="color: #ef4444; margin-bottom: 15px; font-size: 14px; display: none;"></div>
                 <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                    <button onclick="hideEditCampaignModal()" style="background: #444; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">Cancel</button>
-                    <button onclick="updateCampaign()" style="background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600;">Update Campaign</button>
+                    <button onclick="hideEditCampaignModal()" style="background: #444; color: white; border: none; padding: 10px 20px; border-radius: 0; cursor: pointer;">Cancel</button>
+                    <button onclick="updateCampaign()" style="background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 0; cursor: pointer; font-weight: 600;">Update Campaign</button>
                 </div>
             </div>
         </div>
@@ -4088,14 +4088,14 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 // Create modal if it doesn't exist
                 const modalHtml = `
                     <div id="comment-selection-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10001; align-items: center; justify-content: center; overflow-y: auto;">
-                        <div style="background: #1a1a1a; border-radius: 16px; padding: 30px; max-width: 700px; width: 90%; margin: 20px auto; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 8px 32px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto;">
+                        <div style="background: #1a1a1a; border-radius: 0; padding: 10px; max-width: 700px; width: 90%; margin: 20px auto; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 8px 32px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto;">
                             <h2 style="margin: 0 0 20px 0; color: #fff; font-size: 24px;">📝 Select Comments to Boost</h2>
-                            <div id="comment-selection-loading" style="color: #b0b0b0; text-align: center; padding: 20px;">Loading comments...</div>
-                            <div id="comment-selection-list" style="display: none; margin-bottom: 20px;"></div>
-                            <div id="comment-selection-error" style="display: none; color: #ef4444; margin-bottom: 20px;"></div>
+                            <div id="comment-selection-loading" style="color: #b0b0b0; text-align: center; padding: 8px;">Loading comments...</div>
+                            <div id="comment-selection-list" style="display: none; margin-bottom: 12px;"></div>
+                            <div id="comment-selection-error" style="display: none; color: #ef4444; margin-bottom: 12px;"></div>
                             <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                                <button onclick="hideCommentSelectionModal()" style="background: #444; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">Cancel</button>
-                                <button id="order-comment-likes-btn" onclick="orderSelectedCommentLikes()" style="background: #667eea; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; display: none;">🚀 Order Likes for Selected</button>
+                                <button onclick="hideCommentSelectionModal()" style="background: #444; color: white; border: none; padding: 10px 20px; border-radius: 0; cursor: pointer;">Cancel</button>
+                                <button id="order-comment-likes-btn" onclick="orderSelectedCommentLikes()" style="background: #667eea; color: white; border: none; padding: 10px 20px; border-radius: 0; cursor: pointer; display: none;">🚀 Order Likes for Selected</button>
                             </div>
                         </div>
                     </div>
@@ -4128,7 +4128,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     listDiv.innerHTML = '';
                     data.comments.forEach((comment, index) => {
                         const commentHtml = `
-                            <div style="background: #2a2a2a; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 15px; margin-bottom: 10px;">
+                            <div style="background: #2a2a2a; border: 1px solid rgba(255,255,255,0.1); border-radius: 0; padding: 10px; margin-bottom: 10px;">
                                 <label style="display: flex; align-items: flex-start; cursor: pointer; gap: 10px;">
                                     <input type="checkbox" class="comment-checkbox" data-comment-index="${index}" style="margin-top: 3px; cursor: pointer;">
                                     <div style="flex: 1;">
@@ -4645,18 +4645,18 @@ class DashboardHandler(BaseHTTPRequestHandler):
             
             const campaigns = Object.entries(campaignsData);
             
-            let html = '<div style="background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%); border-radius: 12px; padding: 20px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.1);">';
-            html += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">';
+            let html = '<div style="background: #1a1a1a; border-radius: 0; padding: 8px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.1);">';
+            html += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">';
             html += '<h3 style="margin: 0; color: #fff; font-size: 1.2em; font-weight: 600;">📊 Campaigns Overview</h3>';
             html += '<button id="add-campaign-btn-header" class="add-campaign-btn">Add Campaign</button>';
             html += '</div>';
 
             // CPM + Goals calculator (home)
-            html += '<div style="background: #252525; border-radius: 12px; padding: 16px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px;">';
+            html += '<div style="background: #252525; border-radius: 0; padding: 10px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 12px;">';
             html += '<div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap;">';
             html += '<div style="color: #fff; font-weight: 700;">💰 CPM & Goals Calculator</div>';
             if (campaigns.length > 0) {
-                html += '<select id="calc-campaign-select" style="padding: 8px 10px; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; font-size: 13px;">';
+                html += '<select id="calc-campaign-select" style="padding: 8px 10px; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.2); border-radius: 0; color: #fff; font-size: 13px;">';
                 html += '<option value="">Use campaign defaults…</option>';
                 for (const [campaignId, campaign] of campaigns) {
                     const name = (campaign && campaign.name) ? String(campaign.name) : 'Unnamed Campaign';
@@ -4667,17 +4667,17 @@ class DashboardHandler(BaseHTTPRequestHandler):
             }
             html += '</div>';
             html += '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px;">';
-            html += '<div><div style="color:#b0b0b0; font-size:12px; margin-bottom:6px;">CPM ($ / 1000 views)</div><input id="calc-cpm" type="number" min="0" step="0.01" placeholder="2.50" style="width:100%; padding:10px; background:#1a1a1a; border:1px solid rgba(255,255,255,0.2); border-radius:8px; color:#fff;"></div>';
-            html += '<div><div style="color:#b0b0b0; font-size:12px; margin-bottom:6px;"># of videos</div><input id="calc-videos" type="number" min="1" step="1" placeholder="10" style="width:100%; padding:10px; background:#1a1a1a; border:1px solid rgba(255,255,255,0.2); border-radius:8px; color:#fff;"></div>';
-            html += '<div><div style="color:#b0b0b0; font-size:12px; margin-bottom:6px;">Views goal / video</div><input id="calc-views" type="number" min="0" step="1" placeholder="4000" style="width:100%; padding:10px; background:#1a1a1a; border:1px solid rgba(255,255,255,0.2); border-radius:8px; color:#fff;"></div>';
-            html += '<div><div style="color:#b0b0b0; font-size:12px; margin-bottom:6px;">Likes goal / video</div><input id="calc-likes" type="number" min="0" step="1" placeholder="125" style="width:100%; padding:10px; background:#1a1a1a; border:1px solid rgba(255,255,255,0.2); border-radius:8px; color:#fff;"></div>';
-            html += '<div><div style="color:#b0b0b0; font-size:12px; margin-bottom:6px;">Comments goal / video</div><input id="calc-comments" type="number" min="0" step="1" placeholder="7" style="width:100%; padding:10px; background:#1a1a1a; border:1px solid rgba(255,255,255,0.2); border-radius:8px; color:#fff;"></div>';
-            html += '<div><div style="color:#b0b0b0; font-size:12px; margin-bottom:6px;">Comment likes goal / video</div><input id="calc-comment-likes" type="number" min="0" step="1" placeholder="15" style="width:100%; padding:10px; background:#1a1a1a; border:1px solid rgba(255,255,255,0.2); border-radius:8px; color:#fff;"></div>';
+            html += '<div><div style="color:#b0b0b0; font-size:12px; margin-bottom:6px;">CPM ($ / 1000 views)</div><input id="calc-cpm" type="number" min="0" step="0.01" placeholder="2.50" style="width:100%; padding:10px; background:#1a1a1a; border:1px solid rgba(255,255,255,0.2); border-radius: 0; color:#fff;"></div>';
+            html += '<div><div style="color:#b0b0b0; font-size:12px; margin-bottom:6px;"># of videos</div><input id="calc-videos" type="number" min="1" step="1" placeholder="10" style="width:100%; padding:10px; background:#1a1a1a; border:1px solid rgba(255,255,255,0.2); border-radius: 0; color:#fff;"></div>';
+            html += '<div><div style="color:#b0b0b0; font-size:12px; margin-bottom:6px;">Views goal / video</div><input id="calc-views" type="number" min="0" step="1" placeholder="4000" style="width:100%; padding:10px; background:#1a1a1a; border:1px solid rgba(255,255,255,0.2); border-radius: 0; color:#fff;"></div>';
+            html += '<div><div style="color:#b0b0b0; font-size:12px; margin-bottom:6px;">Likes goal / video</div><input id="calc-likes" type="number" min="0" step="1" placeholder="125" style="width:100%; padding:10px; background:#1a1a1a; border:1px solid rgba(255,255,255,0.2); border-radius: 0; color:#fff;"></div>';
+            html += '<div><div style="color:#b0b0b0; font-size:12px; margin-bottom:6px;">Comments goal / video</div><input id="calc-comments" type="number" min="0" step="1" placeholder="7" style="width:100%; padding:10px; background:#1a1a1a; border:1px solid rgba(255,255,255,0.2); border-radius: 0; color:#fff;"></div>';
+            html += '<div><div style="color:#b0b0b0; font-size:12px; margin-bottom:6px;">Comment likes goal / video</div><input id="calc-comment-likes" type="number" min="0" step="1" placeholder="15" style="width:100%; padding:10px; background:#1a1a1a; border:1px solid rgba(255,255,255,0.2); border-radius: 0; color:#fff;"></div>';
             html += '</div>';
             html += '<div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.08); display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px;">';
-            html += '<div style="background:#1f1f1f; border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:12px;"><div style="color:#b0b0b0; font-size:12px;">Estimated Invest</div><div id="calc-invest" style="color:#ef4444; font-weight:800; font-size:18px;">$0.00</div></div>';
-            html += '<div style="background:#1f1f1f; border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:12px;"><div style="color:#b0b0b0; font-size:12px;">Estimated Earn</div><div id="calc-earn" style="color:#10b981; font-weight:800; font-size:18px;">$0.00</div></div>';
-            html += '<div style="background:#1f1f1f; border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:12px;"><div style="color:#b0b0b0; font-size:12px;">Profit</div><div id="calc-profit" style="color:#fff; font-weight:800; font-size:18px;">$0.00</div><div id="calc-roi" style="color:#b0b0b0; font-size:12px; margin-top:4px;">ROI: 0%</div></div>';
+            html += '<div style="background:#1f1f1f; border:1px solid rgba(255,255,255,0.06); border-radius: 0; padding: 8px;"><div style="color:#b0b0b0; font-size:12px;">Estimated Invest</div><div id="calc-invest" style="color:#ef4444; font-weight:800; font-size:18px;">$0.00</div></div>';
+            html += '<div style="background:#1f1f1f; border:1px solid rgba(255,255,255,0.06); border-radius: 0; padding: 8px;"><div style="color:#b0b0b0; font-size:12px;">Estimated Earn</div><div id="calc-earn" style="color:#10b981; font-weight:800; font-size:18px;">$0.00</div></div>';
+            html += '<div style="background:#1f1f1f; border:1px solid rgba(255,255,255,0.06); border-radius: 0; padding: 8px;"><div style="color:#b0b0b0; font-size:12px;">Profit</div><div id="calc-profit" style="color:#fff; font-weight:800; font-size:18px;">$0.00</div><div id="calc-roi" style="color:#b0b0b0; font-size:12px; margin-top:4px;">ROI: 0%</div></div>';
             html += '</div>';
             html += '<div style="margin-top: 10px; color: #888; font-size: 12px;">Uses current service rates (approx): Views $0.014 / 1k, Likes $0.21 / 1k, Comments $13.50 / 1k, Comment Likes $0.21 / 1k.</div>';
             html += '</div>';
@@ -4703,7 +4703,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     const durH = (campaign.target_duration_hours !== undefined) ? campaign.target_duration_hours : 24;
                     const durM = (campaign.target_duration_minutes !== undefined) ? campaign.target_duration_minutes : 0;
                     
-                    html += `<div class="campaign-card-clickable" data-campaign-id="${campaignId}" style="background: #2a2a2a; border-radius: 8px; padding: 15px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: all 0.2s; position: relative; display: flex; flex-direction: column;" onmouseover="this.style.borderColor='rgba(102,126,234,0.5)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.transform='translateY(0)';">
+                    html += `<div class="campaign-card-clickable" data-campaign-id="${campaignId}" style="background: #2a2a2a; border-radius: 0; padding: 10px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: all 0.2s; position: relative; display: flex; flex-direction: column;" onmouseover="this.style.borderColor='rgba(102,126,234,0.5)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.transform='translateY(0)';">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                             <h4 style="margin: 0; color: #fff; font-size: 1.1em; font-weight: 600;">${campaign.name || 'Unnamed Campaign'}</h4>
                             ${campaign.cpm > 0 ? `<span style="color: #667eea; font-size: 0.9em;">CPM: $${campaign.cpm.toFixed(2)}</span>` : '<span style="color: #888; font-size: 0.9em;">No CPM set</span>'}
@@ -4741,9 +4741,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             </div>` : ''}
                         </div>
                         <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px; margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
-                            <button class="edit-campaign-btn" data-campaign-id="${campaignId}" onclick="event.stopPropagation(); showEditCampaignModal('${campaignId}');" style="flex: 1; min-width: 80px; background: #2a2a2a; color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;" onmouseover="this.style.background='#333'; this.style.borderColor='rgba(255,255,255,0.3)';" onmouseout="this.style.background='#2a2a2a'; this.style.borderColor='rgba(255,255,255,0.2)';">Edit</button>
-                            <button class="add-video-to-campaign-btn" data-campaign-id="${campaignId}" onclick="event.stopPropagation(); showAddVideoToCampaignModal('${campaignId}');" style="flex: 1; min-width: 100px; background: #2a2a2a; color: #667eea; border: 1px solid rgba(102,126,234,0.3); padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;" onmouseover="this.style.background='#333'; this.style.borderColor='rgba(102,126,234,0.5)';" onmouseout="this.style.background='#2a2a2a'; this.style.borderColor='rgba(102,126,234,0.3)';">Add Video</button>
-                            ${campaign.status !== 'ended' ? `<button class="end-campaign-btn" data-campaign-id="${campaignId}" onclick="event.stopPropagation(); endCampaign('${campaignId}');" style="flex: 1; min-width: 120px; background: #2a2a2a; color: #ef4444; border: 1px solid rgba(239,68,68,0.3); padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;" onmouseover="this.style.background='#333'; this.style.borderColor='rgba(239,68,68,0.5)';" onmouseout="this.style.background='#2a2a2a'; this.style.borderColor='rgba(239,68,68,0.3)';">End Campaign</button>` : '<span style="flex: 1; color: #888; font-size: 11px; padding: 8px 12px; text-align: center;">Ended</span>'}
+                            <button class="edit-campaign-btn" data-campaign-id="${campaignId}" onclick="event.stopPropagation(); showEditCampaignModal('${campaignId}');" style="flex: 1; min-width: 80px; background: #2a2a2a; color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 0; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;" onmouseover="this.style.background='#333'; this.style.borderColor='rgba(255,255,255,0.3)';" onmouseout="this.style.background='#2a2a2a'; this.style.borderColor='rgba(255,255,255,0.2)';">Edit</button>
+                            <button class="add-video-to-campaign-btn" data-campaign-id="${campaignId}" onclick="event.stopPropagation(); showAddVideoToCampaignModal('${campaignId}');" style="flex: 1; min-width: 100px; background: #2a2a2a; color: #667eea; border: 1px solid rgba(102,126,234,0.3); padding: 8px 12px; border-radius: 0; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;" onmouseover="this.style.background='#333'; this.style.borderColor='rgba(102,126,234,0.5)';" onmouseout="this.style.background='#2a2a2a'; this.style.borderColor='rgba(102,126,234,0.3)';">Add Video</button>
+                            ${campaign.status !== 'ended' ? `<button class="end-campaign-btn" data-campaign-id="${campaignId}" onclick="event.stopPropagation(); endCampaign('${campaignId}');" style="flex: 1; min-width: 120px; background: #2a2a2a; color: #ef4444; border: 1px solid rgba(239,68,68,0.3); padding: 8px 12px; border-radius: 0; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;" onmouseover="this.style.background='#333'; this.style.borderColor='rgba(239,68,68,0.5)';" onmouseout="this.style.background='#2a2a2a'; this.style.borderColor='rgba(239,68,68,0.3)';">End Campaign</button>` : '<span style="flex: 1; color: #888; font-size: 11px; padding: 8px 12px; text-align: center;">Ended</span>'}
                         </div>
                     </div>`;
                 }
@@ -5488,10 +5488,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         <div style="margin-bottom: 15px;">
                             <div style="color: #b0b0b0; font-size: 0.9em; margin-bottom: 10px;">Quick Set (from now):</div>
                             <div class="target-input-group" style="margin-bottom: 10px;">
-                                <input type="number" id="quick-hours-${safeVideoUrlId}" placeholder="Hours" min="0" max="999" style="padding: 10px 12px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; width: 100px; font-size: 14px;">
+                                <input type="number" id="quick-hours-${safeVideoUrlId}" placeholder="Hours" min="0" max="999" style="padding: 10px 12px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 0; color: #fff; width: 100px; font-size: 14px;">
                                 <span style="color: #b0b0b0;">:</span>
-                                <input type="number" id="quick-minutes-${safeVideoUrlId}" placeholder="Minutes" min="0" max="59" style="padding: 10px 12px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; width: 100px; font-size: 14px;">
-                                <button class="quick-set-target-btn" data-video-url="${safeVideoUrlAttr}" data-hours-id="quick-hours-${safeVideoUrlId}" data-minutes-id="quick-minutes-${safeVideoUrlId}" style="background: #667eea; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600;">Quick Set</button>
+                                <input type="number" id="quick-minutes-${safeVideoUrlId}" placeholder="Minutes" min="0" max="59" style="padding: 10px 12px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 0; color: #fff; width: 100px; font-size: 14px;">
+                                <button class="quick-set-target-btn" data-video-url="${safeVideoUrlAttr}" data-hours-id="quick-hours-${safeVideoUrlId}" data-minutes-id="quick-minutes-${safeVideoUrlId}" style="background: #667eea; color: white; border: none; padding: 10px 20px; border-radius: 0; cursor: pointer; font-weight: 600;">Quick Set</button>
                             </div>
                         </div>
                         <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; margin-top: 15px;">
@@ -5518,15 +5518,15 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             <div class="metric-value">${formatNumber(totalViews)}</div>
                             <div class="metric-target">/ ${formatNumber(targetViews)} (${formatPercentage(totalViews, targetViews)})</div>
                             ${viewsOrdered > 0 ? `<div style="color: #667eea; font-size: 0.85em; margin-top: 3px;">📦 Orders placed: <strong>${viewsOrdersCount}</strong> (${formatNumber(viewsOrdered)} total ordered)</div>` : ''}
-                            ${viewsCatchUp > 0 && targetCompletionTime ? `<div style="background: rgba(239, 68, 68, 0.1); border-radius: 6px; padding: 8px; margin-top: 8px; font-size: 0.85em; border: 1px solid rgba(239, 68, 68, 0.3);">
+                            ${viewsCatchUp > 0 && targetCompletionTime ? `<div style="background: rgba(239, 68, 68, 0.1); border-radius: 0; padding: 8px; margin-top: 8px; font-size: 0.85em; border: 1px solid rgba(239, 68, 68, 0.3);">
                                 <div style="color: #ef4444; font-weight: 600; margin-bottom: 4px;">⚠️ Behind Schedule</div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Expected: <span style="color: #fff;">${formatNumber(Math.ceil(expectedViewsNow))}</span></div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Actual: <span style="color: #fff;">${formatNumber(totalViews)}</span></div>
                                 <div style="color: #b0b0b0; margin-bottom: 6px;">Gap: <span style="color: #ef4444; font-weight: 600;">${formatNumber(viewsCatchUp)}</span></div>
-                                <button class="catch-up-btn" data-video-url="${safeVideoUrlAttr}" data-metric="views" data-amount="${viewsCatchUp}" style="width: 100%; background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9em;">Catch Up (${formatNumber(viewsCatchUp)})</button>
+                                <button class="catch-up-btn" data-video-url="${safeVideoUrlAttr}" data-metric="views" data-amount="${viewsCatchUp}" style="width: 100%; background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 0; cursor: pointer; font-weight: 600; font-size: 0.9em;">Catch Up (${formatNumber(viewsCatchUp)})</button>
                             </div>` : ''}
                             ${viewsNeeded > 0 && hoursToViewsGoal > 0 ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;" data-time-to-goal data-hours="${hoursToViewsGoal}" data-metric="views">⏱️ <span data-countdown-to-goal>${formatTimeRemaining(hoursToViewsGoal)}</span> to goal</div>` : viewsNeeded <= 0 ? `<div style="color: #10b981; font-size: 0.85em; margin-top: 5px;">✓ Target reached</div>` : viewsNeeded > 0 && isTargetOverdue ? `<div style="color: #ef4444; font-size: 0.85em; margin-top: 5px;">⚠️ Past due</div>` : ''}
-                            ${nextViewsPurchase ? `<div style="background: rgba(102, 126, 234, 0.1); border-radius: 6px; padding: 8px; margin-top: 8px; font-size: 0.85em;">
+                            ${nextViewsPurchase ? `<div style="background: rgba(102, 126, 234, 0.1); border-radius: 0; padding: 8px; margin-top: 8px; font-size: 0.85em;">
                                 <div style="color: #667eea; font-weight: 600; margin-bottom: 4px;">🛒 Next Purchase</div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Time: <span data-next-purchase data-purchase-time="${nextViewsPurchase.nextPurchaseTime.toISOString()}" data-metric="views" style="color: #fff;"><span data-countdown-display>${formatTimeRemaining(nextViewsPurchase.timeUntilNext)}</span></span></div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Units: <span style="color: #fff;">${formatNumber(nextViewsPurchase.units)}</span> (min order)</div>
@@ -5535,9 +5535,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Already ordered: <span style="color: #10b981; font-weight: 600;">${formatNumber(viewsOrdered)}</span></div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Per order: <span style="color: #10b981; font-weight: 600;">$${nextViewsPurchase.cost.toFixed(4)}</span></div>
                                 <div style="color: #b0b0b0; margin-bottom: 6px;">Total cost: <span style="color: #10b981; font-weight: 600;">$${nextViewsPurchase.totalCost.toFixed(4)}</span></div>
-                                <button class="manual-order-btn" data-video-url="${safeVideoUrlAttr}" data-metric="views" data-minimum="50" style="width: 100%; background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9em; margin-top: 4px;">📦 Manual Order</button>
+                                <button class="manual-order-btn" data-video-url="${safeVideoUrlAttr}" data-metric="views" data-minimum="50" style="width: 100%; background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 0; cursor: pointer; font-weight: 600; font-size: 0.9em; margin-top: 4px;">📦 Manual Order</button>
                             </div>` : nextViewsPurchaseTime ? `<div style="color: #667eea; font-size: 0.85em; margin-top: 3px;" data-next-purchase data-purchase-time="${nextViewsPurchaseTime.toISOString()}" data-metric="views">🛒 Next purchase: <span data-countdown-display>${formatTimeRemaining((nextViewsPurchaseTime - now) / (1000 * 60 * 60))}</span></div>` : ''}
-                            ${targetViews > 0 ? `<button class="manual-order-btn" data-video-url="${safeVideoUrlAttr}" data-metric="views" data-minimum="50" style="width: 100%; background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85em; margin-top: 8px;">📦 Manual Order Views</button>` : ''}
+                            ${targetViews > 0 ? `<button class="manual-order-btn" data-video-url="${safeVideoUrlAttr}" data-metric="views" data-minimum="50" style="width: 100%; background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 0; cursor: pointer; font-weight: 600; font-size: 0.85em; margin-top: 8px;">📦 Manual Order Views</button>` : ''}
                             <div class="progress-bar-container">
                                 <div class="progress-bar" style="width: ${Math.min(viewsProgress, 100)}%">${formatPercentage(totalViews, targetViews)}</div>
                             </div>
@@ -5548,15 +5548,15 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             <div class="metric-value">${formatNumber(totalLikes)}</div>
                             <div class="metric-target">/ ${formatNumber(targetLikes)} (${formatPercentage(totalLikes, targetLikes)})</div>
                             ${likesOrdered > 0 ? `<div style="color: #667eea; font-size: 0.85em; margin-top: 3px;">📦 Orders placed: <strong>${likesOrdersCount}</strong> (${formatNumber(likesOrdered)} total ordered)</div>` : ''}
-                            ${likesCatchUp > 0 && targetCompletionTime ? `<div style="background: rgba(239, 68, 68, 0.1); border-radius: 6px; padding: 8px; margin-top: 8px; font-size: 0.85em; border: 1px solid rgba(239, 68, 68, 0.3);">
+                            ${likesCatchUp > 0 && targetCompletionTime ? `<div style="background: rgba(239, 68, 68, 0.1); border-radius: 0; padding: 8px; margin-top: 8px; font-size: 0.85em; border: 1px solid rgba(239, 68, 68, 0.3);">
                                 <div style="color: #ef4444; font-weight: 600; margin-bottom: 4px;">⚠️ Behind Schedule</div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Expected: <span style="color: #fff;">${formatNumber(Math.ceil(expectedLikesNow))}</span></div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Actual: <span style="color: #fff;">${formatNumber(totalLikes)}</span></div>
                                 <div style="color: #b0b0b0; margin-bottom: 6px;">Gap: <span style="color: #ef4444; font-weight: 600;">${formatNumber(likesCatchUp)}</span></div>
-                                <button class="catch-up-btn" data-video-url="${safeVideoUrlAttr}" data-metric="likes" data-amount="${likesCatchUp}" style="width: 100%; background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9em;">Catch Up (${formatNumber(likesCatchUp)})</button>
+                                <button class="catch-up-btn" data-video-url="${safeVideoUrlAttr}" data-metric="likes" data-amount="${likesCatchUp}" style="width: 100%; background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 0; cursor: pointer; font-weight: 600; font-size: 0.9em;">Catch Up (${formatNumber(likesCatchUp)})</button>
                             </div>` : ''}
                             ${likesNeeded > 0 && hoursToLikesGoal > 0 ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;" data-time-to-goal data-hours="${hoursToLikesGoal}" data-metric="likes">⏱️ <span data-countdown-to-goal>${formatTimeRemaining(hoursToLikesGoal)}</span> to goal</div>` : likesNeeded <= 0 ? `<div style="color: #10b981; font-size: 0.85em; margin-top: 5px;">✓ Target reached</div>` : likesNeeded > 0 && isTargetOverdue ? `<div style="color: #ef4444; font-size: 0.85em; margin-top: 5px;">⚠️ Past due</div>` : likesNeeded > 0 && targetCompletionTime ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;" data-time-to-goal data-hours="${hoursToTarget}" data-metric="likes">⏱️ <span data-countdown-to-goal>${formatTimeRemaining(hoursToTarget)}</span> to goal</div>` : ''}
-                            ${nextLikesPurchase ? `<div style="background: rgba(102, 126, 234, 0.1); border-radius: 6px; padding: 8px; margin-top: 8px; font-size: 0.85em;">
+                            ${nextLikesPurchase ? `<div style="background: rgba(102, 126, 234, 0.1); border-radius: 0; padding: 8px; margin-top: 8px; font-size: 0.85em;">
                                 <div style="color: #667eea; font-weight: 600; margin-bottom: 4px;">🛒 Next Purchase</div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Time: <span data-next-purchase data-purchase-time="${nextLikesPurchase.nextPurchaseTime.toISOString()}" data-metric="likes" style="color: #fff;"><span data-countdown-display>${formatTimeRemaining(nextLikesPurchase.timeUntilNext)}</span></span></div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Units: <span style="color: #fff;">${formatNumber(nextLikesPurchase.units)}</span> (min order)</div>
@@ -5565,9 +5565,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Already ordered: <span style="color: #10b981; font-weight: 600;">${formatNumber(likesOrdered)}</span></div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Per order: <span style="color: #10b981; font-weight: 600;">$${nextLikesPurchase.cost.toFixed(4)}</span></div>
                                 <div style="color: #b0b0b0; margin-bottom: 6px;">Total cost: <span style="color: #10b981; font-weight: 600;">$${nextLikesPurchase.totalCost.toFixed(4)}</span></div>
-                                <button class="manual-order-btn" data-video-url="${safeVideoUrlAttr}" data-metric="likes" data-minimum="10" style="width: 100%; background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9em; margin-top: 4px;">📦 Manual Order</button>
+                                <button class="manual-order-btn" data-video-url="${safeVideoUrlAttr}" data-metric="likes" data-minimum="10" style="width: 100%; background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 0; cursor: pointer; font-weight: 600; font-size: 0.9em; margin-top: 4px;">📦 Manual Order</button>
                             </div>` : nextLikesPurchaseTime ? `<div style="color: #667eea; font-size: 0.85em; margin-top: 3px;" data-next-purchase data-purchase-time="${nextLikesPurchaseTime.toISOString()}" data-metric="likes">🛒 Next purchase: <span data-countdown-display>${formatTimeRemaining((nextLikesPurchaseTime - now) / (1000 * 60 * 60))}</span></div>` : ''}
-                            ${targetLikes > 0 ? `<button class="manual-order-btn" data-video-url="${safeVideoUrlAttr}" data-metric="likes" data-minimum="10" style="width: 100%; background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85em; margin-top: 8px;">📦 Manual Order Likes</button>` : ''}
+                            ${targetLikes > 0 ? `<button class="manual-order-btn" data-video-url="${safeVideoUrlAttr}" data-metric="likes" data-minimum="10" style="width: 100%; background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 0; cursor: pointer; font-weight: 600; font-size: 0.85em; margin-top: 8px;">📦 Manual Order Likes</button>` : ''}
                             <div class="progress-bar-container">
                                 <div class="progress-bar" style="width: ${Math.min(likesProgress, 100)}%">${formatPercentage(totalLikes, targetLikes)}</div>
                             </div>
@@ -5579,7 +5579,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             <div class="metric-target">/ ${targetComments} (${formatPercentage(totalComments, targetComments)})</div>
                             ${commentsOrdered > 0 ? `<div style="color: #667eea; font-size: 0.85em; margin-top: 3px;">📦 Orders placed: <strong>${commentsOrdersCount}</strong> (${formatNumber(commentsOrdered)} total ordered)</div>` : ''}
                             ${commentsNeeded > 0 && hoursToCommentsGoal > 0 ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;" data-time-to-goal data-hours="${hoursToCommentsGoal}" data-metric="comments">⏱️ <span data-countdown-to-goal>${formatTimeRemaining(hoursToCommentsGoal)}</span> to goal</div>` : commentsNeeded <= 0 ? `<div style="color: #10b981; font-size: 0.85em; margin-top: 5px;">✓ Target reached</div>` : commentsNeeded > 0 && isTargetOverdue ? `<div style="color: #ef4444; font-size: 0.85em; margin-top: 5px;">⚠️ Past due</div>` : commentsNeeded > 0 && targetCompletionTime ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;" data-time-to-goal data-hours="${hoursToTarget}" data-metric="comments">⏱️ <span data-countdown-to-goal>${formatTimeRemaining(hoursToTarget)}</span> to goal</div>` : ''}
-                            ${nextCommentsPurchase ? `<div style="background: rgba(102, 126, 234, 0.1); border-radius: 6px; padding: 8px; margin-top: 8px; font-size: 0.85em;">
+                            ${nextCommentsPurchase ? `<div style="background: rgba(102, 126, 234, 0.1); border-radius: 0; padding: 8px; margin-top: 8px; font-size: 0.85em;">
                                 <div style="color: #667eea; font-weight: 600; margin-bottom: 4px;">🛒 Next Purchase</div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Time: <span data-next-purchase data-purchase-time="${nextCommentsPurchase.nextPurchaseTime.toISOString()}" data-metric="comments" style="color: #fff;"><span data-countdown-display>${formatTimeRemaining(nextCommentsPurchase.timeUntilNext)}</span></span></div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Units: <span style="color: #fff;">${formatNumber(nextCommentsPurchase.units)}</span> (min order)</div>
@@ -5600,7 +5600,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             <div class="metric-target">/ ${targetCommentLikes} (${formatPercentage(commentLikesOrdered, targetCommentLikes)})</div>
                             ${commentLikesOrdered > 0 ? `<div style="color: #667eea; font-size: 0.85em; margin-top: 3px;">📦 Orders placed: <strong>${commentLikesOrdersCount}</strong> (${formatNumber(commentLikesOrdered)} total ordered)</div>` : ''}
                             ${commentLikesNeeded > 0 && hoursToCommentLikesGoal > 0 ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;" data-time-to-goal data-hours="${hoursToCommentLikesGoal}" data-metric="comment_likes">⏱️ <span data-countdown-to-goal>${formatTimeRemaining(hoursToCommentLikesGoal)}</span> to goal</div>` : commentLikesNeeded <= 0 ? `<div style="color: #10b981; font-size: 0.85em; margin-top: 5px;">✓ Target reached</div>` : commentLikesNeeded > 0 && isTargetOverdue ? `<div style="color: #ef4444; font-size: 0.85em; margin-top: 5px;">⚠️ Past due</div>` : commentLikesNeeded > 0 && targetCompletionTime ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;" data-time-to-goal data-hours="${hoursToTarget}" data-metric="comment_likes">⏱️ <span data-countdown-to-goal>${formatTimeRemaining(hoursToTarget)}</span> to goal</div>` : ''}
-                            ${nextCommentLikesPurchase ? `<div style="background: rgba(102, 126, 234, 0.1); border-radius: 6px; padding: 8px; margin-top: 8px; font-size: 0.85em;">
+                            ${nextCommentLikesPurchase ? `<div style="background: rgba(102, 126, 234, 0.1); border-radius: 0; padding: 8px; margin-top: 8px; font-size: 0.85em;">
                                 <div style="color: #667eea; font-weight: 600; margin-bottom: 4px;">🛒 Next Purchase</div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Time: <span data-next-purchase data-purchase-time="${nextCommentLikesPurchase.nextPurchaseTime.toISOString()}" data-metric="comment_likes" style="color: #fff;"><span data-countdown-display>${formatTimeRemaining(nextCommentLikesPurchase.timeUntilNext)}</span></span></div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Units: <span style="color: #fff;">${formatNumber(nextCommentLikesPurchase.units)}</span> (min order)</div>
@@ -5613,7 +5613,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             <div class="progress-bar-container">
                                 <div class="progress-bar" style="width: ${Math.min(commentLikesProgress, 100)}%">${formatPercentage(commentLikesOrdered, targetCommentLikes)}</div>
                             </div>
-                            ${commentLikesNeeded > 0 && totalComments > 0 ? `<div style="margin-top: 10px;"><button class="select-comments-btn" data-video-url="${safeVideoUrlAttr}" style="background: #667eea; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 0.9em;">📝 Select Comments to Boost</button></div>` : commentLikesNeeded > 0 && totalComments === 0 ? `<div style="margin-top: 10px; color: #888; font-size: 0.85em;">No comments yet. Comments must be added before ordering likes.</div>` : ''}
+                            ${commentLikesNeeded > 0 && totalComments > 0 ? `<div style="margin-top: 10px;"><button class="select-comments-btn" data-video-url="${safeVideoUrlAttr}" style="background: #667eea; color: white; border: none; padding: 8px 16px; border-radius: 0; cursor: pointer; font-size: 0.9em;">📝 Select Comments to Boost</button></div>` : commentLikesNeeded > 0 && totalComments === 0 ? `<div style="margin-top: 10px; color: #888; font-size: 0.85em;">No comments yet. Comments must be added before ordering likes.</div>` : ''}
                         </div>
                     </div>
                     
@@ -5869,7 +5869,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                         ${savedComments.map(c => `<li>${String(c || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;')}</li>`).join('')}
                                     </ol>
                                     ${!hasCommentsOrdered && currentTotalViews >= commentsMilestone ? `
-                                    <button class="order-comments-btn" data-video-url="${safeVideoUrlAttr}" style="margin-top: 15px; padding: 10px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer; font-size: 14px; width: 100%;">
+                                    <button class="order-comments-btn" data-video-url="${safeVideoUrlAttr}" style="margin-top: 15px; padding: 10px 20px; background: #1a1a1a; border: none; border-radius: 0; color: white; font-weight: 600; cursor: pointer; font-size: 14px; width: 100%;">
                                         🚀 Order Comments Now
                                     </button>
                                     ` : ''}
@@ -5961,7 +5961,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         <div id="comments-status-${safeVideoUrlId}" class="comments-save-status"></div>
                     </div>
                     
-                    <div class="live-activity-section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 12px; margin-bottom: 30px; color: white;">
+                    <div class="live-activity-section" style="background: #1a1a1a; padding: 8px; border-radius: 0; margin-bottom: 16px; color: white;">
                         <h3 style="margin: 0 0 15px 0; color: white; font-size: 18px;">⚡ Live Activity Status</h3>
                         ${(function() {
                             const currentActivity = videoData.current_activity || {};
@@ -6440,7 +6440,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                     timeDisplay = seconds + 's';
                                 }
                                 
-                                statusHtml = '<div class="video-card-mini-activity" style="padding: 12px; margin: 12px 0; background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%); border-radius: 8px; border-left: 3px solid #667eea;">' +
+                                statusHtml = '<div class="video-card-mini-activity" style="padding: 8px; margin: 12px 0; background: #1a1a1a; border-radius: 0; border-left: 3px solid #667eea;">' +
                                     '<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">' +
                                     '<span style="font-size: 18px;">⏳</span>' +
                                     '<div style="flex: 1;">' +
@@ -6490,7 +6490,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 
                                 statusHtml += '</div>';
                             } else if (activityStatus === 'ordering') {
-                                statusHtml = '<div class="video-card-mini-activity" style="padding: 12px; margin: 12px 0; background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%); border-radius: 8px; border-left: 3px solid #667eea;">' +
+                                statusHtml = '<div class="video-card-mini-activity" style="padding: 8px; margin: 12px 0; background: #1a1a1a; border-radius: 0; border-left: 3px solid #667eea;">' +
                                     '<div style="display: flex; align-items: center; gap: 10px;">' +
                                     '<span style="font-size: 18px;">🔄</span>' +
                                     '<div style="flex: 1;">' +
@@ -6564,7 +6564,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                     
                                     const targetTimeDisplay = targetCompletionTimeLocal && hoursToTargetLocal > 0 ? ' (Target: ' + formatTimeRemaining(hoursToTargetLocal) + ')' : '';
                                     
-                                    statusHtml = '<div class="video-card-mini-activity" style="padding: 12px; margin: 12px 0; background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%); border-radius: 8px; border-left: 3px solid #667eea;">' +
+                                    statusHtml = '<div class="video-card-mini-activity" style="padding: 8px; margin: 12px 0; background: #1a1a1a; border-radius: 0; border-left: 3px solid #667eea;">' +
                                         '<div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px;">' +
                                         '<div style="opacity: 0.8;">Time to Goal: <strong style="color: ' + (hoursToGoal < 0 ? '#ef4444' : '#fff') + ';">' + timeToGoal + '</strong>' + targetTimeDisplay + '</div>' +
                                         '<div style="opacity: 0.8;">Rate: <strong style="color: #fff;">' + Math.round(combinedViewsPerHour) + '/hr</strong></div>' +
@@ -6575,8 +6575,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             
                             return statusHtml;
                         }())}
-                        <div class="video-card-mini-actions" style="padding: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
-                            <button class="show-analytics-btn" data-video-url="${safeVideoUrlAttr}" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer; font-size: 14px; transition: transform 0.2s, box-shadow 0.2s;">
+                        <div class="video-card-mini-actions" style="padding: 10px; border-top: 1px solid rgba(255,255,255,0.1);">
+                            <button class="show-analytics-btn" data-video-url="${safeVideoUrlAttr}" style="width: 100%; padding: 8px; background: #1a1a1a; border: none; border-radius: 0; color: white; font-weight: 600; cursor: pointer; font-size: 14px; transition: transform 0.2s, box-shadow 0.2s;">
                                 📊 Show Analytics
                             </button>
                         </div>
@@ -6756,8 +6756,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     return;
                 }
                 
-                let html = '<div style="background: #1a1a1a; border-radius: 8px; padding: 20px; border: 1px solid rgba(255,255,255,0.1);">';
-                html += '<h2 style="color: #fff; margin-bottom: 20px; font-size: 1.5em;">Order History</h2>';
+                let html = '<div style="background: #1a1a1a; border-radius: 0; padding: 8px; border: 1px solid rgba(255,255,255,0.1);">';
+                html += '<h2 style="color: #fff; margin-bottom: 12px; font-size: 1.5em;">Order History</h2>';
                 html += '<div style="display: grid; gap: 12px;">';
                 
                 for (const order of allOrders) {
@@ -6767,7 +6767,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     const typeColor = orderType === 'manual' ? '#10b981' : orderType === 'catch_up' ? '#ef4444' : '#667eea';
                     
                     html += `
-                        <div style="background: #2a2a2a; border-radius: 6px; padding: 16px; border: 1px solid rgba(255,255,255,0.08);">
+                        <div style="background: #2a2a2a; border-radius: 0; padding: 10px; border: 1px solid rgba(255,255,255,0.08);">
                             <div style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 12px;">
                                 <div style="flex: 1; min-width: 200px;">
                                     <div style="color: #fff; font-weight: 600; margin-bottom: 6px;">${order.service ? order.service.charAt(0).toUpperCase() + order.service.slice(1) : 'Unknown'}</div>
@@ -7144,7 +7144,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#667eea'};
                 color: white;
                 padding: 16px 24px;
-                border-radius: 8px;
+                border-radius: 0;
                 box-shadow: 0 4px 12px rgba(0,0,0,0.3);
                 z-index: 100000;
                 font-size: 14px;
@@ -7342,7 +7342,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         const financial = campaign.financial || {};
                         
                         html += '<div class="back-button" data-action="navigate-home">← Back to All Campaigns</div>';
-                        html += `<div style="background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); border-radius: 16px; padding: 30px; margin-bottom: 30px; border: 1px solid rgba(255,255,255,0.1);">`;
+                        html += `<div style="background: #1a1a1a; border-radius: 0; padding: 10px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.1);">`;
                         html += `<h1 style="color: #fff; font-size: 2em; margin-bottom: 10px;">${campaign.name || 'Unnamed Campaign'}</h1>`;
                         html += `<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px;">`;
                         html += `<div><div style="color: #b0b0b0; font-size: 0.9em;">CPM</div><div style="color: #fff; font-size: 1.5em; font-weight: 600;">$${campaign.cpm ? campaign.cpm.toFixed(2) : '0.00'}</div></div>`;
@@ -7359,7 +7359,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             html += `<div style="text-align: center; padding: 40px; color: #b0b0b0;">No videos in this campaign yet. Add videos using the "➕ Add Video" button.</div>`;
                         } else {
                             // Show loading indicator while rendering videos
-                            html += '<div id="campaign-videos-loading" style="text-align: center; padding: 20px; color: #b0b0b0;">Loading videos...</div>';
+                            html += '<div id="campaign-videos-loading" style="text-align: center; padding: 8px; color: #b0b0b0;">Loading videos...</div>';
                             html += '<div id="campaign-videos-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px;"></div>';
                         }
                     }
@@ -7608,66 +7608,72 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                     label: 'Views (Actual)',
                                     data: data.viewsData,
                                     borderColor: 'rgba(102, 126, 234, 1)',
-                                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                                    tension: 0.4,
+                                    backgroundColor: 'transparent',
+                                    tension: 0.1,
                                     fill: true,
                                     yAxisID: 'y',
-                                    borderWidth: 2,
-                                    spanGaps: false
+                                    borderWidth: 3,
+                                    spanGaps: false,
+                                    pointRadius: 3,
+                                    pointHoverRadius: 5
                                 }, {
                                     label: 'Views (Expected)',
                                     data: data.expectedViewsData || [],
                                     borderColor: 'rgba(102, 126, 234, 0.8)',
                                     backgroundColor: 'transparent',
                                     borderDash: [8, 4],
-                                    tension: 0.4,
+                                    tension: 0.1,
                                     fill: false,
                                     yAxisID: 'y',
-                                    borderWidth: 2.5,
+                                    borderWidth: 3,
                                     pointRadius: 0,
                                     order: 0
                                 }, {
                                     label: 'Likes (Actual)',
                                     data: data.likesData,
                                     borderColor: 'rgba(16, 185, 129, 1)',
-                                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                                    tension: 0.4,
+                                    backgroundColor: 'transparent',
+                                    tension: 0.1,
                                     fill: true,
                                     yAxisID: 'y',
-                                    borderWidth: 2,
-                                    spanGaps: false
+                                    borderWidth: 3,
+                                    spanGaps: false,
+                                    pointRadius: 3,
+                                    pointHoverRadius: 5
                                 }, {
                                     label: 'Likes (Expected)',
                                     data: data.expectedLikesData || [],
                                     borderColor: 'rgba(16, 185, 129, 0.8)',
                                     backgroundColor: 'transparent',
                                     borderDash: [8, 4],
-                                    tension: 0.4,
+                                    tension: 0.1,
                                     fill: false,
                                     yAxisID: 'y',
-                                    borderWidth: 2.5,
+                                    borderWidth: 3,
                                     pointRadius: 0,
                                     order: 0
                                 }, {
                                     label: 'Comments (Actual)',
                                     data: data.commentsData,
                                     borderColor: 'rgba(239, 68, 68, 1)',
-                                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                                    tension: 0.4,
+                                    backgroundColor: 'transparent',
+                                    tension: 0.1,
                                     fill: true,
                                     yAxisID: 'y1',
-                                    borderWidth: 2,
-                                    spanGaps: false
+                                    borderWidth: 3,
+                                    spanGaps: false,
+                                    pointRadius: 3,
+                                    pointHoverRadius: 5
                                 }, {
                                     label: 'Comments (Expected)',
                                     data: data.expectedCommentsData || [],
                                     borderColor: 'rgba(239, 68, 68, 0.8)',
                                     backgroundColor: 'transparent',
                                     borderDash: [8, 4],
-                                    tension: 0.4,
+                                    tension: 0.1,
                                     fill: false,
                                     yAxisID: 'y1',
-                                    borderWidth: 2.5,
+                                    borderWidth: 3,
                                     pointRadius: 0,
                                     order: 0
                                 }]

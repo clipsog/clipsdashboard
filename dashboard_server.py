@@ -2137,78 +2137,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header('Content-type', 'application/json')
         self.send_header('Access-Control-Allow-Origin', '*')
-            self.send_header('Content-Length', str(len(response_data)))
-            self.end_headers()
-            self.wfile.write(response_data.encode())
-    
-    def handle_end_campaign(self):
-        """End a campaign (mark as ended but keep for stats)"""
-        try:
-            parsed_path = urllib.parse.urlparse(self.path)
-            query_string = parsed_path.query
-            
-            if self.command == 'GET':
-                params = urllib.parse.parse_qs(query_string)
-            else:
-                content_length = int(self.headers.get('Content-Length', 0))
-                if content_length > 0:
-                    post_data = self.rfile.read(content_length)
-                    params = urllib.parse.parse_qs(post_data.decode())
-                else:
-                    params = {}
-            
-            campaign_id = params.get('campaign_id', [None])[0]
-            
-            if not campaign_id:
-                response_data = json.dumps({'success': False, 'error': 'Missing campaign_id'})
-                self.send_response(400)
-                self.send_header('Content-type', 'application/json')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.send_header('Content-Length', str(len(response_data)))
-                self.end_headers()
-                self.wfile.write(response_data.encode())
-                return
-            
-            campaigns = self.load_campaigns()
-            
-            if campaign_id not in campaigns:
-                response_data = json.dumps({'success': False, 'error': 'Campaign not found'})
-                self.send_response(404)
-                self.send_header('Content-type', 'application/json')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.send_header('Content-Length', str(len(response_data)))
-                self.end_headers()
-                self.wfile.write(response_data.encode())
-                return
-            
-            # Mark campaign as ended
-            campaigns[campaign_id]['status'] = 'ended'
-            campaigns[campaign_id]['ended_at'] = datetime.now().isoformat()
-            
-            self.save_campaigns(campaigns)
-            
-            response_data = json.dumps({
-                'success': True,
-                'message': 'Campaign ended successfully'
-            })
-            self.send_response(200)
-            self.send_header('Content-type', 'application/json')
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.send_header('Content-Length', str(len(response_data)))
-            self.end_headers()
-            self.wfile.write(response_data.encode())
-            
-        except Exception as e:
-            print(f"EXCEPTION in handle_end_campaign: {str(e)}")
-            import traceback
-            traceback.print_exc()
-            response_data = json.dumps({'success': False, 'error': str(e)})
-            self.send_response(500)
-            self.send_header('Content-type', 'application/json')
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.send_header('Content-Length', str(len(response_data)))
-            self.end_headers()
-            self.wfile.write(response_data.encode())
+        self.send_header('Content-Length', str(len(response_data)))
+        self.end_headers()
+        self.wfile.write(response_data.encode())
     
     def handle_end_campaign(self):
         """End a campaign (mark as ended but keep for stats)"""

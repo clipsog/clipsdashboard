@@ -3194,43 +3194,40 @@ class DashboardHandler(BaseHTTPRequestHandler):
         
         /* Summary Statistics */
         .summary-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            display: flex;
+            gap: 24px;
+            margin-bottom: 20px;
+            padding: 12px 16px;
+            background: #1a1a1a;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.08);
+            flex-wrap: wrap;
+            align-items: center;
         }
         
         .summary-stat-card {
-            background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
-            border-radius: 12px;
-            padding: 25px;
-            border: 1px solid rgba(255,255,255,0.1);
-            transition: all 0.2s;
-        }
-        
-        .summary-stat-card:hover {
-            transform: translateY(-2px);
-            border-color: rgba(102, 126, 234, 0.3);
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            flex: 0 1 auto;
         }
         
         .summary-stat-label {
-            color: #b0b0b0;
-            font-size: 0.9em;
-            margin-bottom: 10px;
+            color: #888;
+            font-size: 0.75em;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            font-weight: 500;
         }
         
         .summary-stat-value {
             color: #ffffff;
-            font-size: 2em;
-            font-weight: 700;
+            font-size: 1.1em;
+            font-weight: 600;
         }
         
         .summary-stat-change {
-            margin-top: 8px;
-            font-size: 0.85em;
-            color: #888;
+            display: none;
         }
         
         /* Search and Filter Bar */
@@ -3397,11 +3394,13 @@ class DashboardHandler(BaseHTTPRequestHandler):
             }
             
             .summary-stats {
-                grid-template-columns: 1fr !important;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
             }
             
-            .summary-stat {
-                padding: 15px;
+            .summary-stat-card {
+                width: 100%;
             }
         }
         

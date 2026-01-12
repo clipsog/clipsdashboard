@@ -74,24 +74,26 @@ def run_continuous_bot():
                     # The check_and_place_due_orders method will determine if orders are actually due
                     if has_start_time and has_target:
                         videos_need_check.append(video_url)
+                    
                     # Also check videos with expired timers (for immediate response)
-                    else:
-                        next_views_time = video_progress.get('next_views_purchase_time')
-                        next_likes_time = video_progress.get('next_likes_purchase_time')
-                        next_comments_time = video_progress.get('next_comments_purchase_time')
-                        next_comment_likes_time = video_progress.get('next_comment_likes_purchase_time')
-                        
-                        # Check if any timer has expired
-                        if any([next_views_time, next_likes_time, next_comments_time, next_comment_likes_time]):
-                            for timer_str in [next_views_time, next_likes_time, next_comments_time, next_comment_likes_time]:
-                                if timer_str:
-                                    try:
-                                        purchase_time = datetime.fromisoformat(timer_str.replace('Z', '+00:00'))
-                                        if purchase_time <= now:
+                    # This runs independently of the campaign check above
+                    next_views_time = video_progress.get('next_views_purchase_time')
+                    next_likes_time = video_progress.get('next_likes_purchase_time')
+                    next_comments_time = video_progress.get('next_comments_purchase_time')
+                    next_comment_likes_time = video_progress.get('next_comment_likes_purchase_time')
+                    
+                    # Check if any timer has expired
+                    if any([next_views_time, next_likes_time, next_comments_time, next_comment_likes_time]):
+                        for timer_str in [next_views_time, next_likes_time, next_comments_time, next_comment_likes_time]:
+                            if timer_str:
+                                try:
+                                    purchase_time = datetime.fromisoformat(timer_str.replace('Z', '+00:00'))
+                                    if purchase_time <= now:
+                                        if video_url not in videos_need_check:
                                             videos_need_check.append(video_url)
-                                            break
-                                    except:
-                                        pass
+                                        break
+                                except:
+                                    pass
                         
                 except Exception as e:
                     print(f"❌ Error checking {video_url}: {e}")

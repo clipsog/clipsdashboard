@@ -4671,11 +4671,20 @@ class DashboardHandler(BaseHTTPRequestHandler):
             const savedNextCommentsTime = videoData.next_comments_purchase_time ? new Date(videoData.next_comments_purchase_time) : null;
             const savedNextCommentLikesTime = videoData.next_comment_likes_purchase_time ? new Date(videoData.next_comment_likes_purchase_time) : null;
             
-            // Use saved times if they're still in the future, otherwise calculate new ones
-            let nextViewsPurchaseTime = (savedNextViewsTime && savedNextViewsTime > now) ? savedNextViewsTime : null;
-            let nextLikesPurchaseTime = (savedNextLikesTime && savedNextLikesTime > now) ? savedNextLikesTime : null;
-            let nextCommentsPurchaseTime = (savedNextCommentsTime && savedNextCommentsTime > now) ? savedNextCommentsTime : null;
-            let nextCommentLikesPurchaseTime = (savedNextCommentLikesTime && savedNextCommentLikesTime > now) ? savedNextCommentLikesTime : null;
+            // Use saved times if they're still in the future OR recently expired (within 10 minutes)
+            // This gives the bot time to place orders before recalculating
+            const GRACE_PERIOD_MS = 10 * 60 * 1000; // 10 minutes
+            
+            const isRecentlyExpired = (savedTime) => {
+                if (!savedTime) return false;
+                const expiredAgo = now - savedTime;
+                return expiredAgo >= 0 && expiredAgo <= GRACE_PERIOD_MS;
+            };
+            
+            let nextViewsPurchaseTime = (savedNextViewsTime && (savedNextViewsTime > now || isRecentlyExpired(savedNextViewsTime))) ? savedNextViewsTime : null;
+            let nextLikesPurchaseTime = (savedNextLikesTime && (savedNextLikesTime > now || isRecentlyExpired(savedNextLikesTime))) ? savedNextLikesTime : null;
+            let nextCommentsPurchaseTime = (savedNextCommentsTime && (savedNextCommentsTime > now || isRecentlyExpired(savedNextCommentsTime))) ? savedNextCommentsTime : null;
+            let nextCommentLikesPurchaseTime = (savedNextCommentLikesTime && (savedNextCommentLikesTime > now || isRecentlyExpired(savedNextCommentLikesTime))) ? savedNextCommentLikesTime : null;
             
             // Calculate next purchase info for each metric (only if we don't have saved times)
             let nextViewsPurchase = null;

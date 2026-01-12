@@ -1391,14 +1391,18 @@ class DashboardHandler(BaseHTTPRequestHandler):
             
             # Rebuild campaign videos from progress.json (ensure persistence after restarts)
             # This ensures videos with campaign_id in progress.json are added to campaigns
+            # This is critical for persistence - if server restarts, videos are restored
             for video_url, video_data in progress.items():
                 campaign_id = video_data.get('campaign_id')
                 if campaign_id and campaign_id in campaigns:
+                    # Initialize videos list if it doesn't exist
                     if 'videos' not in campaigns[campaign_id]:
                         campaigns[campaign_id]['videos'] = []
+                    # Add video if not already in list (prevents duplicates)
                     if video_url not in campaigns[campaign_id]['videos']:
                         campaigns[campaign_id]['videos'].append(video_url)
                         campaigns_changed = True
+                        print(f"Rebuilt: Added video {video_url[:50]}... to campaign {campaign_id}")
             
             # Calculate financial data for each campaign
             for campaign_id, campaign_data in campaigns.items():
@@ -1456,9 +1460,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 profit = total_earned - total_spent
                 roi = (profit / total_spent * 100) if total_spent > 0 else 0
                 
-                # Remove videos that no longer exist in progress
+                # Clean up: Remove videos that no longer exist in progress
+                # But keep videos that have campaign_id set (they'll be rebuilt)
+                original_count = len(video_urls)
                 campaign_data['videos'] = [v for v in video_urls if v in progress]
-                if len(campaign_data['videos']) != len(video_urls):
+                if len(campaign_data['videos']) != original_count:
                     campaigns_changed = True
                 
                 campaign_data['financial'] = {
@@ -2286,14 +2292,19 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     camp_data['videos'] = [v for v in camp_data.get('videos', []) if v not in video_urls]
             
             # Add videos to selected campaign
+            # Ensure all videos in video_urls that exist in progress are added
             existing_videos = set(campaigns[campaign_id].get('videos', []))
-            new_videos = [v for v in video_urls if v in progress and v not in existing_videos]
-            campaigns[campaign_id]['videos'] = list(existing_videos) + new_videos
+            # Add all videos that exist in progress to the campaign
+            for video_url in video_urls:
+                if video_url in progress:
+                    existing_videos.add(video_url)
+            campaigns[campaign_id]['videos'] = list(existing_videos)
             
             # Update video campaign assignments in progress (and apply campaign goals)
             campaign = campaigns.get(campaign_id, {})
             for video_url in video_urls:
                 if video_url in progress:
+                    # Always set campaign_id to ensure persistence
                     progress[video_url]['campaign_id'] = campaign_id
 
                     # Apply campaign goals to each post (per-video)

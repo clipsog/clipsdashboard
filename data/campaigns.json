@@ -1,0 +1,82 @@
+{
+  "campaign_1_1768093788": {
+    "name": "Marty Supreme",
+    "cpm": 3.0,
+    "videos": [
+      "https://www.tiktok.com/@the.clips.origins/video/7593452575140187410",
+      "https://www.tiktok.com/@the.clips.origins/video/7593461497490181384",
+      "https://www.tiktok.com/@the.clips.origins/video/7593440632790650119",
+      "https://www.tiktok.com/@the.clips.origins/video/7593456227598847240"
+    ],
+    "created_at": "2026-01-10T20:09:48.062629",
+    "target_views": 4000,
+    "target_likes": 125,
+    "target_comments": 7,
+    "target_comment_likes": 15,
+    "target_duration_hours": 24,
+    "target_duration_minutes": 0,
+    "financial": {
+      "total_spent": 0.29,
+      "total_views": 9437,
+      "total_earned": 28.31,
+      "profit": 28.02,
+      "roi": 9559.16
+    }
+  },
+  "campaign_2_1768143606": {
+    "name": "David Kuhsner (ASH)",
+    "cpm": 1.0,
+    "target_views": 4000,
+    "target_likes": 125,
+    "target_comments": 10,
+    "target_comment_likes": 15,
+    "target_duration_hours": 24,
+    "target_duration_minutes": 0,
+    "videos": [
+      "https://www.tiktok.com/@the.clips.origins/video/7594132553569783058",
+      "https://www.tiktok.com/@the.clips.origins/video/7594136221153037575",
+      "https://www.tiktok.com/@the.clips.origins/video/7594134744862887186",
+      "https://www.tiktok.com/@the.clips.origins/video/7594133296389426440"
+    ],
+    "created_at": "2026-01-11T10:00:06.729082"
+  },
+  "campaign_3_1768152575": {
+    "name": "Peter Thomas Roth (Superclip)",
+    "cpm": 2.25,
+    "target_views": 3000,
+    "target_likes": 65,
+    "target_comments": 7,
+    "target_comment_likes": 15,
+    "target_duration_hours": 15,
+    "target_duration_minutes": 0,
+    "videos": [
+      "https://vt.tiktok.com/ZS5tV8kGG/",
+      "https://vt.tiktok.com/ZS5t4Tt5F/"
+    ],
+    "created_at": "2026-01-11T12:29:35.485176"
+  },
+  "campaign_4_1768152841": {
+    "name": "Muha",
+    "cpm": 3.0,
+    "target_views": 2000,
+    "target_likes": 60,
+    "target_comments": 7,
+    "target_comment_likes": 15,
+    "target_duration_hours": 24,
+    "target_duration_minutes": 0,
+    "videos": [],
+    "created_at": "2026-01-11T12:34:01.886197"
+  },
+  "campaign_5_1768188825": {
+    "name": "Rein me in (clipster)",
+    "cpm": 0.3,
+    "target_views": 4000,
+    "target_likes": 95,
+    "target_comments": 7,
+    "target_comment_likes": 15,
+    "target_duration_hours": 24,
+    "target_duration_minutes": 0,
+    "videos": [],
+    "created_at": "2026-01-11T22:33:45.074431"
+  }
+}

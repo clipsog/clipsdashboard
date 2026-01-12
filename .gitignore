@@ -12,7 +12,8 @@ build/
 .venv
 venv/
 ENV/
-data/
+data/*
+!data/*.json
 *.log
 .pytest_cache/
 .coverage

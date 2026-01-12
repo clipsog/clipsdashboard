@@ -1,0 +1,2690 @@
+{
+  "https://www.tiktok.com/@the.clips.origins/video/7593452575140187410": {
+    "start_time": "2026-01-09T23:43:29.443181",
+    "target_views": 4000,
+    "target_likes": 125,
+    "target_comments": 7,
+    "target_comment_likes": 15,
+    "orders_placed": {
+      "views": 550,
+      "likes": 30,
+      "comments": 10,
+      "comment_likes": 0
+    },
+    "order_history": [
+      {
+        "timestamp": "2026-01-09T23:43:29.965385",
+        "service": "views",
+        "quantity": 50,
+        "order_id": 58211790
+      },
+      {
+        "timestamp": "2026-01-09T23:43:32.398626",
+        "service": "likes",
+        "quantity": 10,
+        "order_id": 58211791
+      },
+      {
+        "timestamp": "2026-01-09T23:45:11.000399",
+        "service": "views",
+        "quantity": 50,
+        "order_id": 58211801
+      },
+      {
+        "timestamp": "2026-01-09T23:46:13.788251",
+        "service": "views",
+        "quantity": 50,
+        "order_id": 58211809
+      },
+      {
+        "timestamp": "2026-01-09T23:47:01.572287",
+        "service": "views",
+        "quantity": 50,
+        "order_id": 58211816
+      },
+      {
+        "timestamp": "2026-01-09T23:49:10.060861",
+        "service": "views",
+        "quantity": 50,
+        "order_id": 58211838
+      },
+      {
+        "timestamp": "2026-01-09T23:49:32.411779",
+        "service": "views",
+        "quantity": 50,
+        "order_id": 58211844
+      },
+      {
+        "timestamp": "2026-01-09T23:50:01.198105",
+        "service": "views",
+        "quantity": 50,
+        "order_id": 58211845
+      },
+      {
+        "timestamp": "2026-01-09T23:50:03.631710",
+        "service": "likes",
+        "quantity": 10,
+        "order_id": 58211846
+      },
+      {
+        "timestamp": "2026-01-09T23:50:34.256524",
+        "service": "views",
+        "quantity": 50,
+        "order_id": 58211848
+      },
+      {
+        "timestamp": "2026-01-09T23:54:58.726995",
+        "service": "views",
+        "quantity": 50,
+        "order_id": 58211877
+      },
+      {
+        "timestamp": "2026-01-09T23:55:20.655685",
+        "service": "comments",
+        "quantity": 10,
+        "order_id": 58211883
+      },
+      {
+        "timestamp": "2026-01-09T23:55:21.117643",
+        "service": "views",
+        "quantity": 50,
+        "order_id": 58211884
+      },
+      {
+        "timestamp": "2026-01-10T00:07:37.301811",
+        "service": "views",
+        "quantity": 50,
+        "order_id": 58211980
+      },
+      {
+        "timestamp": "2026-01-10T00:07:39.757422",
+        "service": "likes",
+        "quantity": 10,
+        "order_id": 58211981
+      }
+    ],
+    "next_orders": [],
+    "total_cost": 0.14900000000000002,
+    "initial_views": 3161,
+    "initial_likes": 0,
+    "target_completion_time": "2026-01-10T21:40:00",
+    "target_completion_datetime": "2026-01-10T21:40:00",
+    "real_views": 3375,
+    "real_likes": 69,
+    "real_comments": 4,
+    "growth_history": [
+      {
+        "timestamp": "2026-01-09T23:43:29.443181",
+        "views": 3161,
+        "likes": 0,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-10T11:45:41.523639",
+        "views": 3368,
+        "likes": 69,
+        "comments": 4
+      },
+      {
+        "timestamp": "2026-01-10T12:37:58.912698",
+        "views": 3369,
+        "likes": 69,
+        "comments": 4
+      },
+      {
+        "timestamp": "2026-01-11T09:21:07.837641",
+        "views": 3371,
+        "likes": 69,
+        "comments": 4
+      },
+      {
+        "timestamp": "2026-01-11T20:08:46.735553",
+        "views": 3372,
+        "likes": 69,
+        "comments": 4
+      },
+      {
+        "timestamp": "2026-01-11T20:18:37.498250",
+        "views": 3373,
+        "likes": 69,
+        "comments": 4
+      },
+      {
+        "timestamp": "2026-01-12T01:39:33.154363",
+        "views": 3374,
+        "likes": 69,
+        "comments": 4
+      },
+      {
+        "timestamp": "2026-01-12T12:12:22.768292",
+        "views": 3375,
+        "likes": 69,
+        "comments": 4
+      }
+    ],
+    "campaign_id": "campaign_1_1768093788"
+  },
+  "https://www.tiktok.com/@the.clips.origins/video/7593461497490181384": {
+    "start_time": "2026-01-10T00:24:32.283150",
+    "target_views": 4000,
+    "target_likes": 125,
+    "target_comments": 7,
+    "target_comment_likes": 15,
+    "initial_views": 2281,
+    "initial_likes": 59,
+    "initial_comments": 1,
+    "real_views": 2369,
+    "real_likes": 59,
+    "real_comments": 1,
+    "orders_placed": {
+      "views": 100,
+      "likes": 10,
+      "comments": 0,
+      "comment_likes": 0
+    },
+    "order_history": [
+      {
+        "timestamp": "2026-01-10T00:27:30.238669",
+        "service": "views",
+        "quantity": 50,
+        "order_id": 58212133
+      },
+      {
+        "timestamp": "2026-01-10T00:29:44.211250",
+        "service": "views",
+        "quantity": 50,
+        "order_id": 58212151
+      },
+      {
+        "timestamp": "2026-01-10T00:29:50.021408",
+        "service": "likes",
+        "quantity": 10,
+        "order_id": 58212152
+      }
+    ],
+    "next_orders": [],
+    "total_cost": 0.0035,
+    "target_completion_time": "2026-01-10T22:24:00",
+    "target_completion_datetime": "2026-01-10T22:24:00",
+    "growth_history": [
+      {
+        "timestamp": "2026-01-10T00:24:32.283150",
+        "views": 2281,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-10T14:27:23.916334",
+        "views": 2283,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-10T15:20:52.832109",
+        "views": 2284,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-10T18:43:20.636713",
+        "views": 2285,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-11T09:21:08.531250",
+        "views": 2286,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-11T10:53:52.417230",
+        "views": 2287,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-11T12:15:17.303055",
+        "views": 2288,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-11T14:17:10.303757",
+        "views": 2289,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-11T20:08:47.404730",
+        "views": 2298,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-11T20:37:37.894844",
+        "views": 2299,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-11T23:31:09.843810",
+        "views": 2300,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-11T23:58:41.964675",
+        "views": 2301,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T01:18:34.677473",
+        "views": 2302,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T01:20:33.937788",
+        "views": 2303,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T01:31:33.974118",
+        "views": 2304,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T01:37:33.726803",
+        "views": 2307,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T02:06:33.753912",
+        "views": 2308,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T02:24:33.632729",
+        "views": 2309,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T02:56:33.519102",
+        "views": 2310,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T05:09:58.010700",
+        "views": 2315,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T07:58:40.280332",
+        "views": 2332,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T08:02:52.157374",
+        "views": 2333,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T08:03:48.522341",
+        "views": 2334,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T08:08:34.247257",
+        "views": 2335,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T08:13:34.574873",
+        "views": 2336,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T08:14:48.547573",
+        "views": 2337,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T08:19:49.458675",
+        "views": 2338,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T08:25:16.154358",
+        "views": 2339,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T08:31:16.427448",
+        "views": 2340,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T08:40:34.569509",
+        "views": 2341,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T08:41:34.389701",
+        "views": 2342,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T08:42:03.334965",
+        "views": 2343,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T08:42:34.135358",
+        "views": 2344,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T08:43:04.091864",
+        "views": 2345,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T08:44:34.410435",
+        "views": 2346,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T08:51:22.213903",
+        "views": 2347,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T08:58:50.105819",
+        "views": 2348,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T09:01:49.964872",
+        "views": 2349,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T09:06:32.232716",
+        "views": 2351,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T09:12:01.834457",
+        "views": 2352,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T09:15:17.491251",
+        "views": 2353,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T09:19:20.150890",
+        "views": 2354,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T09:20:37.296829",
+        "views": 2355,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T09:29:38.167211",
+        "views": 2356,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T09:40:34.729959",
+        "views": 2357,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T09:41:35.067206",
+        "views": 2358,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T09:42:34.703892",
+        "views": 2359,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T10:15:34.317548",
+        "views": 2361,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T10:18:34.506495",
+        "views": 2362,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T10:19:34.154380",
+        "views": 2364,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T11:10:33.283829",
+        "views": 2366,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T11:17:33.012158",
+        "views": 2367,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T11:21:34.064263",
+        "views": 2368,
+        "likes": 59,
+        "comments": 1
+      },
+      {
+        "timestamp": "2026-01-12T11:36:34.537844",
+        "views": 2369,
+        "likes": 59,
+        "comments": 1
+      }
+    ],
+    "campaign_id": "campaign_1_1768093788"
+  },
+  "https://www.tiktok.com/@the.clips.origins/video/7593440632790650119": {
+    "start_time": "2026-01-10T07:35:40.045418",
+    "target_views": 4000,
+    "target_likes": 125,
+    "target_comments": 7,
+    "target_comment_likes": 15,
+    "initial_views": 2104,
+    "initial_likes": 94,
+    "initial_comments": 0,
+    "real_views": 2217,
+    "real_likes": 97,
+    "real_comments": 10,
+    "orders_placed": {
+      "views": 100,
+      "likes": 20,
+      "comments": 10,
+      "comment_likes": 0
+    },
+    "order_history": [
+      {
+        "timestamp": "2026-01-10T07:45:10.849982",
+        "service": "views",
+        "quantity": 50,
+        "order_id": 58218097
+      },
+      {
+        "timestamp": "2026-01-10T07:45:16.722921",
+        "service": "likes",
+        "quantity": 10,
+        "order_id": 58218099
+      },
+      {
+        "timestamp": "2026-01-10T07:55:51.267068",
+        "service": "views",
+        "quantity": 50,
+        "order_id": 58218277
+      },
+      {
+        "timestamp": "2026-01-10T07:55:56.589740",
+        "service": "likes",
+        "quantity": 10,
+        "order_id": 58218278
+      },
+      {
+        "timestamp": "2026-01-10T18:44:00.551788",
+        "service": "comments",
+        "quantity": 10,
+        "order_id": 58225814
+      }
+    ],
+    "next_orders": [],
+    "total_cost": 0.0056,
+    "saved_comments": [
+      "himothee Chalamet",
+      "Masterclass",
+      "Esdeekid's friend is goated",
+      "Overated imo",
+      "\ud83d\ude2d",
+      "Ping Pong Movie btw",
+      "Still haven't watched it",
+      "Dunes better",
+      "Focused",
+      "Goat"
+    ],
+    "target_completion_time": "2026-01-10T22:24:00",
+    "target_completion_datetime": "2026-01-10T22:24:00",
+    "growth_history": [
+      {
+        "timestamp": "2026-01-10T07:35:40.045418",
+        "views": 2104,
+        "likes": 94,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-10T12:45:16.499647",
+        "views": 2105,
+        "likes": 94,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-10T14:27:24.563426",
+        "views": 2107,
+        "likes": 94,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-10T14:36:24.704473",
+        "views": 2108,
+        "likes": 94,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-10T17:09:14.966240",
+        "views": 2109,
+        "likes": 94,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-10T17:37:23.940058",
+        "views": 2111,
+        "likes": 94,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-10T17:41:35.126660",
+        "views": 2112,
+        "likes": 94,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-10T17:50:33.324518",
+        "views": 2113,
+        "likes": 94,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-10T17:50:40.352545",
+        "views": 2113,
+        "likes": 95,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-10T18:14:10.804147",
+        "views": 2114,
+        "likes": 95,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-10T18:14:21.054290",
+        "views": 2115,
+        "likes": 95,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-10T18:19:30.908102",
+        "views": 2116,
+        "likes": 95,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-10T19:32:20.444585",
+        "views": 2117,
+        "likes": 95,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-10T19:36:56.560903",
+        "views": 2118,
+        "likes": 95,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-10T20:12:53.829060",
+        "views": 2119,
+        "likes": 95,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-10T20:13:06.962165",
+        "views": 2119,
+        "likes": 96,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T09:21:09.130330",
+        "views": 2145,
+        "likes": 96,
+        "comments": 10
+      },
+      {
+        "timestamp": "2026-01-11T09:33:53.230923",
+        "views": 2146,
+        "likes": 96,
+        "comments": 10
+      },
+      {
+        "timestamp": "2026-01-11T11:41:55.321434",
+        "views": 2148,
+        "likes": 96,
+        "comments": 10
+      },
+      {
+        "timestamp": "2026-01-11T12:19:56.747861",
+        "views": 2149,
+        "likes": 96,
+        "comments": 10
+      },
+      {
+        "timestamp": "2026-01-11T13:50:36.738355",
+        "views": 2150,
+        "likes": 96,
+        "comments": 10
+      },
+      {
+        "timestamp": "2026-01-11T20:08:48.255652",
+        "views": 2172,
+        "likes": 96,
+        "comments": 10
+      },
+      {
+        "timestamp": "2026-01-11T21:31:16.200939",
+        "views": 2173,
+        "likes": 96,
+        "comments": 10
+      },
+      {
+        "timestamp": "2026-01-11T23:44:50.617357",
+        "views": 2174,
+        "likes": 96,
+        "comments": 10
+      },
+      {
+        "timestamp": "2026-01-12T00:16:46.121124",
+        "views": 2176,
+        "likes": 96,
+        "comments": 10
+      },
+      {
+        "timestamp": "2026-01-12T00:42:34.600062",
+        "views": 2177,
+        "likes": 96,
+        "comments": 10
+      },
+      {
+        "timestamp": "2026-01-12T00:50:34.624509",
+        "views": 2178,
+        "likes": 96,
+        "comments": 10
+      },
+      {
+        "timestamp": "2026-01-12T01:02:40.166341",
+        "views": 2180,
+        "likes": 96,
+        "comments": 10
+      },
+      {
+        "timestamp": "2026-01-12T01:30:34.651934",
+        "views": 2183,
+        "likes": 96,
+        "comments": 10
+      },
+      {
+        "timestamp": "2026-01-12T01:49:34.186272",
+        "views": 2184,
+        "likes": 96,
+        "comments": 10
+      },
+      {
+        "timestamp": "2026-01-12T02:06:34.328550",
+        "views": 2185,
+        "likes": 96,
+        "comments": 10
+      },
+      {
+        "timestamp": "2026-01-12T02:18:46.192578",
+        "views": 2186,
+        "likes": 96,
+        "comments": 10
+      },
+      {
+        "timestamp": "2026-01-12T02:30:34.175245",
+        "views": 2187,
+        "likes": 96,
+        "comments": 10
+      },
+      {
+        "timestamp": "2026-01-12T02:50:34.429317",
+        "views": 2188,
+        "likes": 96,
+        "comments": 10
+      },
+      {
+        "timestamp": "2026-01-12T03:06:34.355837",
+        "views": 2189,
+        "likes": 96,
+        "comments": 10
+      },
+      {
+        "timestamp": "2026-01-12T05:09:58.542018",
+        "views": 2194,
+        "likes": 96,
+        "comments": 10
+      },
+      {
+        "timestamp": "2026-01-12T07:58:41.129119",
+        "views": 2203,
+        "likes": 96,
+        "comments": 10
+      },
+      {
+        "timestamp": "2026-01-12T08:03:49.454243",
+        "views": 2204,
+        "likes": 96,
+        "comments": 10
+      },
+      {
+        "timestamp": "2026-01-12T08:43:34.793181",
+        "views": 2205,
+        "likes": 96,
+        "comments": 10
+      },
+      {
+        "timestamp": "2026-01-12T08:45:34.685664",
+        "views": 2206,
+        "likes": 97,
+        "comments": 10
+      },
+      {
+        "timestamp": "2026-01-12T08:46:56.438449",
+        "views": 2208,
+        "likes": 97,
+        "comments": 10
+      },
+      {
+        "timestamp": "2026-01-12T08:49:08.824537",
+        "views": 2209,
+        "likes": 97,
+        "comments": 10
+      },
+      {
+        "timestamp": "2026-01-12T09:08:02.613246",
+        "views": 2210,
+        "likes": 97,
+        "comments": 10
+      },
+      {
+        "timestamp": "2026-01-12T10:05:34.890000",
+        "views": 2211,
+        "likes": 97,
+        "comments": 10
+      },
+      {
+        "timestamp": "2026-01-12T11:10:33.912105",
+        "views": 2212,
+        "likes": 97,
+        "comments": 10
+      },
+      {
+        "timestamp": "2026-01-12T11:12:33.962656",
+        "views": 2213,
+        "likes": 97,
+        "comments": 10
+      },
+      {
+        "timestamp": "2026-01-12T11:19:34.641144",
+        "views": 2214,
+        "likes": 97,
+        "comments": 10
+      },
+      {
+        "timestamp": "2026-01-12T11:24:34.521039",
+        "views": 2215,
+        "likes": 97,
+        "comments": 10
+      },
+      {
+        "timestamp": "2026-01-12T11:56:11.910987",
+        "views": 2216,
+        "likes": 97,
+        "comments": 10
+      },
+      {
+        "timestamp": "2026-01-12T11:56:35.273128",
+        "views": 2217,
+        "likes": 97,
+        "comments": 10
+      }
+    ],
+    "activity_log": [
+      {
+        "timestamp": "2026-01-10T18:44:00.551800",
+        "message": "Ordered 10 comments via dashboard",
+        "level": "success"
+      }
+    ],
+    "current_activity": {
+      "status": "ordering",
+      "action": "Ordering 10 comments",
+      "service": "Comments",
+      "quantity": 10,
+      "last_updated": "2026-01-10T18:44:00.551803"
+    },
+    "campaign_id": "campaign_1_1768093788"
+  },
+  "https://www.tiktok.com/@the.clips.origins/video/7593456227598847240": {
+    "start_time": "2026-01-10T18:45:30.699635",
+    "target_views": 4000,
+    "target_likes": 125,
+    "target_comments": 7,
+    "target_comment_likes": 15,
+    "initial_views": 1664,
+    "initial_likes": 41,
+    "initial_comments": 0,
+    "real_views": 1678,
+    "real_likes": 41,
+    "real_comments": 0,
+    "orders_placed": {
+      "views": 0,
+      "likes": 0,
+      "comments": 0,
+      "comment_likes": 0
+    },
+    "order_history": [],
+    "next_orders": [],
+    "total_cost": 0,
+    "activity_log": [
+      {
+        "timestamp": "2026-01-10T18:45:30.699647",
+        "message": "Video added to campaign",
+        "level": "info"
+      }
+    ],
+    "growth_history": [
+      {
+        "timestamp": "2026-01-10T18:45:30.699648",
+        "views": 1664,
+        "likes": 41,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T09:21:09.724538",
+        "views": 1667,
+        "likes": 41,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T12:45:12.507812",
+        "views": 1668,
+        "likes": 41,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T20:08:48.981021",
+        "views": 1671,
+        "likes": 41,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:55:35.231741",
+        "views": 1672,
+        "likes": 41,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T05:09:59.109259",
+        "views": 1674,
+        "likes": 41,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T07:58:42.001837",
+        "views": 1676,
+        "likes": 41,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T11:27:50.350960",
+        "views": 1677,
+        "likes": 41,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T11:33:50.037839",
+        "views": 1678,
+        "likes": 41,
+        "comments": 0
+      }
+    ],
+    "target_completion_time": "2026-01-10T21:46:00",
+    "target_completion_datetime": "2026-01-10T21:46:00",
+    "campaign_id": "campaign_1_1768093788"
+  },
+  "https://www.tiktok.com/@example/video/123": {
+    "start_time": "2026-01-11T10:09:06.010403",
+    "target_views": 4000,
+    "target_likes": 125,
+    "target_comments": 7,
+    "target_comment_likes": 15,
+    "initial_views": 0,
+    "initial_likes": 0,
+    "initial_comments": 0,
+    "real_views": 0,
+    "real_likes": 0,
+    "real_comments": 0,
+    "orders_placed": {
+      "views": 0,
+      "likes": 0,
+      "comments": 0,
+      "comment_likes": 0
+    },
+    "order_history": [],
+    "next_orders": [],
+    "total_cost": 0,
+    "activity_log": [
+      {
+        "timestamp": "2026-01-11T10:09:06.010454",
+        "message": "Video added to campaign",
+        "level": "info"
+      }
+    ],
+    "growth_history": [
+      {
+        "timestamp": "2026-01-11T10:09:06.010456",
+        "views": 0,
+        "likes": 0,
+        "comments": 0
+      }
+    ]
+  },
+  "https://www.tiktok.com/@the.clips.origins/video/7594132553569783058": {
+    "start_time": "2026-01-11T21:30:11.171014",
+    "target_views": 4000,
+    "target_likes": 125,
+    "target_comments": 10,
+    "target_comment_likes": 15,
+    "initial_views": 3070,
+    "initial_likes": 45,
+    "initial_comments": 0,
+    "real_views": 3070,
+    "real_likes": 45,
+    "real_comments": 0,
+    "orders_placed": {
+      "views": 1603,
+      "likes": 57,
+      "comments": 0,
+      "comment_likes": 0
+    },
+    "order_history": [
+      {
+        "service": "views",
+        "quantity": 1603,
+        "order_id": "58252224",
+        "timestamp": "2026-01-12T08:51:43.699272",
+        "type": "catch_up"
+      },
+      {
+        "service": "likes",
+        "quantity": 57,
+        "order_id": "58252443",
+        "timestamp": "2026-01-12T09:04:08.106426",
+        "type": "catch_up"
+      }
+    ],
+    "next_orders": [],
+    "total_cost": 0.034412,
+    "activity_log": [
+      {
+        "timestamp": "2026-01-11T21:30:11.171058",
+        "message": "Video added to campaign",
+        "level": "info"
+      }
+    ],
+    "growth_history": [
+      {
+        "timestamp": "2026-01-11T21:30:11.171061",
+        "views": 508,
+        "likes": 4,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T21:31:22.572800",
+        "views": 510,
+        "likes": 4,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T21:42:19.292711",
+        "views": 512,
+        "likes": 4,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T21:47:15.975050",
+        "views": 513,
+        "likes": 4,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T21:48:47.108261",
+        "views": 514,
+        "likes": 4,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T21:55:11.258907",
+        "views": 515,
+        "likes": 4,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T22:10:49.563938",
+        "views": 518,
+        "likes": 4,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T22:13:55.673704",
+        "views": 519,
+        "likes": 4,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T22:15:57.464340",
+        "views": 520,
+        "likes": 4,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T22:17:57.927469",
+        "views": 522,
+        "likes": 4,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T22:18:57.465206",
+        "views": 523,
+        "likes": 4,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T22:25:31.513799",
+        "views": 524,
+        "likes": 4,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T22:28:19.182864",
+        "views": 525,
+        "likes": 4,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T22:33:19.261556",
+        "views": 526,
+        "likes": 4,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T22:39:18.151679",
+        "views": 527,
+        "likes": 4,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T22:43:13.903009",
+        "views": 528,
+        "likes": 4,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T22:53:35.351077",
+        "views": 529,
+        "likes": 4,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:00:47.731301",
+        "views": 530,
+        "likes": 5,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:13:40.208767",
+        "views": 531,
+        "likes": 5,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:15:38.220812",
+        "views": 532,
+        "likes": 5,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:17:41.351547",
+        "views": 533,
+        "likes": 5,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:20:43.338399",
+        "views": 534,
+        "likes": 5,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:28:19.271719",
+        "views": 536,
+        "likes": 5,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:32:57.360837",
+        "views": 538,
+        "likes": 5,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:33:27.323712",
+        "views": 539,
+        "likes": 5,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:34:22.238808",
+        "views": 542,
+        "likes": 5,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:36:48.811028",
+        "views": 543,
+        "likes": 5,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:43:57.689281",
+        "views": 546,
+        "likes": 5,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:47:16.041638",
+        "views": 547,
+        "likes": 5,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:49:16.049835",
+        "views": 548,
+        "likes": 5,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:55:14.262968",
+        "views": 549,
+        "likes": 5,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:56:27.639208",
+        "views": 551,
+        "likes": 5,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:59:45.021909",
+        "views": 552,
+        "likes": 5,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:05:43.906635",
+        "views": 554,
+        "likes": 5,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:06:44.274201",
+        "views": 555,
+        "likes": 5,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:13:16.436497",
+        "views": 556,
+        "likes": 5,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:15:16.229519",
+        "views": 557,
+        "likes": 5,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:16:17.851559",
+        "views": 558,
+        "likes": 5,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:24:43.363310",
+        "views": 559,
+        "likes": 5,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:26:44.166028",
+        "views": 560,
+        "likes": 5,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:29:55.151731",
+        "views": 561,
+        "likes": 5,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:35:54.954817",
+        "views": 562,
+        "likes": 5,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:42:43.197782",
+        "views": 563,
+        "likes": 6,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:43:44.308420",
+        "views": 564,
+        "likes": 6,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:47:43.040273",
+        "views": 566,
+        "likes": 6,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:49:44.567005",
+        "views": 568,
+        "likes": 6,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:51:43.214488",
+        "views": 569,
+        "likes": 6,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:53:43.199643",
+        "views": 570,
+        "likes": 6,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T01:02:48.593314",
+        "views": 572,
+        "likes": 6,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T01:05:43.536717",
+        "views": 573,
+        "likes": 6,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T01:08:44.100625",
+        "views": 574,
+        "likes": 6,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T01:12:43.789569",
+        "views": 575,
+        "likes": 6,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T01:14:43.624598",
+        "views": 577,
+        "likes": 6,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T01:16:42.217131",
+        "views": 578,
+        "likes": 6,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T01:18:43.774670",
+        "views": 579,
+        "likes": 6,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T01:33:43.704025",
+        "views": 580,
+        "likes": 6,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T01:36:42.878928",
+        "views": 582,
+        "likes": 6,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T01:40:44.657911",
+        "views": 584,
+        "likes": 7,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T01:46:42.957775",
+        "views": 585,
+        "likes": 7,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T01:50:43.364103",
+        "views": 586,
+        "likes": 7,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T01:57:43.176080",
+        "views": 588,
+        "likes": 7,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T02:10:02.128726",
+        "views": 589,
+        "likes": 7,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T02:36:42.716473",
+        "views": 590,
+        "likes": 7,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T02:40:42.942050",
+        "views": 591,
+        "likes": 7,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T02:46:43.247283",
+        "views": 593,
+        "likes": 7,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T02:52:42.415960",
+        "views": 594,
+        "likes": 7,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T03:06:43.310138",
+        "views": 595,
+        "likes": 7,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T05:10:06.953815",
+        "views": 602,
+        "likes": 7,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T07:58:51.844610",
+        "views": 609,
+        "likes": 7,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T08:09:58.340884",
+        "views": 610,
+        "likes": 7,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T08:27:44.708871",
+        "views": 611,
+        "likes": 7,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T08:47:08.433426",
+        "views": 612,
+        "likes": 7,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T08:52:30.656812",
+        "views": 3047,
+        "likes": 7,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T08:54:01.339737",
+        "views": 3048,
+        "likes": 7,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T09:00:00.418678",
+        "views": 3050,
+        "likes": 7,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T09:10:11.220898",
+        "views": 3051,
+        "likes": 7,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T09:11:14.015142",
+        "views": 3052,
+        "likes": 7,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T09:29:47.173280",
+        "views": 3053,
+        "likes": 7,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T09:35:38.907504",
+        "views": 3054,
+        "likes": 13,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T09:36:39.328580",
+        "views": 3060,
+        "likes": 16,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T09:37:39.618996",
+        "views": 3061,
+        "likes": 17,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T09:41:46.249469",
+        "views": 3062,
+        "likes": 17,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T09:42:46.375201",
+        "views": 3062,
+        "likes": 44,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T10:01:44.173229",
+        "views": 3063,
+        "likes": 45,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T10:07:45.850517",
+        "views": 3064,
+        "likes": 45,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T10:08:47.031586",
+        "views": 3065,
+        "likes": 45,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T10:10:46.894896",
+        "views": 3066,
+        "likes": 45,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T11:10:42.397354",
+        "views": 3069,
+        "likes": 45,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T12:12:18.522949",
+        "views": 3070,
+        "likes": 45,
+        "comments": 0
+      }
+    ],
+    "campaign_id": "campaign_2_1768143606",
+    "target_completion_time": "2026-01-12T21:30:11.171703",
+    "target_completion_datetime": "2026-01-12T21:30:11.171703",
+    "next_views_purchase_time": "2026-01-12T16:43:20.254Z",
+    "next_likes_purchase_time": "2026-01-12T16:33:59.331Z",
+    "next_comments_purchase_time": "2026-01-13T02:30:11.171Z",
+    "next_comment_likes_purchase_time": "2026-01-13T02:30:11.171Z"
+  },
+  "https://www.tiktok.com/@the.clips.origins/video/7594133296389426440": {
+    "start_time": "2026-01-11T21:31:36.597785",
+    "target_views": 4000,
+    "target_likes": 125,
+    "target_comments": 10,
+    "target_comment_likes": 15,
+    "initial_views": 3136,
+    "initial_likes": 87,
+    "initial_comments": 0,
+    "real_views": 3136,
+    "real_likes": 87,
+    "real_comments": 0,
+    "orders_placed": {
+      "views": 1580,
+      "likes": 37,
+      "comments": 0,
+      "comment_likes": 0
+    },
+    "order_history": [
+      {
+        "service": "views",
+        "quantity": 1580,
+        "order_id": "58252452",
+        "timestamp": "2026-01-12T09:04:25.455531",
+        "type": "catch_up"
+      },
+      {
+        "service": "likes",
+        "quantity": 37,
+        "order_id": "58252703",
+        "timestamp": "2026-01-12T09:19:32.772363",
+        "type": "catch_up"
+      }
+    ],
+    "next_orders": [],
+    "total_cost": 0.02989,
+    "activity_log": [
+      {
+        "timestamp": "2026-01-11T21:31:36.597805",
+        "message": "Video added to campaign",
+        "level": "info"
+      }
+    ],
+    "growth_history": [
+      {
+        "timestamp": "2026-01-11T21:31:36.597806",
+        "views": 707,
+        "likes": 50,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T22:39:18.690857",
+        "views": 708,
+        "likes": 50,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T22:54:36.488064",
+        "views": 709,
+        "likes": 50,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T01:02:49.127381",
+        "views": 710,
+        "likes": 50,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T08:03:58.988280",
+        "views": 711,
+        "likes": 50,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T09:06:14.565530",
+        "views": 3135,
+        "likes": 50,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T09:21:49.143000",
+        "views": 3135,
+        "likes": 66,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T09:22:49.897940",
+        "views": 3135,
+        "likes": 85,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T09:23:48.122621",
+        "views": 3135,
+        "likes": 87,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T12:12:19.104118",
+        "views": 3136,
+        "likes": 87,
+        "comments": 0
+      }
+    ],
+    "campaign_id": "campaign_2_1768143606",
+    "target_completion_time": "2026-01-12T21:31:36.598291",
+    "target_completion_datetime": "2026-01-12T21:31:36.598291",
+    "next_views_purchase_time": "2026-01-12T16:45:13.704Z",
+    "next_likes_purchase_time": "2026-01-12T17:42:58.351Z",
+    "next_comments_purchase_time": "2026-01-13T02:31:36.598Z",
+    "next_comment_likes_purchase_time": "2026-01-13T02:31:36.598Z"
+  },
+  "https://www.tiktok.com/@the.clips.origins/video/7594134744862887186": {
+    "start_time": "2026-01-11T21:33:14.546633",
+    "target_views": 4000,
+    "target_likes": 125,
+    "target_comments": 10,
+    "target_comment_likes": 15,
+    "initial_views": 3279,
+    "initial_likes": 75,
+    "initial_comments": 0,
+    "real_views": 3279,
+    "real_likes": 75,
+    "real_comments": 0,
+    "orders_placed": {
+      "views": 1478,
+      "likes": 47,
+      "comments": 0,
+      "comment_likes": 0
+    },
+    "order_history": [
+      {
+        "service": "views",
+        "quantity": 1478,
+        "order_id": "58252445",
+        "timestamp": "2026-01-12T09:04:08.974170",
+        "type": "catch_up"
+      },
+      {
+        "service": "likes",
+        "quantity": 47,
+        "order_id": "58252451",
+        "timestamp": "2026-01-12T09:04:25.014360",
+        "type": "catch_up"
+      }
+    ],
+    "next_orders": [],
+    "total_cost": 0.030562,
+    "activity_log": [
+      {
+        "timestamp": "2026-01-11T21:33:14.546662",
+        "message": "Video added to campaign",
+        "level": "info"
+      }
+    ],
+    "growth_history": [
+      {
+        "timestamp": "2026-01-11T22:34:30.645264",
+        "views": 778,
+        "likes": 26,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T22:37:17.981517",
+        "views": 779,
+        "likes": 26,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T22:39:19.279759",
+        "views": 782,
+        "likes": 26,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T22:40:18.183467",
+        "views": 783,
+        "likes": 26,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T22:41:04.867145",
+        "views": 784,
+        "likes": 26,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T22:43:27.811846",
+        "views": 785,
+        "likes": 26,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T22:47:24.260827",
+        "views": 786,
+        "likes": 26,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T22:49:36.150318",
+        "views": 787,
+        "likes": 26,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T22:51:37.064155",
+        "views": 788,
+        "likes": 26,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T22:52:36.461926",
+        "views": 790,
+        "likes": 26,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T22:54:37.359578",
+        "views": 791,
+        "likes": 26,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T22:57:38.153356",
+        "views": 794,
+        "likes": 26,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T22:59:50.579221",
+        "views": 795,
+        "likes": 26,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:00:48.826919",
+        "views": 797,
+        "likes": 26,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:01:48.902326",
+        "views": 798,
+        "likes": 26,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:07:39.329699",
+        "views": 799,
+        "likes": 26,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:08:38.750907",
+        "views": 800,
+        "likes": 26,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:09:39.627557",
+        "views": 801,
+        "likes": 26,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:13:41.581533",
+        "views": 803,
+        "likes": 26,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:14:42.349755",
+        "views": 804,
+        "likes": 26,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:15:39.406426",
+        "views": 805,
+        "likes": 26,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:19:43.300198",
+        "views": 806,
+        "likes": 26,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:23:45.328544",
+        "views": 811,
+        "likes": 26,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:25:44.528250",
+        "views": 812,
+        "likes": 27,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:30:47.907071",
+        "views": 814,
+        "likes": 27,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:31:02.353205",
+        "views": 815,
+        "likes": 27,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:31:52.517481",
+        "views": 817,
+        "likes": 27,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:32:19.813323",
+        "views": 819,
+        "likes": 27,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:33:40.293611",
+        "views": 820,
+        "likes": 27,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:34:23.368419",
+        "views": 821,
+        "likes": 27,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:35:29.508635",
+        "views": 824,
+        "likes": 27,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:36:29.426311",
+        "views": 825,
+        "likes": 27,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:43:58.814146",
+        "views": 826,
+        "likes": 27,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:47:18.259963",
+        "views": 827,
+        "likes": 27,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:50:14.525886",
+        "views": 829,
+        "likes": 27,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:51:17.039801",
+        "views": 830,
+        "likes": 27,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:52:29.491328",
+        "views": 831,
+        "likes": 27,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:57:28.797842",
+        "views": 832,
+        "likes": 27,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-11T23:57:50.956668",
+        "views": 834,
+        "likes": 27,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:02:46.124528",
+        "views": 835,
+        "likes": 27,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:03:45.479544",
+        "views": 837,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:04:45.892492",
+        "views": 838,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:09:48.074640",
+        "views": 840,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:10:48.981542",
+        "views": 841,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:11:50.151705",
+        "views": 842,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:14:18.409887",
+        "views": 844,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:16:19.429689",
+        "views": 846,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:17:55.784467",
+        "views": 847,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:19:57.079952",
+        "views": 848,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:21:56.384023",
+        "views": 849,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:22:56.374881",
+        "views": 850,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:26:45.290957",
+        "views": 851,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:27:44.331202",
+        "views": 853,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:31:57.479206",
+        "views": 855,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:33:56.846334",
+        "views": 856,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:36:56.685464",
+        "views": 857,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:42:44.321912",
+        "views": 858,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:51:44.296527",
+        "views": 859,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:53:44.468712",
+        "views": 860,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T00:58:44.811715",
+        "views": 861,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T01:02:49.706466",
+        "views": 864,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T01:03:43.588029",
+        "views": 865,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T01:10:44.414733",
+        "views": 866,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T01:16:44.144912",
+        "views": 867,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T01:19:46.351821",
+        "views": 868,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T01:23:45.714807",
+        "views": 869,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T01:26:56.652994",
+        "views": 871,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T01:31:45.179703",
+        "views": 872,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T01:32:46.081265",
+        "views": 873,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T01:33:45.031009",
+        "views": 874,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T01:35:44.083134",
+        "views": 875,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T01:42:46.548301",
+        "views": 876,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T01:49:44.149397",
+        "views": 879,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T01:52:47.445093",
+        "views": 882,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T01:53:43.677202",
+        "views": 883,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T01:55:44.479688",
+        "views": 884,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T02:01:45.538581",
+        "views": 886,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T02:10:03.231498",
+        "views": 887,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T02:14:43.836525",
+        "views": 889,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T02:22:44.998830",
+        "views": 894,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T02:24:44.477237",
+        "views": 895,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T02:26:45.614024",
+        "views": 896,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T02:30:44.210866",
+        "views": 898,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T02:36:43.811476",
+        "views": 899,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T02:38:44.857406",
+        "views": 900,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T02:44:43.918182",
+        "views": 901,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T03:06:44.496216",
+        "views": 903,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T06:10:50.913753",
+        "views": 915,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T08:07:00.274259",
+        "views": 916,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T09:04:59.210084",
+        "views": 3273,
+        "likes": 28,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T09:18:30.310282",
+        "views": 3273,
+        "likes": 30,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T09:19:31.716013",
+        "views": 3273,
+        "likes": 31,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T09:21:50.132972",
+        "views": 3273,
+        "likes": 55,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T09:22:50.670869",
+        "views": 3273,
+        "likes": 75,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T10:13:46.671605",
+        "views": 3274,
+        "likes": 75,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T10:16:45.968385",
+        "views": 3275,
+        "likes": 75,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T10:30:44.917628",
+        "views": 3276,
+        "likes": 75,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T10:38:50.458568",
+        "views": 3277,
+        "likes": 75,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T11:10:43.548367",
+        "views": 3278,
+        "likes": 75,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T12:08:40.585885",
+        "views": 3279,
+        "likes": 75,
+        "comments": 0
+      }
+    ],
+    "campaign_id": "campaign_2_1768143606",
+    "target_completion_time": "2026-01-12T21:33:14.547113",
+    "target_completion_datetime": "2026-01-12T21:33:14.547113",
+    "next_views_purchase_time": "2026-01-12T16:52:14.141Z",
+    "next_likes_purchase_time": "2026-01-12T17:45:54.129Z",
+    "next_comments_purchase_time": "2026-01-13T02:33:14.547Z",
+    "next_comment_likes_purchase_time": "2026-01-13T02:33:14.547Z"
+  },
+  "https://www.tiktok.com/@the.clips.origins/video/7594136221153037575": {
+    "start_time": "2026-01-11T21:33:42.047297",
+    "target_views": 4000,
+    "target_likes": 125,
+    "target_comments": 10,
+    "target_comment_likes": 15,
+    "initial_views": 3241,
+    "initial_likes": 70,
+    "initial_comments": 0,
+    "real_views": 3241,
+    "real_likes": 70,
+    "real_comments": 0,
+    "orders_placed": {
+      "views": 1589,
+      "likes": 52,
+      "comments": 0,
+      "comment_likes": 0
+    },
+    "order_history": [
+      {
+        "service": "views",
+        "quantity": 1589,
+        "order_id": "58252436",
+        "timestamp": "2026-01-12T09:03:49.728064",
+        "type": "catch_up"
+      },
+      {
+        "service": "likes",
+        "quantity": 52,
+        "order_id": "58252444",
+        "timestamp": "2026-01-12T09:04:08.548820",
+        "type": "catch_up"
+      }
+    ],
+    "next_orders": [],
+    "total_cost": 0.033166,
+    "activity_log": [
+      {
+        "timestamp": "2026-01-11T21:33:42.047332",
+        "message": "Video added to campaign",
+        "level": "info"
+      }
+    ],
+    "growth_history": [
+      {
+        "timestamp": "2026-01-11T21:33:42.047335",
+        "views": 676,
+        "likes": 18,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T03:06:45.046848",
+        "views": 677,
+        "likes": 18,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T06:10:51.478537",
+        "views": 678,
+        "likes": 18,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T08:34:44.455603",
+        "views": 679,
+        "likes": 18,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T09:04:24.519629",
+        "views": 3240,
+        "likes": 18,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T09:15:30.313658",
+        "views": 3240,
+        "likes": 19,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T09:16:31.128995",
+        "views": 3240,
+        "likes": 39,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T09:17:30.264761",
+        "views": 3240,
+        "likes": 58,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T09:18:31.285805",
+        "views": 3240,
+        "likes": 70,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T12:12:20.233503",
+        "views": 3241,
+        "likes": 70,
+        "comments": 0
+      }
+    ],
+    "campaign_id": "campaign_2_1768143606",
+    "target_completion_time": "2026-01-12T21:33:42.047805",
+    "target_completion_datetime": "2026-01-12T21:33:42.047805",
+    "next_views_purchase_time": "2026-01-12T16:49:40.229Z",
+    "next_likes_purchase_time": "2026-01-12T17:12:55.262Z",
+    "next_comments_purchase_time": "2026-01-13T02:33:42.047Z",
+    "next_comment_likes_purchase_time": "2026-01-13T02:33:42.047Z"
+  },
+  "https://vt.tiktok.com/ZS5t4Tt5F/": {
+    "start_time": "2026-01-12T12:08:53.862486",
+    "target_views": 3000,
+    "target_likes": 65,
+    "target_comments": 7,
+    "target_comment_likes": 15,
+    "initial_views": 29,
+    "initial_likes": 3,
+    "initial_comments": 0,
+    "real_views": 29,
+    "real_likes": 3,
+    "real_comments": 0,
+    "orders_placed": {
+      "views": 0,
+      "likes": 0,
+      "comments": 0,
+      "comment_likes": 0
+    },
+    "order_history": [],
+    "next_orders": [],
+    "total_cost": 0,
+    "activity_log": [
+      {
+        "timestamp": "2026-01-12T12:08:53.862579",
+        "message": "Video added to campaign",
+        "level": "info"
+      }
+    ],
+    "growth_history": [
+      {
+        "timestamp": "2026-01-12T12:08:53.862581",
+        "views": 0,
+        "likes": 0,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T12:12:21.068880",
+        "views": 28,
+        "likes": 3,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T12:13:41.564129",
+        "views": 29,
+        "likes": 3,
+        "comments": 0
+      }
+    ],
+    "campaign_id": "campaign_3_1768152575",
+    "target_completion_time": "2026-01-13T03:08:53.863144",
+    "target_completion_datetime": "2026-01-13T03:08:53.863144",
+    "next_views_purchase_time": "2026-01-12T17:41:11.030Z",
+    "next_likes_purchase_time": "2026-01-12T19:18:34.818Z",
+    "next_comments_purchase_time": "2026-01-13T08:08:53.863Z",
+    "next_comment_likes_purchase_time": "2026-01-13T08:08:53.863Z"
+  },
+  "https://vt.tiktok.com/ZS5tV8kGG/": {
+    "start_time": "2026-01-12T12:10:18.300477",
+    "target_views": 3000,
+    "target_likes": 65,
+    "target_comments": 7,
+    "target_comment_likes": 15,
+    "initial_views": 624,
+    "initial_likes": 39,
+    "initial_comments": 0,
+    "real_views": 624,
+    "real_likes": 39,
+    "real_comments": 0,
+    "orders_placed": {
+      "views": 0,
+      "likes": 0,
+      "comments": 0,
+      "comment_likes": 0
+    },
+    "order_history": [],
+    "next_orders": [],
+    "total_cost": 0,
+    "activity_log": [
+      {
+        "timestamp": "2026-01-12T12:10:18.300574",
+        "message": "Video added to campaign",
+        "level": "info"
+      }
+    ],
+    "growth_history": [
+      {
+        "timestamp": "2026-01-12T12:10:18.300576",
+        "views": 0,
+        "likes": 0,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T12:12:22.187178",
+        "views": 557,
+        "likes": 37,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T12:12:39.569671",
+        "views": 562,
+        "likes": 37,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T12:12:56.903911",
+        "views": 568,
+        "likes": 37,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T12:13:12.472757",
+        "views": 575,
+        "likes": 37,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T12:13:42.433661",
+        "views": 583,
+        "likes": 38,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T12:14:01.109869",
+        "views": 587,
+        "likes": 38,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T12:14:43.775916",
+        "views": 596,
+        "likes": 38,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T12:15:01.224021",
+        "views": 603,
+        "likes": 38,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T12:15:44.330245",
+        "views": 608,
+        "likes": 38,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T12:16:45.743805",
+        "views": 611,
+        "likes": 38,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T12:17:01.950403",
+        "views": 612,
+        "likes": 38,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T12:19:41.571264",
+        "views": 622,
+        "likes": 39,
+        "comments": 0
+      },
+      {
+        "timestamp": "2026-01-12T12:19:59.383995",
+        "views": 623,
+        "likes": 39,
+        "comments": 0
+      }
+    ],
+    "campaign_id": "campaign_3_1768152575",
+    "target_completion_time": "2026-01-13T03:10:18.301268",
+    "target_completion_datetime": "2026-01-13T03:10:18.301268",
+    "next_views_purchase_time": "2026-01-12T17:43:36.786Z",
+    "next_likes_purchase_time": "2026-01-12T22:11:52.493Z",
+    "next_comments_purchase_time": "2026-01-13T08:10:18.301Z",
+    "next_comment_likes_purchase_time": "2026-01-13T08:10:18.301Z"
+  }
+}

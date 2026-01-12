@@ -49,7 +49,7 @@ def run_continuous_bot():
             # Process each video - check ALL active campaigns for due orders
             # This ensures we catch up on missed orders after server restarts
             now = datetime.now()
-            videos_need_check = []
+            videos_need_check = set()  # Use set for O(1) lookup and automatic deduplication
             
             for video_url in list(progress.keys()):
                 try:
@@ -73,8 +73,7 @@ def run_continuous_bot():
                     # Always check videos with active campaigns (has start_time and target)
                     # The check_and_place_due_orders method will determine if orders are actually due
                     if has_start_time and has_target:
-                        videos_need_check.append(video_url)
-                    
+                        videos_need_check.add(video_url)
                     # Also check videos with expired timers (for immediate response)
                     # This runs independently of the campaign check above
                     next_views_time = video_progress.get('next_views_purchase_time')
@@ -89,8 +88,7 @@ def run_continuous_bot():
                                 try:
                                     purchase_time = datetime.fromisoformat(timer_str.replace('Z', '+00:00'))
                                     if purchase_time <= now:
-                                        if video_url not in videos_need_check:
-                                            videos_need_check.append(video_url)
+                                        videos_need_check.add(video_url)  # Set automatically handles duplicates
                                         break
                                 except:
                                     pass

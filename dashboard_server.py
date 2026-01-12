@@ -1528,8 +1528,28 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     'roi': round(roi, 2)
                 }
 
-            if campaigns_changed:
+            # ALWAYS save campaigns after rebuild to ensure persistence
+            # Even if campaigns_changed is False, we save to ensure rebuild is persisted
+            # This prevents videos from disappearing due to timing issues or file corruption
+            if campaigns_changed or rebuild_count > 0:
                 self.save_campaigns(campaigns)
+                print(f"[REBUILD] Saved campaigns (changed={campaigns_changed}, rebuilt={rebuild_count})")
+            
+            # VERIFICATION: Check for videos that have campaign_id but aren't in campaigns
+            # This helps diagnose the "videos disappearing" issue
+            orphaned_videos = []
+            for video_url, video_data in progress.items():
+                campaign_id = video_data.get('campaign_id')
+                if campaign_id:
+                    if campaign_id not in campaigns:
+                        orphaned_videos.append((video_url, campaign_id, 'campaign_not_found'))
+                    elif video_url not in campaigns[campaign_id].get('videos', []):
+                        orphaned_videos.append((video_url, campaign_id, 'not_in_campaign_list'))
+            
+            if orphaned_videos:
+                print(f"[WARNING] Found {len(orphaned_videos)} orphaned video(s):")
+                for video_url, campaign_id, reason in orphaned_videos:
+                    print(f"  - {video_url[:60]}... (campaign={campaign_id}, reason={reason})")
             
             response_data = json.dumps({'success': True, 'campaigns': campaigns})
             self.send_response(200)
@@ -2428,10 +2448,25 @@ class DashboardHandler(BaseHTTPRequestHandler):
             return {}
     
     def save_progress(self, progress):
-        """Save progress to file"""
+        """Save progress to file with atomic write to prevent corruption"""
+        import tempfile
+        import shutil
+        
         PROGRESS_FILE.parent.mkdir(parents=True, exist_ok=True)
-        with open(PROGRESS_FILE, 'w') as f:
-            json.dump(progress, f, indent=2)
+        
+        # Write to temporary file first (atomic operation)
+        temp_fd, temp_path = tempfile.mkstemp(dir=PROGRESS_FILE.parent, suffix='.tmp')
+        try:
+            with os.fdopen(temp_fd, 'w') as f:
+                json.dump(progress, f, indent=2)
+            # Atomic move (rename) to actual file
+            shutil.move(temp_path, PROGRESS_FILE)
+        except Exception as e:
+            # Clean up temp file if something went wrong
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+            print(f"[ERROR] Failed to save progress: {e}")
+            raise
     
     def load_campaigns(self):
         """Load campaigns from file"""
@@ -2444,10 +2479,26 @@ class DashboardHandler(BaseHTTPRequestHandler):
             return {}
     
     def save_campaigns(self, campaigns):
-        """Save campaigns to file"""
+        """Save campaigns to file with atomic write to prevent corruption"""
+        import tempfile
+        import shutil
+        
         CAMPAIGNS_FILE.parent.mkdir(parents=True, exist_ok=True)
-        with open(CAMPAIGNS_FILE, 'w') as f:
-            json.dump(campaigns, f, indent=2)
+        
+        # Write to temporary file first (atomic operation)
+        temp_fd, temp_path = tempfile.mkstemp(dir=CAMPAIGNS_FILE.parent, suffix='.tmp')
+        try:
+            with os.fdopen(temp_fd, 'w') as f:
+                json.dump(campaigns, f, indent=2)
+            # Atomic move (rename) to actual file
+            shutil.move(temp_path, CAMPAIGNS_FILE)
+            print(f"[SAVE] Campaigns saved successfully ({len(campaigns)} campaigns)")
+        except Exception as e:
+            # Clean up temp file if something went wrong
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+            print(f"[ERROR] Failed to save campaigns: {e}")
+            raise
     
     def get_dashboard_html(self):
         """Generate HTML dashboard"""

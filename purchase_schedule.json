@@ -1,0 +1,746 @@
+[
+  {
+    "time_seconds": 0,
+    "time_hours": 0.0,
+    "time_str": "0h 0m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 50
+  },
+  {
+    "time_seconds": 0,
+    "time_hours": 0.0,
+    "time_str": "0h 0m",
+    "service": "Likes",
+    "quantity": 10,
+    "cumulative_likes": 10
+  },
+  {
+    "time_seconds": 1080,
+    "time_hours": 0.3,
+    "time_str": "0h 18m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 100
+  },
+  {
+    "time_seconds": 2160,
+    "time_hours": 0.6,
+    "time_str": "0h 36m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 150
+  },
+  {
+    "time_seconds": 3240,
+    "time_hours": 0.9,
+    "time_str": "0h 54m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 200
+  },
+  {
+    "time_seconds": 4320,
+    "time_hours": 1.2,
+    "time_str": "1h 11m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 250
+  },
+  {
+    "time_seconds": 5400,
+    "time_hours": 1.5,
+    "time_str": "1h 30m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 300
+  },
+  {
+    "time_seconds": 6480,
+    "time_hours": 1.8,
+    "time_str": "1h 48m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 350
+  },
+  {
+    "time_seconds": 6646,
+    "time_hours": 1.846111111111111,
+    "time_str": "1h 50m",
+    "service": "Likes",
+    "quantity": 10,
+    "cumulative_likes": 20
+  },
+  {
+    "time_seconds": 7560,
+    "time_hours": 2.1,
+    "time_str": "2h 6m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 400
+  },
+  {
+    "time_seconds": 8640,
+    "time_hours": 2.4,
+    "time_str": "2h 23m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 450
+  },
+  {
+    "time_seconds": 9720,
+    "time_hours": 2.7,
+    "time_str": "2h 42m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 500
+  },
+  {
+    "time_seconds": 10800,
+    "time_hours": 3.0,
+    "time_str": "3h 0m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 550
+  },
+  {
+    "time_seconds": 11880,
+    "time_hours": 3.3,
+    "time_str": "3h 17m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 600
+  },
+  {
+    "time_seconds": 12960,
+    "time_hours": 3.6,
+    "time_str": "3h 36m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 650
+  },
+  {
+    "time_seconds": 13292,
+    "time_hours": 3.692222222222222,
+    "time_str": "3h 41m",
+    "service": "Likes",
+    "quantity": 10,
+    "cumulative_likes": 30
+  },
+  {
+    "time_seconds": 14040,
+    "time_hours": 3.9,
+    "time_str": "3h 53m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 700
+  },
+  {
+    "time_seconds": 15120,
+    "time_hours": 4.2,
+    "time_str": "4h 12m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 750
+  },
+  {
+    "time_seconds": 16200,
+    "time_hours": 4.5,
+    "time_str": "4h 30m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 800
+  },
+  {
+    "time_seconds": 17280,
+    "time_hours": 4.8,
+    "time_str": "4h 47m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 850
+  },
+  {
+    "time_seconds": 18360,
+    "time_hours": 5.1,
+    "time_str": "5h 5m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 900
+  },
+  {
+    "time_seconds": 19440,
+    "time_hours": 5.4,
+    "time_str": "5h 24m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 950
+  },
+  {
+    "time_seconds": 19938,
+    "time_hours": 5.538333333333333,
+    "time_str": "5h 32m",
+    "service": "Likes",
+    "quantity": 10,
+    "cumulative_likes": 40
+  },
+  {
+    "time_seconds": 20520,
+    "time_hours": 5.7,
+    "time_str": "5h 42m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 1000
+  },
+  {
+    "time_seconds": 21600,
+    "time_hours": 6.0,
+    "time_str": "6h 0m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 1050
+  },
+  {
+    "time_seconds": 22680,
+    "time_hours": 6.3,
+    "time_str": "6h 17m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 1100
+  },
+  {
+    "time_seconds": 23760,
+    "time_hours": 6.6,
+    "time_str": "6h 35m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 1150
+  },
+  {
+    "time_seconds": 24840,
+    "time_hours": 6.9,
+    "time_str": "6h 54m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 1200
+  },
+  {
+    "time_seconds": 25920,
+    "time_hours": 7.2,
+    "time_str": "7h 12m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 1250
+  },
+  {
+    "time_seconds": 26584,
+    "time_hours": 7.384444444444444,
+    "time_str": "7h 23m",
+    "service": "Likes",
+    "quantity": 10,
+    "cumulative_likes": 50
+  },
+  {
+    "time_seconds": 27000,
+    "time_hours": 7.5,
+    "time_str": "7h 30m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 1300
+  },
+  {
+    "time_seconds": 28080,
+    "time_hours": 7.8,
+    "time_str": "7h 47m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 1350
+  },
+  {
+    "time_seconds": 29160,
+    "time_hours": 8.1,
+    "time_str": "8h 5m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 1400
+  },
+  {
+    "time_seconds": 30240,
+    "time_hours": 8.4,
+    "time_str": "8h 24m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 1450
+  },
+  {
+    "time_seconds": 31320,
+    "time_hours": 8.7,
+    "time_str": "8h 41m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 1500
+  },
+  {
+    "time_seconds": 32400,
+    "time_hours": 9.0,
+    "time_str": "9h 0m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 1550
+  },
+  {
+    "time_seconds": 33230,
+    "time_hours": 9.230555555555556,
+    "time_str": "9h 13m",
+    "service": "Likes",
+    "quantity": 10,
+    "cumulative_likes": 60
+  },
+  {
+    "time_seconds": 33480,
+    "time_hours": 9.3,
+    "time_str": "9h 18m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 1600
+  },
+  {
+    "time_seconds": 34560,
+    "time_hours": 9.6,
+    "time_str": "9h 35m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 1650
+  },
+  {
+    "time_seconds": 35640,
+    "time_hours": 9.9,
+    "time_str": "9h 54m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 1700
+  },
+  {
+    "time_seconds": 36720,
+    "time_hours": 10.2,
+    "time_str": "10h 11m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 1750
+  },
+  {
+    "time_seconds": 37800,
+    "time_hours": 10.5,
+    "time_str": "10h 30m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 1800
+  },
+  {
+    "time_seconds": 38880,
+    "time_hours": 10.8,
+    "time_str": "10h 48m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 1850
+  },
+  {
+    "time_seconds": 39876,
+    "time_hours": 11.076666666666666,
+    "time_str": "11h 4m",
+    "service": "Likes",
+    "quantity": 10,
+    "cumulative_likes": 70
+  },
+  {
+    "time_seconds": 39960,
+    "time_hours": 11.1,
+    "time_str": "11h 5m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 1900
+  },
+  {
+    "time_seconds": 41040,
+    "time_hours": 11.4,
+    "time_str": "11h 24m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 1950
+  },
+  {
+    "time_seconds": 42120,
+    "time_hours": 11.7,
+    "time_str": "11h 41m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 2000
+  },
+  {
+    "time_seconds": 43200,
+    "time_hours": 12.0,
+    "time_str": "12h 0m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 2050
+  },
+  {
+    "time_seconds": 44280,
+    "time_hours": 12.3,
+    "time_str": "12h 18m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 2100
+  },
+  {
+    "time_seconds": 45360,
+    "time_hours": 12.6,
+    "time_str": "12h 35m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 2150
+  },
+  {
+    "time_seconds": 46440,
+    "time_hours": 12.9,
+    "time_str": "12h 54m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 2200
+  },
+  {
+    "time_seconds": 46522,
+    "time_hours": 12.922777777777778,
+    "time_str": "12h 55m",
+    "service": "Likes",
+    "quantity": 10,
+    "cumulative_likes": 80
+  },
+  {
+    "time_seconds": 47520,
+    "time_hours": 13.2,
+    "time_str": "13h 11m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 2250
+  },
+  {
+    "time_seconds": 48600,
+    "time_hours": 13.5,
+    "time_str": "13h 30m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 2300
+  },
+  {
+    "time_seconds": 49680,
+    "time_hours": 13.8,
+    "time_str": "13h 48m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 2350
+  },
+  {
+    "time_seconds": 50760,
+    "time_hours": 14.1,
+    "time_str": "14h 5m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 2400
+  },
+  {
+    "time_seconds": 51840,
+    "time_hours": 14.4,
+    "time_str": "14h 24m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 2450
+  },
+  {
+    "time_seconds": 52920,
+    "time_hours": 14.7,
+    "time_str": "14h 41m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 2500
+  },
+  {
+    "time_seconds": 53168,
+    "time_hours": 14.768888888888888,
+    "time_str": "14h 46m",
+    "service": "Likes",
+    "quantity": 10,
+    "cumulative_likes": 90
+  },
+  {
+    "time_seconds": 54000,
+    "time_hours": 15.0,
+    "time_str": "15h 0m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 2550
+  },
+  {
+    "time_seconds": 55080,
+    "time_hours": 15.3,
+    "time_str": "15h 18m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 2600
+  },
+  {
+    "time_seconds": 56160,
+    "time_hours": 15.6,
+    "time_str": "15h 35m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 2650
+  },
+  {
+    "time_seconds": 57240,
+    "time_hours": 15.9,
+    "time_str": "15h 54m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 2700
+  },
+  {
+    "time_seconds": 58320,
+    "time_hours": 16.2,
+    "time_str": "16h 11m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 2750
+  },
+  {
+    "time_seconds": 59400,
+    "time_hours": 16.5,
+    "time_str": "16h 30m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 2800
+  },
+  {
+    "time_seconds": 59814,
+    "time_hours": 16.615,
+    "time_str": "16h 36m",
+    "service": "Likes",
+    "quantity": 10,
+    "cumulative_likes": 100
+  },
+  {
+    "time_seconds": 60480,
+    "time_hours": 16.8,
+    "time_str": "16h 48m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 2850
+  },
+  {
+    "time_seconds": 61560,
+    "time_hours": 17.1,
+    "time_str": "17h 6m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 2900
+  },
+  {
+    "time_seconds": 62640,
+    "time_hours": 17.4,
+    "time_str": "17h 23m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 2950
+  },
+  {
+    "time_seconds": 63720,
+    "time_hours": 17.7,
+    "time_str": "17h 41m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 3000
+  },
+  {
+    "time_seconds": 64800,
+    "time_hours": 18.0,
+    "time_str": "18h 0m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 3050
+  },
+  {
+    "time_seconds": 65880,
+    "time_hours": 18.3,
+    "time_str": "18h 18m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 3100
+  },
+  {
+    "time_seconds": 66460,
+    "time_hours": 18.461111111111112,
+    "time_str": "18h 27m",
+    "service": "Likes",
+    "quantity": 10,
+    "cumulative_likes": 110
+  },
+  {
+    "time_seconds": 66960,
+    "time_hours": 18.6,
+    "time_str": "18h 36m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 3150
+  },
+  {
+    "time_seconds": 68040,
+    "time_hours": 18.9,
+    "time_str": "18h 53m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 3200
+  },
+  {
+    "time_seconds": 69120,
+    "time_hours": 19.2,
+    "time_str": "19h 11m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 3250
+  },
+  {
+    "time_seconds": 70200,
+    "time_hours": 19.5,
+    "time_str": "19h 30m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 3300
+  },
+  {
+    "time_seconds": 71280,
+    "time_hours": 19.8,
+    "time_str": "19h 48m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 3350
+  },
+  {
+    "time_seconds": 72360,
+    "time_hours": 20.1,
+    "time_str": "20h 6m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 3400
+  },
+  {
+    "time_seconds": 73106,
+    "time_hours": 20.307222222222222,
+    "time_str": "20h 18m",
+    "service": "Likes",
+    "quantity": 10,
+    "cumulative_likes": 120
+  },
+  {
+    "time_seconds": 73440,
+    "time_hours": 20.4,
+    "time_str": "20h 23m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 3450
+  },
+  {
+    "time_seconds": 74520,
+    "time_hours": 20.7,
+    "time_str": "20h 41m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 3500
+  },
+  {
+    "time_seconds": 75600,
+    "time_hours": 21.0,
+    "time_str": "21h 0m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 3550
+  },
+  {
+    "time_seconds": 76680,
+    "time_hours": 21.3,
+    "time_str": "21h 18m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 3600
+  },
+  {
+    "time_seconds": 77760,
+    "time_hours": 21.6,
+    "time_str": "21h 36m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 3650
+  },
+  {
+    "time_seconds": 78840,
+    "time_hours": 21.9,
+    "time_str": "21h 53m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 3700
+  },
+  {
+    "time_seconds": 79752,
+    "time_hours": 22.153333333333332,
+    "time_str": "22h 9m",
+    "service": "Likes",
+    "quantity": 5,
+    "cumulative_likes": 125
+  },
+  {
+    "time_seconds": 79920,
+    "time_hours": 22.2,
+    "time_str": "22h 11m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 3750
+  },
+  {
+    "time_seconds": 81000,
+    "time_hours": 22.5,
+    "time_str": "22h 30m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 3800
+  },
+  {
+    "time_seconds": 82080,
+    "time_hours": 22.8,
+    "time_str": "22h 48m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 3850
+  },
+  {
+    "time_seconds": 83160,
+    "time_hours": 23.1,
+    "time_str": "23h 6m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 3900
+  },
+  {
+    "time_seconds": 84240,
+    "time_hours": 23.4,
+    "time_str": "23h 23m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 3950
+  },
+  {
+    "time_seconds": 85320,
+    "time_hours": 23.7,
+    "time_str": "23h 41m",
+    "service": "Views",
+    "quantity": 50,
+    "cumulative_views": 4000
+  }
+]

@@ -3349,8 +3349,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
         <!-- Add Video Modal -->
         <div id="add-video-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000; align-items: center; justify-content: center;">
             <div style="background: #1a1a1a; border-radius: 16px; padding: 30px; max-width: 500px; width: 90%; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 8px 32px rgba(0,0,0,0.5);">
-                <h2 style="margin: 0 0 20px 0; color: #fff; font-size: 24px;">➕ Add Video to Campaign</h2>
-                <p style="color: #b0b0b0; margin-bottom: 20px; font-size: 14px;">Enter a TikTok video URL to start tracking it in your campaign.</p>
+                <h2 style="margin: 0 0 20px 0; color: #fff; font-size: 24px;">➕ Add Videos to Campaign</h2>
+                <p style="color: #b0b0b0; margin-bottom: 20px; font-size: 14px;">Enter TikTok video URLs (one per line) to start tracking them in your campaign. You can add multiple videos at once.</p>
                 <div style="margin-bottom: 12px;">
                     <label style="display: block; color: #fff; margin-bottom: 8px; font-weight: 600;">Assign to Campaign (optional)</label>
                     <div style="display: flex; gap: 10px;">
@@ -3361,7 +3361,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     </div>
                     <div style="color: #888; font-size: 12px; margin-top: 6px;">If you choose a campaign, we’ll apply that campaign’s goals & speed to this post.</div>
                 </div>
-                <input type="text" id="new-video-url" placeholder="https://www.tiktok.com/@username/video/1234567890" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: #252525; color: #fff; font-size: 14px; margin-bottom: 20px; box-sizing: border-box;">
+                <textarea id="new-video-url" placeholder="Enter TikTok video URLs (one per line):&#10;https://www.tiktok.com/@username/video/1234567890&#10;https://www.tiktok.com/@username/video/0987654321" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: #252525; color: #fff; font-size: 14px; margin-bottom: 20px; box-sizing: border-box; min-height: 120px; resize: vertical; font-family: inherit;"></textarea>
+                <div id="add-video-progress" style="display: none; margin-bottom: 15px; max-height: 200px; overflow-y: auto; background: #252525; border-radius: 8px; padding: 12px; border: 1px solid rgba(255,255,255,0.1);">
+                    <div style="color: #fff; font-weight: 600; margin-bottom: 8px; font-size: 14px;">Adding videos...</div>
+                    <div id="add-video-progress-list" style="font-size: 13px;"></div>
+                </div>
                 <div id="add-video-error" style="color: #ff4444; font-size: 13px; margin-bottom: 15px; display: none;"></div>
                 <div style="display: flex; gap: 10px; justify-content: flex-end;">
                     <button onclick="hideAddVideoModal()" style="padding: 10px 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: #fff; cursor: pointer; font-size: 14px;">Cancel</button>
@@ -6578,6 +6582,19 @@ class DashboardHandler(BaseHTTPRequestHandler):
             input.value = '';
             errorDiv.style.display = 'none';
             errorDiv.textContent = '';
+            
+            // Reset progress
+            const progressDiv = document.getElementById('add-video-progress');
+            const progressList = document.getElementById('add-video-progress-list');
+            if (progressDiv) progressDiv.style.display = 'none';
+            if (progressList) progressList.innerHTML = '';
+            
+            // Reset button
+            const addButton = document.querySelector('#add-video-modal button[onclick="addVideo()"]');
+            if (addButton) {
+                addButton.disabled = false;
+                addButton.textContent = 'Add Video';
+            }
             if (campaignSelector) {
                 populateAddVideoCampaignSelector();
                 campaignSelector.value = campaignId || '';
@@ -6594,81 +6611,199 @@ class DashboardHandler(BaseHTTPRequestHandler):
         function hideAddVideoModal() {
             const modal = document.getElementById('add-video-modal');
             const errorDiv = document.getElementById('add-video-error');
+            const progressDiv = document.getElementById('add-video-progress');
+            const progressList = document.getElementById('add-video-progress-list');
+            const input = document.getElementById('new-video-url');
+            const addButton = document.querySelector('#add-video-modal button[onclick="addVideo()"]');
             
             modal.style.display = 'none';
             errorDiv.style.display = 'none';
             errorDiv.textContent = '';
+            progressDiv.style.display = 'none';
+            progressList.innerHTML = '';
+            input.value = '';
+            
+            // Reset button
+            if (addButton) {
+                addButton.disabled = false;
+                addButton.textContent = 'Add Video';
+            }
         }
         
         async function addVideo() {
             const input = document.getElementById('new-video-url');
             const errorDiv = document.getElementById('add-video-error');
-            const videoUrl = input.value.trim();
+            const progressDiv = document.getElementById('add-video-progress');
+            const progressList = document.getElementById('add-video-progress-list');
+            const videoUrlsText = input.value.trim();
             const campaignSelector = document.getElementById('add-video-campaign-selector');
             const campaignId = campaignSelector ? campaignSelector.value : '';
             
-            // Clear previous errors
+            // Clear previous errors and progress
             errorDiv.style.display = 'none';
             errorDiv.textContent = '';
+            progressDiv.style.display = 'none';
+            progressList.innerHTML = '';
+            
+            // Parse URLs (split by newlines, filter empty)
+            const videoUrls = videoUrlsText.split('\n')
+                .map(url => url.trim())
+                .filter(url => url.length > 0);
             
             // Validate input
-            if (!videoUrl) {
-                errorDiv.textContent = 'Please enter a TikTok video URL';
+            if (videoUrls.length === 0) {
+                errorDiv.textContent = 'Please enter at least one TikTok video URL';
                 errorDiv.style.display = 'block';
                 return;
             }
             
-            if (!videoUrl.includes('tiktok.com')) {
-                errorDiv.textContent = 'Please enter a valid TikTok video URL';
+            // Validate all URLs are TikTok URLs
+            const invalidUrls = videoUrls.filter(url => !url.includes('tiktok.com'));
+            if (invalidUrls.length > 0) {
+                errorDiv.textContent = `Invalid URLs found. All URLs must be TikTok video URLs.`;
                 errorDiv.style.display = 'block';
                 return;
             }
             
-            // Disable button and show loading
+            // Disable button and show progress
             const addButton = document.querySelector('#add-video-modal button[onclick="addVideo()"]');
             const originalText = addButton.textContent;
-            addButton.textContent = 'Adding...';
             addButton.disabled = true;
+            progressDiv.style.display = 'block';
             
-            try {
-                const params = new URLSearchParams({
-                    video_url: videoUrl
-                });
-                if (campaignId) params.set('campaign_id', campaignId);
+            const results = {
+                success: [],
+                failed: []
+            };
+            
+            // Process each URL sequentially
+            for (let i = 0; i < videoUrls.length; i++) {
+                const videoUrl = videoUrls[i];
+                const shortUrl = videoUrl.length > 60 ? videoUrl.substring(0, 57) + '...' : videoUrl;
+                
+                // Update progress
+                progressList.innerHTML += `<div id="progress-${i}" style="margin-bottom: 6px; padding: 6px; border-radius: 4px; background: #1a1a1a;">
+                    <span style="color: #b0b0b0;">[${i + 1}/${videoUrls.length}]</span> 
+                    <span style="color: #fff;">${shortUrl}</span> 
+                    <span id="status-${i}" style="color: #667eea; margin-left: 8px;">⏳ Processing...</span>
+                </div>`;
+                
+                // Scroll to latest
+                progressDiv.scrollTop = progressDiv.scrollHeight;
+                
+                try {
+                    const params = new URLSearchParams({
+                        video_url: videoUrl
+                    });
+                    if (campaignId) params.set('campaign_id', campaignId);
 
-                const response = await fetch('/api/add-video?' + params.toString(), {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: params.toString()
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    // Close modal
-                    hideAddVideoModal();
+                    const response = await fetch('/api/add-video?' + params.toString(), {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: params.toString()
+                    });
                     
-                    // Refresh dashboard
-                    await loadDashboard(false);
-                    // Refresh campaigns so the new video shows up under the campaign immediately
-                    await loadCampaigns();
+                    const data = await response.json();
                     
-                    // Show success message (optional)
-                    console.log('Video added successfully:', data);
-                } else {
-                    errorDiv.textContent = data.error || 'Failed to add video';
-                    errorDiv.style.display = 'block';
-                    addButton.textContent = originalText;
-                    addButton.disabled = false;
+                    if (data.success) {
+                        results.success.push({url: videoUrl, data: data});
+                        document.getElementById(`status-${i}`).innerHTML = '<span style="color: #10b981;">✓ Added</span>';
+                        document.getElementById(`progress-${i}`).style.background = 'rgba(16, 185, 129, 0.1)';
+                        
+                        // Show notification
+                        showNotification(`✓ Video added: ${shortUrl}`, 'success');
+                    } else {
+                        results.failed.push({url: videoUrl, error: data.error || 'Failed to add video'});
+                        document.getElementById(`status-${i}`).innerHTML = `<span style="color: #ef4444;">✗ ${data.error || 'Failed'}</span>`;
+                        document.getElementById(`progress-${i}`).style.background = 'rgba(239, 68, 68, 0.1)';
+                        
+                        // Show notification
+                        showNotification(`✗ Failed: ${shortUrl} - ${data.error || 'Failed to add'}`, 'error');
+                    }
+                } catch (error) {
+                    results.failed.push({url: videoUrl, error: error.message});
+                    document.getElementById(`status-${i}`).innerHTML = `<span style="color: #ef4444;">✗ Error: ${error.message}</span>`;
+                    document.getElementById(`progress-${i}`).style.background = 'rgba(239, 68, 68, 0.1)';
+                    
+                    // Show notification
+                    showNotification(`✗ Error: ${shortUrl} - ${error.message}`, 'error');
                 }
-            } catch (error) {
-                errorDiv.textContent = 'Error: ' + error.message;
-                errorDiv.style.display = 'block';
+            }
+            
+            // Update button text
+            if (results.success.length > 0 && results.failed.length === 0) {
+                addButton.textContent = `✓ Added ${results.success.length} video(s)`;
+                // Close modal after a short delay
+                setTimeout(() => {
+                    hideAddVideoModal();
+                    loadDashboard(false);
+                    loadCampaigns();
+                }, 1500);
+            } else if (results.success.length > 0) {
+                addButton.textContent = `✓ Added ${results.success.length}/${videoUrls.length} video(s)`;
+                addButton.disabled = false;
+                // Refresh dashboard
+                await loadDashboard(false);
+                await loadCampaigns();
+            } else {
                 addButton.textContent = originalText;
                 addButton.disabled = false;
+                errorDiv.textContent = `Failed to add ${results.failed.length} video(s). Check progress above for details.`;
+                errorDiv.style.display = 'block';
             }
+        }
+        
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#667eea'};
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                z-index: 10001;
+                font-size: 14px;
+                max-width: 400px;
+                animation: slideIn 0.3s ease-out;
+            `;
+            notification.textContent = message;
+            
+            // Add animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from {
+                        transform: translateX(100%);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: translateX(0);
+                        opacity: 1;
+                    }
+                }
+            `;
+            if (!document.getElementById('notification-style')) {
+                style.id = 'notification-style';
+                document.head.appendChild(style);
+            }
+            
+            document.body.appendChild(notification);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideIn 0.3s ease-out reverse';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
         }
 
         function populateAddVideoCampaignSelector() {

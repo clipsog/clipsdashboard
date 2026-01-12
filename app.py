@@ -110,15 +110,17 @@ def run_continuous_bot():
                     import traceback
                     traceback.print_exc()
             
-            # Run delivery plan for videos that need checking
+            # Check and place due orders for videos that need checking
             for video_url in videos_need_check:
                 try:
-                    print(f"🚀 Running delivery plan for: {video_url[:50]}...")
+                    print(f"🔍 Checking due orders for: {video_url[:50]}...")
                     bot = DeliveryBot(video_url)
-                    # Run in a thread to avoid blocking
-                    bot_thread = threading.Thread(target=bot.run_delivery_plan, daemon=True)
-                    bot_thread.start()
-                    bot_thread.join(timeout=60)  # Wait max 60 seconds per video
+                    # Check and place due orders immediately (non-blocking)
+                    orders_placed = bot.check_and_place_due_orders()
+                    if orders_placed:
+                        print(f"✅ Orders placed for: {video_url[:50]}")
+                    else:
+                        print(f"✓ No orders due for: {video_url[:50]}")
                 except Exception as e:
                     print(f"❌ Error processing {video_url}: {e}")
                     import traceback

@@ -394,6 +394,145 @@ class DeliveryBot:
             print(f"{Fore.YELLOW}⚠ Error adjusting schedule: {e}. Using original schedule.{Style.RESET_ALL}")
             return purchases
     
+    def check_and_place_due_orders(self):
+        """Check if any orders are due and place them immediately (non-blocking)"""
+        try:
+            # Load progress to get start time and completed purchases
+            progress = self.load_progress()
+            if self.video_url not in progress:
+                return False
+            
+            video_progress = progress[self.video_url]
+            
+            # Get start time (when campaign started)
+            start_time_str = video_progress.get('start_time') or video_progress.get('campaign_start_time')
+            if not start_time_str:
+                return False
+            
+            try:
+                start_time = datetime.fromisoformat(start_time_str.replace('Z', '+00:00'))
+            except:
+                return False
+            
+            # Load purchase schedule
+            schedule_file = Path(__file__).parent / 'purchase_schedule.json'
+            if not schedule_file.exists():
+                return False
+            
+            with open(schedule_file, 'r') as f:
+                purchases = json.load(f)
+            
+            # Adjust schedule for this video's target completion time
+            target_completion_time = video_progress.get('target_completion_time') or video_progress.get('target_completion_datetime')
+            if target_completion_time:
+                purchases = self.calculate_adjusted_schedule(purchases, target_completion_time, start_time)
+            
+            # Get completed purchases
+            completed_purchases = video_progress.get('completed_purchases', [])
+            
+            # Filter out comments and comment_likes (milestone-based)
+            views_likes_purchases = [p for p in purchases if p['service'] not in ['Comments', 'Comment Likes']]
+            
+            # Create function to generate purchase ID
+            def get_purchase_id(purchase):
+                return f"{purchase.get('time_seconds', 0)}_{purchase.get('service', '')}_{purchase.get('quantity', 0)}"
+            
+            # Find due orders (time has passed, not completed)
+            now = datetime.now()
+            due_orders = []
+            
+            for purchase in views_likes_purchases:
+                purchase_id = get_purchase_id(purchase)
+                if purchase_id in completed_purchases:
+                    continue  # Already completed
+                
+                purchase_time = start_time + timedelta(seconds=purchase.get('time_seconds', 0))
+                
+                # Check if order is due (within last 5 minutes to account for timing)
+                time_diff = (now - purchase_time).total_seconds()
+                if -60 <= time_diff <= 300:  # Due if within 1 min before to 5 min after
+                    due_orders.append((purchase, purchase_time))
+            
+            if not due_orders:
+                return False
+            
+            # Place due orders
+            print(f"{Fore.CYAN}📦 Found {len(due_orders)} due order(s) to place{Style.RESET_ALL}")
+            
+            for purchase, purchase_time in due_orders:
+                service = purchase['service']
+                quantity = purchase['quantity']
+                service_key = service.lower().replace(' ', '_')
+                service_id = SERVICES.get(service_key)
+                
+                if not service_id:
+                    print(f"{Fore.RED}Unknown service: {service}{Style.RESET_ALL}")
+                    continue
+                
+                print(f"{Fore.YELLOW}[{purchase['time_str']}] Placing order: {quantity} {service.lower()}...{Style.RESET_ALL}")
+                
+                # Update activity status
+                progress = self.load_progress()
+                if self.video_url in progress:
+                    progress[self.video_url]['current_activity'] = {
+                        'status': 'ordering',
+                        'action': f"Ordering {quantity} {service.lower()}",
+                        'service': service,
+                        'quantity': quantity,
+                        'last_updated': datetime.now().isoformat()
+                    }
+                    self.save_progress(progress)
+                
+                # Place the order
+                success, order_id = self.create_order(service_id, quantity, service)
+                
+                if success:
+                    print(f"  {Fore.GREEN}✓ Order placed! ID: {order_id}{Style.RESET_ALL}")
+                    self.update_progress(service_key, quantity, order_id)
+                    
+                    # Mark as completed
+                    progress = self.load_progress()
+                    if self.video_url in progress:
+                        purchase_id = get_purchase_id(purchase)
+                        if 'completed_purchases' not in progress[self.video_url]:
+                            progress[self.video_url]['completed_purchases'] = []
+                        if purchase_id not in progress[self.video_url]['completed_purchases']:
+                            progress[self.video_url]['completed_purchases'].append(purchase_id)
+                            
+                            # Update next purchase time for this metric
+                            # Find next purchase of same type
+                            next_purchase = None
+                            for p in views_likes_purchases:
+                                if p['service'] == service:
+                                    p_id = get_purchase_id(p)
+                                    if p_id not in progress[self.video_url]['completed_purchases']:
+                                        next_purchase = p
+                                        break
+                            
+                            if next_purchase:
+                                next_purchase_time = start_time + timedelta(seconds=next_purchase.get('time_seconds', 0))
+                                service_lower = service.lower().replace(' ', '_')
+                                if service_lower == 'views':
+                                    progress[self.video_url]['next_views_purchase_time'] = next_purchase_time.isoformat()
+                                elif service_lower == 'likes':
+                                    progress[self.video_url]['next_likes_purchase_time'] = next_purchase_time.isoformat()
+                                elif service_lower == 'comments':
+                                    progress[self.video_url]['next_comments_purchase_time'] = next_purchase_time.isoformat()
+                                elif service_lower == 'comment_likes':
+                                    progress[self.video_url]['next_comment_likes_purchase_time'] = next_purchase_time.isoformat()
+                            
+                            self.save_progress(progress)
+                else:
+                    print(f"  {Fore.RED}✗ Failed to place order{Style.RESET_ALL}")
+            
+            return True
+            
+        except Exception as e:
+            print(f"{Fore.RED}Error checking due orders: {e}{Style.RESET_ALL}")
+            import traceback
+            traceback.print_exc()
+            return False
+    
     def run_delivery_plan(self):
         """Run the full delivery plan"""
         # Load purchase schedule

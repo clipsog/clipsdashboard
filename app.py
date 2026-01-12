@@ -82,7 +82,7 @@ def run_continuous_bot():
                     next_comment_likes_time = video_progress.get('next_comment_likes_purchase_time')
                     
                     # Check if any timer has expired
-                    if any([next_views_time, next_likes_time, next_comments_time, next_comment_likes_time]):
+                    if next_views_time or next_likes_time or next_comments_time or next_comment_likes_time:
                         for timer_str in [next_views_time, next_likes_time, next_comments_time, next_comment_likes_time]:
                             if timer_str:
                                 try:
@@ -90,7 +90,7 @@ def run_continuous_bot():
                                     if purchase_time <= now:
                                         videos_need_check.add(video_url)  # Set automatically handles duplicates
                                         break
-                                except:
+                                except (ValueError, TypeError):
                                     pass
                         
                 except Exception as e:

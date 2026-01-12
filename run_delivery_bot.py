@@ -405,13 +405,19 @@ class DeliveryBot:
             video_progress = progress[self.video_url]
             
             # Get start time (when campaign started)
+            # This is critical - timing is always relative to campaign start, not server restart
             start_time_str = video_progress.get('start_time') or video_progress.get('campaign_start_time')
             if not start_time_str:
+                # If no start_time exists, this might be an old campaign - can't proceed without timing reference
+                print(f"{Fore.YELLOW}⚠️ No start_time found for video - cannot determine order timing{Style.RESET_ALL}")
                 return False
             
             try:
                 start_time = datetime.fromisoformat(start_time_str.replace('Z', '+00:00'))
-            except:
+                # Log to confirm we're using the correct start time
+                print(f"{Fore.CYAN}📅 Campaign start time: {start_time.strftime('%Y-%m-%d %H:%M:%S')} (persisted){Style.RESET_ALL}")
+            except Exception as e:
+                print(f"{Fore.RED}Error parsing start_time: {e}{Style.RESET_ALL}")
                 return False
             
             # Load purchase schedule
@@ -438,8 +444,12 @@ class DeliveryBot:
                 return f"{purchase.get('time_seconds', 0)}_{purchase.get('service', '')}_{purchase.get('quantity', 0)}"
             
             # Find due orders (time has passed, not completed)
+            # This catches up on missed orders after server restarts/downtime
             now = datetime.now()
             due_orders = []
+            
+            # Maximum catch-up window: 24 hours (to avoid placing huge backlogs)
+            MAX_CATCHUP_SECONDS = 24 * 60 * 60
             
             for purchase in views_likes_purchases:
                 purchase_id = get_purchase_id(purchase)
@@ -448,16 +458,28 @@ class DeliveryBot:
                 
                 purchase_time = start_time + timedelta(seconds=purchase.get('time_seconds', 0))
                 
-                # Check if order is due (within last 5 minutes to account for timing)
+                # Check if order is due (catch up on missed orders)
                 time_diff = (now - purchase_time).total_seconds()
-                if -60 <= time_diff <= 300:  # Due if within 1 min before to 5 min after
+                
+                # Order is due if:
+                # 1. Time has passed (or within 1 minute before for early execution)
+                # 2. Not too old (within catch-up window)
+                if -60 <= time_diff <= MAX_CATCHUP_SECONDS:
                     due_orders.append((purchase, purchase_time))
             
             if not due_orders:
                 return False
             
+            # Sort by purchase time to place in order
+            due_orders.sort(key=lambda x: x[1])
+            
+            # Check if any are catch-up orders (more than 5 minutes old)
+            catch_up_orders = [o for o in due_orders if (now - o[1]).total_seconds() > 300]
+            if catch_up_orders:
+                print(f"{Fore.YELLOW}⚠️ Found {len(catch_up_orders)} missed order(s) to catch up on{Style.RESET_ALL}")
+            
             # Place due orders
-            print(f"{Fore.CYAN}📦 Found {len(due_orders)} due order(s) to place{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}📦 Placing {len(due_orders)} due order(s) (campaign started: {start_time.strftime('%Y-%m-%d %H:%M:%S')}){Style.RESET_ALL}")
             
             for purchase, purchase_time in due_orders:
                 service = purchase['service']

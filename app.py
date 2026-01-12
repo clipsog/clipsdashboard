@@ -46,7 +46,8 @@ def run_continuous_bot():
                 time.sleep(60)  # Check every 1 minute
                 continue
             
-            # Process each video (run delivery plan in a non-blocking way)
+            # Process each video - check ALL active campaigns for due orders
+            # This ensures we catch up on missed orders after server restarts
             now = datetime.now()
             videos_need_check = []
             
@@ -54,56 +55,43 @@ def run_continuous_bot():
                 try:
                     video_progress = progress.get(video_url, {})
                     
-                    # Check if there are pending orders by checking next_*_purchase_time fields
-                    next_views_time = video_progress.get('next_views_purchase_time')
-                    next_likes_time = video_progress.get('next_likes_purchase_time')
-                    next_comments_time = video_progress.get('next_comments_purchase_time')
-                    next_comment_likes_time = video_progress.get('next_comment_likes_purchase_time')
+                    # Check if campaign is active (has start_time and target_completion_time)
+                    has_start_time = video_progress.get('start_time') or video_progress.get('campaign_start_time')
+                    has_target = video_progress.get('target_completion_time') or video_progress.get('target_completion_datetime')
                     
-                    # Check if any timer has expired
-                    time_to_order = False
-                    if next_views_time:
+                    # Check if campaign is still active (target not reached or not overdue)
+                    if has_target:
                         try:
-                            purchase_time = datetime.fromisoformat(next_views_time.replace('Z', '+00:00'))
-                            if purchase_time <= now:
-                                time_to_order = True
-                                print(f"⏰ Views timer expired for: {video_url[:50]}")
+                            target_time = datetime.fromisoformat(has_target.replace('Z', '+00:00'))
+                            if target_time < now:
+                                # Campaign target time has passed, might still have pending orders
+                                # Check if there are any uncompleted purchases
+                                pass
                         except:
                             pass
                     
-                    if next_likes_time:
-                        try:
-                            purchase_time = datetime.fromisoformat(next_likes_time.replace('Z', '+00:00'))
-                            if purchase_time <= now:
-                                time_to_order = True
-                                print(f"⏰ Likes timer expired for: {video_url[:50]}")
-                        except:
-                            pass
-                    
-                    if next_comments_time:
-                        try:
-                            purchase_time = datetime.fromisoformat(next_comments_time.replace('Z', '+00:00'))
-                            if purchase_time <= now:
-                                time_to_order = True
-                                print(f"⏰ Comments timer expired for: {video_url[:50]}")
-                        except:
-                            pass
-                    
-                    if next_comment_likes_time:
-                        try:
-                            purchase_time = datetime.fromisoformat(next_comment_likes_time.replace('Z', '+00:00'))
-                            if purchase_time <= now:
-                                time_to_order = True
-                                print(f"⏰ Comment likes timer expired for: {video_url[:50]}")
-                        except:
-                            pass
-                    
-                    # Also check if there are next_orders or if campaign is active
-                    next_orders = video_progress.get('next_orders', [])
-                    has_target = video_progress.get('target_completion_time')
-                    
-                    if time_to_order or next_orders or (has_target and not video_progress.get('completed_purchases')):
+                    # Always check videos with active campaigns (has start_time and target)
+                    # The check_and_place_due_orders method will determine if orders are actually due
+                    if has_start_time and has_target:
                         videos_need_check.append(video_url)
+                    # Also check videos with expired timers (for immediate response)
+                    else:
+                        next_views_time = video_progress.get('next_views_purchase_time')
+                        next_likes_time = video_progress.get('next_likes_purchase_time')
+                        next_comments_time = video_progress.get('next_comments_purchase_time')
+                        next_comment_likes_time = video_progress.get('next_comment_likes_purchase_time')
+                        
+                        # Check if any timer has expired
+                        if any([next_views_time, next_likes_time, next_comments_time, next_comment_likes_time]):
+                            for timer_str in [next_views_time, next_likes_time, next_comments_time, next_comment_likes_time]:
+                                if timer_str:
+                                    try:
+                                        purchase_time = datetime.fromisoformat(timer_str.replace('Z', '+00:00'))
+                                        if purchase_time <= now:
+                                            videos_need_check.append(video_url)
+                                            break
+                                    except:
+                                        pass
                         
                 except Exception as e:
                     print(f"❌ Error checking {video_url}: {e}")

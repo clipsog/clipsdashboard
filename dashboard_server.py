@@ -85,6 +85,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.handle_create_campaign()
         elif path == '/api/update-campaign':
             self.handle_update_campaign()
+        elif path == '/api/end-campaign':
+            self.handle_end_campaign()
         elif path == '/api/assign-videos':
             self.handle_assign_videos()
         elif path == '/api/save-next-purchase-time':
@@ -123,6 +125,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.handle_create_campaign()
         elif path == '/api/update-campaign':
             self.handle_update_campaign()
+        elif path == '/api/end-campaign':
+            self.handle_end_campaign()
         elif path == '/api/assign-videos':
             self.handle_assign_videos()
         elif path == '/api/save-next-purchase-time':
@@ -2133,9 +2137,147 @@ class DashboardHandler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header('Content-type', 'application/json')
         self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Content-Length', str(len(response_data)))
-        self.end_headers()
-        self.wfile.write(response_data.encode())
+            self.send_header('Content-Length', str(len(response_data)))
+            self.end_headers()
+            self.wfile.write(response_data.encode())
+    
+    def handle_end_campaign(self):
+        """End a campaign (mark as ended but keep for stats)"""
+        try:
+            parsed_path = urllib.parse.urlparse(self.path)
+            query_string = parsed_path.query
+            
+            if self.command == 'GET':
+                params = urllib.parse.parse_qs(query_string)
+            else:
+                content_length = int(self.headers.get('Content-Length', 0))
+                if content_length > 0:
+                    post_data = self.rfile.read(content_length)
+                    params = urllib.parse.parse_qs(post_data.decode())
+                else:
+                    params = {}
+            
+            campaign_id = params.get('campaign_id', [None])[0]
+            
+            if not campaign_id:
+                response_data = json.dumps({'success': False, 'error': 'Missing campaign_id'})
+                self.send_response(400)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Content-Length', str(len(response_data)))
+                self.end_headers()
+                self.wfile.write(response_data.encode())
+                return
+            
+            campaigns = self.load_campaigns()
+            
+            if campaign_id not in campaigns:
+                response_data = json.dumps({'success': False, 'error': 'Campaign not found'})
+                self.send_response(404)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Content-Length', str(len(response_data)))
+                self.end_headers()
+                self.wfile.write(response_data.encode())
+                return
+            
+            # Mark campaign as ended
+            campaigns[campaign_id]['status'] = 'ended'
+            campaigns[campaign_id]['ended_at'] = datetime.now().isoformat()
+            
+            self.save_campaigns(campaigns)
+            
+            response_data = json.dumps({
+                'success': True,
+                'message': 'Campaign ended successfully'
+            })
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Content-Length', str(len(response_data)))
+            self.end_headers()
+            self.wfile.write(response_data.encode())
+            
+        except Exception as e:
+            print(f"EXCEPTION in handle_end_campaign: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            response_data = json.dumps({'success': False, 'error': str(e)})
+            self.send_response(500)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Content-Length', str(len(response_data)))
+            self.end_headers()
+            self.wfile.write(response_data.encode())
+    
+    def handle_end_campaign(self):
+        """End a campaign (mark as ended but keep for stats)"""
+        try:
+            parsed_path = urllib.parse.urlparse(self.path)
+            query_string = parsed_path.query
+            
+            if self.command == 'GET':
+                params = urllib.parse.parse_qs(query_string)
+            else:
+                content_length = int(self.headers.get('Content-Length', 0))
+                if content_length > 0:
+                    post_data = self.rfile.read(content_length)
+                    params = urllib.parse.parse_qs(post_data.decode())
+                else:
+                    params = {}
+            
+            campaign_id = params.get('campaign_id', [None])[0]
+            
+            if not campaign_id:
+                response_data = json.dumps({'success': False, 'error': 'Missing campaign_id'})
+                self.send_response(400)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Content-Length', str(len(response_data)))
+                self.end_headers()
+                self.wfile.write(response_data.encode())
+                return
+            
+            campaigns = self.load_campaigns()
+            
+            if campaign_id not in campaigns:
+                response_data = json.dumps({'success': False, 'error': 'Campaign not found'})
+                self.send_response(404)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Content-Length', str(len(response_data)))
+                self.end_headers()
+                self.wfile.write(response_data.encode())
+                return
+            
+            # Mark campaign as ended
+            campaigns[campaign_id]['status'] = 'ended'
+            campaigns[campaign_id]['ended_at'] = datetime.now().isoformat()
+            
+            self.save_campaigns(campaigns)
+            
+            response_data = json.dumps({
+                'success': True,
+                'message': 'Campaign ended successfully'
+            })
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Content-Length', str(len(response_data)))
+            self.end_headers()
+            self.wfile.write(response_data.encode())
+            
+        except Exception as e:
+            print(f"EXCEPTION in handle_end_campaign: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            response_data = json.dumps({'success': False, 'error': str(e)})
+            self.send_response(500)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Content-Length', str(len(response_data)))
+            self.end_headers()
+            self.wfile.write(response_data.encode())
     
     def handle_assign_videos(self):
         """Assign videos to a campaign"""
@@ -3349,8 +3491,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
         <!-- Add Video Modal -->
         <div id="add-video-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000; align-items: center; justify-content: center;">
             <div style="background: #1a1a1a; border-radius: 16px; padding: 30px; max-width: 500px; width: 90%; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 8px 32px rgba(0,0,0,0.5);">
-                <h2 style="margin: 0 0 20px 0; color: #fff; font-size: 24px;">➕ Add Videos to Campaign</h2>
-                <p style="color: #b0b0b0; margin-bottom: 20px; font-size: 14px;">Enter TikTok video URLs (one per line) to start tracking them in your campaign. You can add multiple videos at once.</p>
+                <h2 style="margin: 0 0 20px 0; color: #fff; font-size: 24px;">➕ Add Video to Campaign</h2>
+                <p style="color: #b0b0b0; margin-bottom: 20px; font-size: 14px;">Enter a TikTok video URL to start tracking it in your campaign.</p>
                 <div style="margin-bottom: 12px;">
                     <label style="display: block; color: #fff; margin-bottom: 8px; font-weight: 600;">Assign to Campaign (optional)</label>
                     <div style="display: flex; gap: 10px;">
@@ -3361,15 +3503,22 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     </div>
                     <div style="color: #888; font-size: 12px; margin-top: 6px;">If you choose a campaign, we’ll apply that campaign’s goals & speed to this post.</div>
                 </div>
-                <textarea id="new-video-url" placeholder="Enter TikTok video URLs (one per line):&#10;https://www.tiktok.com/@username/video/1234567890&#10;https://www.tiktok.com/@username/video/0987654321" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: #252525; color: #fff; font-size: 14px; margin-bottom: 20px; box-sizing: border-box; min-height: 120px; resize: vertical; font-family: inherit;"></textarea>
-                <div id="add-video-progress" style="display: none; margin-bottom: 15px; max-height: 200px; overflow-y: auto; background: #252525; border-radius: 8px; padding: 12px; border: 1px solid rgba(255,255,255,0.1);">
-                    <div style="color: #fff; font-weight: 600; margin-bottom: 8px; font-size: 14px;">Adding videos...</div>
-                    <div id="add-video-progress-list" style="font-size: 13px;"></div>
+                <textarea id="new-video-url" placeholder="Enter one or more TikTok URLs (one per line)&#10;https://www.tiktok.com/@username/video/1234567890&#10;https://www.tiktok.com/@username/video/0987654321" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: #252525; color: #fff; font-size: 14px; margin-bottom: 12px; box-sizing: border-box; min-height: 120px; resize: vertical; font-family: monospace;"></textarea>
+                <div style="color: #888; font-size: 12px; margin-bottom: 12px;">💡 Tip: Paste multiple URLs, one per line</div>
+                <div id="add-video-progress" style="display: none; margin-bottom: 15px;">
+                    <div style="color: #667eea; font-size: 13px; margin-bottom: 8px;">Adding videos...</div>
+                    <div style="background: #252525; border-radius: 8px; padding: 12px; max-height: 200px; overflow-y: auto;">
+                        <div id="add-video-progress-list" style="color: #b0b0b0; font-size: 12px; font-family: monospace;"></div>
+                    </div>
+                    <div style="background: #252525; height: 4px; border-radius: 2px; margin-top: 8px; overflow: hidden;">
+                        <div id="add-video-progress-bar" style="background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); height: 100%; width: 0%; transition: width 0.3s;"></div>
+                    </div>
                 </div>
                 <div id="add-video-error" style="color: #ff4444; font-size: 13px; margin-bottom: 15px; display: none;"></div>
+                <div id="add-video-success" style="color: #10b981; font-size: 13px; margin-bottom: 15px; display: none;"></div>
                 <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                    <button onclick="hideAddVideoModal()" style="padding: 10px 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: #fff; cursor: pointer; font-size: 14px;">Cancel</button>
-                    <button onclick="addVideo()" style="padding: 10px 20px; border-radius: 8px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; cursor: pointer; font-weight: 600; font-size: 14px;">Add Video</button>
+                    <button onclick="hideAddVideoModal()" id="add-video-cancel-btn" style="padding: 10px 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: #fff; cursor: pointer; font-size: 14px;">Cancel</button>
+                    <button onclick="addVideo()" id="add-video-submit-btn" style="padding: 10px 20px; border-radius: 8px; border: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; cursor: pointer; font-weight: 600; font-size: 14px;">Add Video(s)</button>
                 </div>
             </div>
         </div>
@@ -4210,6 +4359,38 @@ class DashboardHandler(BaseHTTPRequestHandler):
             }
         }
         
+        async function endCampaign(campaignId) {
+            if (!confirm('Are you sure you want to end this campaign? The campaign will remain visible for stats tracking, but no new orders will be placed.')) {
+                return;
+            }
+            
+            try {
+                const params = new URLSearchParams({
+                    campaign_id: campaignId
+                });
+                
+                const response = await fetch('/api/end-campaign?' + params.toString(), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: params.toString()
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showNotification('✓ Campaign ended successfully', 'success');
+                    await loadCampaigns();
+                    await loadDashboard(false);
+                } else {
+                    alert('❌ Error: ' + (data.error || 'Failed to end campaign'));
+                }
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            }
+        }
+        
         function showEditCampaignModal(campaignId) {
             const campaign = campaignsData[campaignId];
             if (!campaign) return;
@@ -4420,9 +4601,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             <h4 style="margin: 0; color: #fff; font-size: 1.1em; font-weight: 600;">${campaign.name || 'Unnamed Campaign'}</h4>
                             ${campaign.cpm > 0 ? `<span style="color: #667eea; font-size: 0.9em;">CPM: $${campaign.cpm.toFixed(2)}</span>` : '<span style="color: #888; font-size: 0.9em;">No CPM set</span>'}
                         </div>
-                        <div style="position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; z-index: 10;">
+                        <div style="position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; z-index: 10; flex-wrap: wrap;">
                             <button class="edit-campaign-btn" data-campaign-id="${campaignId}" onclick="event.stopPropagation(); showEditCampaignModal('${campaignId}');" style="background: #2a2a2a; color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;" onmouseover="this.style.background='#333';" onmouseout="this.style.background='#2a2a2a';">Edit</button>
                             <button class="add-video-to-campaign-btn" data-campaign-id="${campaignId}" onclick="event.stopPropagation(); showAddVideoToCampaignModal('${campaignId}');" style="background: #2a2a2a; color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;" onmouseover="this.style.background='#333';" onmouseout="this.style.background='#2a2a2a';">Add Video</button>
+                            ${campaign.status !== 'ended' ? `<button class="end-campaign-btn" data-campaign-id="${campaignId}" onclick="event.stopPropagation(); endCampaign('${campaignId}');" style="background: #2a2a2a; color: #ef4444; border: 1px solid rgba(239,68,68,0.3); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;" onmouseover="this.style.background='#333'; this.style.borderColor='rgba(239,68,68,0.5)';" onmouseout="this.style.background='#2a2a2a'; this.style.borderColor='rgba(239,68,68,0.3)';">End Campaign</button>` : '<span style="color: #888; font-size: 11px; padding: 6px 12px;">Ended</span>'}
                         </div>
                         <div style="color: #b0b0b0; font-size: 0.85em; margin-bottom: 10px;">
                             <div>Goals/post: ${formatNumber(goalViews)} views · ${formatNumber(goalLikes)} likes · ${formatNumber(goalComments)} comments · ${formatNumber(goalCommentLikes)} comment likes</div>
@@ -6582,19 +6764,6 @@ class DashboardHandler(BaseHTTPRequestHandler):
             input.value = '';
             errorDiv.style.display = 'none';
             errorDiv.textContent = '';
-            
-            // Reset progress
-            const progressDiv = document.getElementById('add-video-progress');
-            const progressList = document.getElementById('add-video-progress-list');
-            if (progressDiv) progressDiv.style.display = 'none';
-            if (progressList) progressList.innerHTML = '';
-            
-            // Reset button
-            const addButton = document.querySelector('#add-video-modal button[onclick="addVideo()"]');
-            if (addButton) {
-                addButton.disabled = false;
-                addButton.textContent = 'Add Video';
-            }
             if (campaignSelector) {
                 populateAddVideoCampaignSelector();
                 campaignSelector.value = campaignId || '';
@@ -6611,89 +6780,78 @@ class DashboardHandler(BaseHTTPRequestHandler):
         function hideAddVideoModal() {
             const modal = document.getElementById('add-video-modal');
             const errorDiv = document.getElementById('add-video-error');
-            const progressDiv = document.getElementById('add-video-progress');
-            const progressList = document.getElementById('add-video-progress-list');
-            const input = document.getElementById('new-video-url');
-            const addButton = document.querySelector('#add-video-modal button[onclick="addVideo()"]');
             
             modal.style.display = 'none';
             errorDiv.style.display = 'none';
             errorDiv.textContent = '';
-            progressDiv.style.display = 'none';
-            progressList.innerHTML = '';
-            input.value = '';
-            
-            // Reset button
-            if (addButton) {
-                addButton.disabled = false;
-                addButton.textContent = 'Add Video';
-            }
         }
         
         async function addVideo() {
             const input = document.getElementById('new-video-url');
             const errorDiv = document.getElementById('add-video-error');
+            const successDiv = document.getElementById('add-video-success');
             const progressDiv = document.getElementById('add-video-progress');
             const progressList = document.getElementById('add-video-progress-list');
-            const videoUrlsText = input.value.trim();
+            const progressBar = document.getElementById('add-video-progress-bar');
+            const addButton = document.getElementById('add-video-submit-btn');
+            const cancelButton = document.getElementById('add-video-cancel-btn');
             const campaignSelector = document.getElementById('add-video-campaign-selector');
             const campaignId = campaignSelector ? campaignSelector.value : '';
             
-            // Clear previous errors and progress
-            errorDiv.style.display = 'none';
-            errorDiv.textContent = '';
-            progressDiv.style.display = 'none';
-            progressList.innerHTML = '';
-            
-            // Parse URLs (split by newlines, filter empty)
-            const videoUrls = videoUrlsText.split('\n')
+            // Get URLs from textarea (one per line)
+            const urlsText = input.value.trim();
+            const urls = urlsText.split('\\n')
                 .map(url => url.trim())
                 .filter(url => url.length > 0);
             
+            // Clear previous messages
+            errorDiv.style.display = 'none';
+            errorDiv.textContent = '';
+            successDiv.style.display = 'none';
+            successDiv.textContent = '';
+            
             // Validate input
-            if (videoUrls.length === 0) {
+            if (urls.length === 0) {
                 errorDiv.textContent = 'Please enter at least one TikTok video URL';
                 errorDiv.style.display = 'block';
                 return;
             }
             
-            // Validate all URLs are TikTok URLs
-            const invalidUrls = videoUrls.filter(url => !url.includes('tiktok.com'));
+            // Validate all URLs
+            const invalidUrls = urls.filter(url => !url.includes('tiktok.com'));
             if (invalidUrls.length > 0) {
-                errorDiv.textContent = `Invalid URLs found. All URLs must be TikTok video URLs.`;
+                errorDiv.textContent = `Invalid URLs detected. All URLs must be TikTok links.`;
                 errorDiv.style.display = 'block';
                 return;
             }
             
-            // Disable button and show progress
-            const addButton = document.querySelector('#add-video-modal button[onclick="addVideo()"]');
-            const originalText = addButton.textContent;
-            addButton.disabled = true;
+            // Show progress
             progressDiv.style.display = 'block';
+            progressList.innerHTML = '';
+            progressBar.style.width = '0%';
+            addButton.disabled = true;
+            cancelButton.disabled = true;
+            addButton.textContent = 'Adding...';
             
-            const results = {
-                success: [],
-                failed: []
-            };
+            let successCount = 0;
+            let errorCount = 0;
+            const results = [];
             
-            // Process each URL sequentially
-            for (let i = 0; i < videoUrls.length; i++) {
-                const videoUrl = videoUrls[i];
-                const shortUrl = videoUrl.length > 60 ? videoUrl.substring(0, 57) + '...' : videoUrl;
+            // Process each URL
+            for (let i = 0; i < urls.length; i++) {
+                const url = urls[i];
+                const progress = ((i + 1) / urls.length) * 100;
+                progressBar.style.width = progress + '%';
                 
-                // Update progress
-                progressList.innerHTML += `<div id="progress-${i}" style="margin-bottom: 6px; padding: 6px; border-radius: 4px; background: #1a1a1a;">
-                    <span style="color: #b0b0b0;">[${i + 1}/${videoUrls.length}]</span> 
-                    <span style="color: #fff;">${shortUrl}</span> 
-                    <span id="status-${i}" style="color: #667eea; margin-left: 8px;">⏳ Processing...</span>
-                </div>`;
-                
-                // Scroll to latest
-                progressDiv.scrollTop = progressDiv.scrollHeight;
+                // Update progress list
+                const statusLine = document.createElement('div');
+                statusLine.style.marginBottom = '4px';
+                statusLine.innerHTML = `[${i + 1}/${urls.length}] ${url.substring(0, 60)}... <span style="color: #667eea;">Processing...</span>`;
+                progressList.appendChild(statusLine);
                 
                 try {
                     const params = new URLSearchParams({
-                        video_url: videoUrl
+                        video_url: url
                     });
                     if (campaignId) params.set('campaign_id', campaignId);
 
@@ -6708,50 +6866,49 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     const data = await response.json();
                     
                     if (data.success) {
-                        results.success.push({url: videoUrl, data: data});
-                        document.getElementById(`status-${i}`).innerHTML = '<span style="color: #10b981;">✓ Added</span>';
-                        document.getElementById(`progress-${i}`).style.background = 'rgba(16, 185, 129, 0.1)';
-                        
-                        // Show notification
-                        showNotification(`✓ Video added: ${shortUrl}`, 'success');
+                        successCount++;
+                        statusLine.innerHTML = `[${i + 1}/${urls.length}] ${url.substring(0, 60)}... <span style="color: #10b981;">✓ Added</span>`;
+                        results.push({ url, success: true, data });
                     } else {
-                        results.failed.push({url: videoUrl, error: data.error || 'Failed to add video'});
-                        document.getElementById(`status-${i}`).innerHTML = `<span style="color: #ef4444;">✗ ${data.error || 'Failed'}</span>`;
-                        document.getElementById(`progress-${i}`).style.background = 'rgba(239, 68, 68, 0.1)';
-                        
-                        // Show notification
-                        showNotification(`✗ Failed: ${shortUrl} - ${data.error || 'Failed to add'}`, 'error');
+                        errorCount++;
+                        statusLine.innerHTML = `[${i + 1}/${urls.length}] ${url.substring(0, 60)}... <span style="color: #ef4444;">✗ ${data.error || 'Failed'}</span>`;
+                        results.push({ url, success: false, error: data.error });
                     }
                 } catch (error) {
-                    results.failed.push({url: videoUrl, error: error.message});
-                    document.getElementById(`status-${i}`).innerHTML = `<span style="color: #ef4444;">✗ Error: ${error.message}</span>`;
-                    document.getElementById(`progress-${i}`).style.background = 'rgba(239, 68, 68, 0.1)';
-                    
-                    // Show notification
-                    showNotification(`✗ Error: ${shortUrl} - ${error.message}`, 'error');
+                    errorCount++;
+                    statusLine.innerHTML = `[${i + 1}/${urls.length}] ${url.substring(0, 60)}... <span style="color: #ef4444;">✗ Error: ${error.message}</span>`;
+                    results.push({ url, success: false, error: error.message });
                 }
+                
+                // Scroll to bottom of progress list
+                progressList.scrollTop = progressList.scrollHeight;
             }
             
-            // Update button text
-            if (results.success.length > 0 && results.failed.length === 0) {
-                addButton.textContent = `✓ Added ${results.success.length} video(s)`;
-                // Close modal after a short delay
-                setTimeout(() => {
+            // Complete
+            progressBar.style.width = '100%';
+            
+            // Show results
+            if (successCount > 0) {
+                successDiv.textContent = `✓ Successfully added ${successCount} video(s)${errorCount > 0 ? ` (${errorCount} failed)` : ''}`;
+                successDiv.style.display = 'block';
+                
+                // Show notification
+                showNotification(`✓ ${successCount} video(s) added successfully`, 'success');
+                
+                // Refresh dashboard after a short delay
+                setTimeout(async () => {
+                    await loadDashboard(false);
+                    await loadCampaigns();
                     hideAddVideoModal();
-                    loadDashboard(false);
-                    loadCampaigns();
+                    // Clear input
+                    input.value = '';
                 }, 1500);
-            } else if (results.success.length > 0) {
-                addButton.textContent = `✓ Added ${results.success.length}/${videoUrls.length} video(s)`;
-                addButton.disabled = false;
-                // Refresh dashboard
-                await loadDashboard(false);
-                await loadCampaigns();
             } else {
-                addButton.textContent = originalText;
-                addButton.disabled = false;
-                errorDiv.textContent = `Failed to add ${results.failed.length} video(s). Check progress above for details.`;
+                errorDiv.textContent = `Failed to add all videos. ${errorCount} error(s) occurred.`;
                 errorDiv.style.display = 'block';
+                addButton.disabled = false;
+                cancelButton.disabled = false;
+                addButton.textContent = 'Add Video(s)';
             }
         }
         
@@ -6764,13 +6921,14 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 right: 20px;
                 background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#667eea'};
                 color: white;
-                padding: 12px 20px;
+                padding: 16px 24px;
                 border-radius: 8px;
                 box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-                z-index: 10001;
+                z-index: 100000;
                 font-size: 14px;
-                max-width: 400px;
+                font-weight: 600;
                 animation: slideIn 0.3s ease-out;
+                max-width: 400px;
             `;
             notification.textContent = message;
             
@@ -6779,7 +6937,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             style.textContent = `
                 @keyframes slideIn {
                     from {
-                        transform: translateX(100%);
+                        transform: translateX(400px);
                         opacity: 0;
                     }
                     to {
@@ -6788,10 +6946,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     }
                 }
             `;
-            if (!document.getElementById('notification-style')) {
-                style.id = 'notification-style';
-                document.head.appendChild(style);
-            }
+            document.head.appendChild(style);
             
             document.body.appendChild(notification);
             
@@ -6799,9 +6954,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
             setTimeout(() => {
                 notification.style.animation = 'slideIn 0.3s ease-out reverse';
                 setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.parentNode.removeChild(notification);
-                    }
+                    notification.remove();
+                    style.remove();
                 }, 300);
             }, 3000);
         }
@@ -6982,14 +7136,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         if (campaignVideos.length === 0) {
                             html += `<div style="text-align: center; padding: 40px; color: #b0b0b0;">No videos in this campaign yet. Add videos using the "➕ Add Video" button.</div>`;
                         } else {
-                            html += '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px;">';
-                            for (const videoUrl of campaignVideos) {
-                                const videoData = progress[videoUrl];
-                                if (videoData) {
-                                    html += renderVideoCard(videoUrl, videoData);
-                                }
-                            }
-                            html += '</div>';
+                            // Show loading indicator while rendering videos
+                            html += '<div id="campaign-videos-loading" style="text-align: center; padding: 20px; color: #b0b0b0;">Loading videos...</div>';
+                            html += '<div id="campaign-videos-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px;"></div>';
                         }
                     }
                 } else if (route.type === 'detail') {
@@ -7067,6 +7216,52 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 // Smooth update without full reload
                 content.innerHTML = html;
                 content.style.opacity = '1';
+                
+                // If we're showing a campaign, render videos asynchronously in batches
+                if (route.type === 'campaign') {
+                    const campaignId = route.campaignId;
+                    const campaign = campaignsData[campaignId];
+                    if (campaign) {
+                        const campaignVideos = campaign.videos || [];
+                        if (campaignVideos.length > 0) {
+                            // Render videos in batches to avoid blocking UI
+                            const batchSize = 5;
+                            let currentIndex = 0;
+                            const container = document.getElementById('campaign-videos-container');
+                            const loading = document.getElementById('campaign-videos-loading');
+                            
+                            function renderBatch() {
+                                if (!container) return;
+                                
+                                const batch = campaignVideos.slice(currentIndex, currentIndex + batchSize);
+                                let batchHtml = '';
+                                
+                                for (const videoUrl of batch) {
+                                    const videoData = progress[videoUrl];
+                                    if (videoData) {
+                                        batchHtml += renderVideoCard(videoUrl, videoData);
+                                    }
+                                }
+                                
+                                container.innerHTML += batchHtml;
+                                currentIndex += batchSize;
+                                
+                                if (currentIndex < campaignVideos.length) {
+                                    // Continue with next batch
+                                    setTimeout(renderBatch, 50);
+                                } else {
+                                    // All videos rendered
+                                    if (loading) loading.style.display = 'none';
+                                    // Initialize charts after all videos are rendered
+                                    setTimeout(initializeGrowthCharts, 100);
+                                }
+                            }
+                            
+                            // Start rendering
+                            setTimeout(renderBatch, 0);
+                        }
+                    }
+                }
                 
                 // Attach event listeners directly to Show Analytics buttons after rendering
                 // Use requestAnimationFrame to ensure DOM is ready

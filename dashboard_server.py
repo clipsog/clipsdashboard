@@ -91,6 +91,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.handle_save_next_purchase_time()
         elif path == '/api/catch-up':
             self.handle_catch_up()
+        elif path == '/api/manual-order':
+            self.handle_manual_order()
         elif path == '/health' or path == '/api/health':
             self.handle_health()
         else:
@@ -127,6 +129,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.handle_save_next_purchase_time()
         elif path == '/api/catch-up':
             self.handle_catch_up()
+        elif path == '/api/manual-order':
+            self.handle_manual_order()
         elif path == '/health' or path == '/api/health':
             self.handle_health()
         else:
@@ -1924,6 +1928,201 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(response_data.encode())
     
+    def handle_manual_order(self):
+        """Handle manual order request"""
+        try:
+            parsed_path = urllib.parse.urlparse(self.path)
+            query_string = parsed_path.query
+            
+            if self.command == 'GET':
+                params = urllib.parse.parse_qs(query_string)
+            else:
+                content_length = int(self.headers.get('Content-Length', 0))
+                if content_length > 0:
+                    post_data = self.rfile.read(content_length)
+                    params = urllib.parse.parse_qs(post_data.decode())
+                else:
+                    params = {}
+            
+            video_url = params.get('video_url', [None])[0]
+            metric = params.get('metric', [None])[0]  # 'views', 'likes', 'comments', 'comment_likes'
+            amount = params.get('amount', [None])[0]  # Amount to order
+            
+            if not video_url or not metric or not amount:
+                response_data = json.dumps({'success': False, 'error': 'Missing required parameters'})
+                self.send_response(400)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Content-Length', str(len(response_data)))
+                self.end_headers()
+                self.wfile.write(response_data.encode())
+                return
+            
+            try:
+                amount = int(amount)
+            except:
+                response_data = json.dumps({'success': False, 'error': 'Invalid amount'})
+                self.send_response(400)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Content-Length', str(len(response_data)))
+                self.end_headers()
+                self.wfile.write(response_data.encode())
+                return
+            
+            if amount <= 0:
+                response_data = json.dumps({'success': False, 'error': 'Amount must be greater than 0'})
+                self.send_response(400)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Content-Length', str(len(response_data)))
+                self.end_headers()
+                self.wfile.write(response_data.encode())
+                return
+            
+            # Service IDs and minimums (matching run_delivery_bot.py)
+            SERVICES = {
+                'views': '1321',
+                'likes': '250',
+                'comments': '1384',
+                'comment_likes': '14718'
+            }
+            
+            MINIMUMS = {
+                'views': 50,
+                'likes': 10,
+                'comments': 10,
+                'comment_likes': 50
+            }
+            
+            API_KEY = "3327db2d9f02b8c241b200a40fe3d12d"
+            BASE_URL = "https://smmfollows.com/api/v2"
+            
+            if metric not in SERVICES:
+                response_data = json.dumps({'success': False, 'error': 'Invalid metric'})
+                self.send_response(400)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Content-Length', str(len(response_data)))
+                self.end_headers()
+                self.wfile.write(response_data.encode())
+                return
+            
+            # Ensure amount meets minimum
+            minimum = MINIMUMS[metric]
+            if amount < minimum:
+                response_data = json.dumps({'success': False, 'error': f'Amount must be at least {minimum} for {metric}'})
+                self.send_response(400)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Content-Length', str(len(response_data)))
+                self.end_headers()
+                self.wfile.write(response_data.encode())
+                return
+            
+            service_id = SERVICES[metric]
+            
+            # Place order
+            import requests
+            order_data = {
+                'key': API_KEY,
+                'action': 'add',
+                'service': service_id,
+                'link': video_url,
+                'quantity': amount
+            }
+            
+            # Add comments if needed
+            if metric == 'comments':
+                progress = self.load_progress()
+                if video_url in progress:
+                    comments_text = progress[video_url].get('comments_text', '')
+                    if comments_text:
+                        order_data['comments'] = comments_text
+            
+            response = requests.post(BASE_URL, data=order_data, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                order_id = data.get('order', 0)
+                if order_id and order_id != 0:
+                    # Update progress
+                    progress = self.load_progress()
+                    if video_url not in progress:
+                        progress[video_url] = {}
+                    
+                    # Update orders placed
+                    if 'orders_placed' not in progress[video_url]:
+                        progress[video_url]['orders_placed'] = {'views': 0, 'likes': 0, 'comments': 0, 'comment_likes': 0}
+                    
+                    orders_placed = progress[video_url]['orders_placed']
+                    orders_placed[metric] = orders_placed.get(metric, 0) + amount
+                    
+                    # Update order history
+                    if 'order_history' not in progress[video_url]:
+                        progress[video_url]['order_history'] = []
+                    
+                    progress[video_url]['order_history'].append({
+                        'service': metric,
+                        'quantity': amount,
+                        'order_id': str(order_id),
+                        'timestamp': datetime.now().isoformat(),
+                        'type': 'manual'
+                    })
+                    
+                    # Update total cost
+                    rates = {
+                        'views': 0.0140,
+                        'likes': 0.2100,
+                        'comments': 13.5000,
+                        'comment_likes': 0.2100
+                    }
+                    cost = (amount / 1000.0) * rates[metric]
+                    progress[video_url]['total_cost'] = progress[video_url].get('total_cost', 0) + cost
+                    
+                    self.save_progress(progress)
+                    
+                    response_data = json.dumps({
+                        'success': True,
+                        'message': f'Manual order placed: {amount} {metric}',
+                        'order_id': order_id,
+                        'amount': amount
+                    })
+                    self.send_response(200)
+                    self.send_header('Content-type', 'application/json')
+                    self.send_header('Access-Control-Allow-Origin', '*')
+                    self.send_header('Content-Length', str(len(response_data)))
+                    self.end_headers()
+                    self.wfile.write(response_data.encode())
+                else:
+                    error_msg = data.get('error', 'Unknown error')
+                    response_data = json.dumps({'success': False, 'error': f'Order failed: {error_msg}'})
+                    self.send_response(400)
+                    self.send_header('Content-type', 'application/json')
+                    self.send_header('Access-Control-Allow-Origin', '*')
+                    self.send_header('Content-Length', str(len(response_data)))
+                    self.end_headers()
+                    self.wfile.write(response_data.encode())
+            else:
+                response_data = json.dumps({'success': False, 'error': f'API request failed: {response.status_code}'})
+                self.send_response(500)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Content-Length', str(len(response_data)))
+                self.end_headers()
+                self.wfile.write(response_data.encode())
+        except Exception as e:
+            print(f"EXCEPTION in handle_manual_order: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            response_data = json.dumps({'success': False, 'error': str(e)})
+            self.send_response(500)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Content-Length', str(len(response_data)))
+            self.end_headers()
+            self.wfile.write(response_data.encode())
+    
     def handle_health(self):
         """Health check endpoint for Render"""
         response_data = json.dumps({
@@ -3488,6 +3687,61 @@ class DashboardHandler(BaseHTTPRequestHandler):
             }
         }
         
+        async function manualOrder(videoUrl, metric, minimum, buttonElement) {
+            const button = buttonElement || event.target;
+            const amountStr = prompt(`Enter amount of ${metric} to order (minimum: ${minimum}):`, minimum);
+            
+            if (!amountStr) {
+                return; // User cancelled
+            }
+            
+            const amount = parseInt(amountStr);
+            if (isNaN(amount) || amount < minimum) {
+                alert(`Amount must be at least ${minimum} for ${metric}`);
+                return;
+            }
+            
+            if (!confirm(`Place manual order for ${amount.toLocaleString()} ${metric}?`)) {
+                return;
+            }
+            
+            const originalText = button.textContent;
+            button.disabled = true;
+            button.textContent = 'Placing order...';
+            
+            try {
+                const params = new URLSearchParams({
+                    video_url: videoUrl,
+                    metric: metric,
+                    amount: amount
+                });
+                
+                const response = await fetch('/api/manual-order?' + params.toString(), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: params.toString()
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    alert(`✓ Manual order placed! Order ID: ${data.order_id}\nAmount: ${data.amount.toLocaleString()} ${metric}`);
+                    // Reload dashboard to show updated stats
+                    await loadDashboard(true);
+                } else {
+                    alert('❌ Error: ' + (data.error || 'Failed to place manual order'));
+                    button.disabled = false;
+                    button.textContent = originalText;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error placing manual order: ' + error.message);
+                button.disabled = false;
+                button.textContent = originalText;
+            }
+        }
+        
         async function saveComments(videoUrl, textareaId) {
             const textarea = document.getElementById(textareaId);
             const comments = textarea.value.trim();
@@ -4987,8 +5241,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Expected total: <span style="color: #fff;">${formatNumber(expectedViewsToOrder)}</span></div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Already ordered: <span style="color: #10b981; font-weight: 600;">${formatNumber(viewsOrdered)}</span></div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Per order: <span style="color: #10b981; font-weight: 600;">$${nextViewsPurchase.cost.toFixed(4)}</span></div>
-                                <div style="color: #b0b0b0;">Total cost: <span style="color: #10b981; font-weight: 600;">$${nextViewsPurchase.totalCost.toFixed(4)}</span></div>
+                                <div style="color: #b0b0b0; margin-bottom: 6px;">Total cost: <span style="color: #10b981; font-weight: 600;">$${nextViewsPurchase.totalCost.toFixed(4)}</span></div>
+                                <button class="manual-order-btn" data-video-url="${safeVideoUrlAttr}" data-metric="views" data-minimum="50" style="width: 100%; background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9em; margin-top: 4px;">📦 Manual Order</button>
                             </div>` : nextViewsPurchaseTime ? `<div style="color: #667eea; font-size: 0.85em; margin-top: 3px;" data-next-purchase data-purchase-time="${nextViewsPurchaseTime.toISOString()}" data-metric="views">🛒 Next purchase: <span data-countdown-display>${formatTimeRemaining((nextViewsPurchaseTime - now) / (1000 * 60 * 60))}</span></div>` : ''}
+                            ${targetViews > 0 ? `<button class="manual-order-btn" data-video-url="${safeVideoUrlAttr}" data-metric="views" data-minimum="50" style="width: 100%; background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85em; margin-top: 8px;">📦 Manual Order Views</button>` : ''}
                             <div class="progress-bar-container">
                                 <div class="progress-bar" style="width: ${Math.min(viewsProgress, 100)}%">${formatPercentage(totalViews, targetViews)}</div>
                             </div>
@@ -5015,8 +5271,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Expected total: <span style="color: #fff;">${formatNumber(expectedLikesToOrder)}</span></div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Already ordered: <span style="color: #10b981; font-weight: 600;">${formatNumber(likesOrdered)}</span></div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Per order: <span style="color: #10b981; font-weight: 600;">$${nextLikesPurchase.cost.toFixed(4)}</span></div>
-                                <div style="color: #b0b0b0;">Total cost: <span style="color: #10b981; font-weight: 600;">$${nextLikesPurchase.totalCost.toFixed(4)}</span></div>
+                                <div style="color: #b0b0b0; margin-bottom: 6px;">Total cost: <span style="color: #10b981; font-weight: 600;">$${nextLikesPurchase.totalCost.toFixed(4)}</span></div>
+                                <button class="manual-order-btn" data-video-url="${safeVideoUrlAttr}" data-metric="likes" data-minimum="10" style="width: 100%; background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9em; margin-top: 4px;">📦 Manual Order</button>
                             </div>` : nextLikesPurchaseTime ? `<div style="color: #667eea; font-size: 0.85em; margin-top: 3px;" data-next-purchase data-purchase-time="${nextLikesPurchaseTime.toISOString()}" data-metric="likes">🛒 Next purchase: <span data-countdown-display>${formatTimeRemaining((nextLikesPurchaseTime - now) / (1000 * 60 * 60))}</span></div>` : ''}
+                            ${targetLikes > 0 ? `<button class="manual-order-btn" data-video-url="${safeVideoUrlAttr}" data-metric="likes" data-minimum="10" style="width: 100%; background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85em; margin-top: 8px;">📦 Manual Order Likes</button>` : ''}
                             <div class="progress-bar-container">
                                 <div class="progress-bar" style="width: ${Math.min(likesProgress, 100)}%">${formatPercentage(totalLikes, targetLikes)}</div>
                             </div>
@@ -6436,6 +6694,15 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 const metric = e.target.getAttribute('data-metric');
                 const amount = parseInt(e.target.getAttribute('data-amount'));
                 catchUp(videoUrl, metric, amount, e.target);
+            }
+            
+            if (e.target && e.target.classList.contains('manual-order-btn')) {
+                e.preventDefault();
+                e.stopPropagation();
+                const videoUrl = e.target.getAttribute('data-video-url');
+                const metric = e.target.getAttribute('data-metric');
+                const minimum = parseInt(e.target.getAttribute('data-minimum'));
+                manualOrder(videoUrl, metric, minimum, e.target);
             }
         });
         

@@ -3195,12 +3195,12 @@ class DashboardHandler(BaseHTTPRequestHandler):
         /* Summary Statistics */
         .summary-stats {
             display: flex;
-            gap: 24px;
-            margin-bottom: 20px;
-            padding: 12px 16px;
+            gap: 20px;
+            margin-bottom: 16px;
+            padding: 8px 12px;
             background: #1a1a1a;
-            border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.06);
             flex-wrap: wrap;
             align-items: center;
         }
@@ -3208,26 +3208,65 @@ class DashboardHandler(BaseHTTPRequestHandler):
         .summary-stat-card {
             display: flex;
             align-items: baseline;
-            gap: 8px;
+            gap: 6px;
             flex: 0 1 auto;
         }
         
         .summary-stat-label {
-            color: #888;
-            font-size: 0.75em;
+            color: #666;
+            font-size: 0.7em;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
             font-weight: 500;
         }
         
         .summary-stat-value {
             color: #ffffff;
-            font-size: 1.1em;
+            font-size: 0.95em;
             font-weight: 600;
         }
         
         .summary-stat-change {
             display: none;
+        }
+        
+        /* Tab Navigation */
+        .tab-navigation {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: #888;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            margin-bottom: -1px;
+        }
+        
+        .tab-btn:hover {
+            color: #fff;
+            background: rgba(255,255,255,0.05);
+        }
+        
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
         }
         
         /* Search and Filter Bar */
@@ -3443,7 +3482,14 @@ class DashboardHandler(BaseHTTPRequestHandler):
         
         <div id="summary-stats-container"></div>
         
-        <div class="controls-bar">
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+            <button class="tab-btn active" data-tab="dashboard" onclick="switchTab('dashboard')">Dashboard</button>
+            <button class="tab-btn" data-tab="campaigns" onclick="switchTab('campaigns')">Campaigns</button>
+            <button class="tab-btn" data-tab="order-log" onclick="switchTab('order-log')">Order Log</button>
+        </div>
+        
+        <div class="controls-bar" id="dashboard-controls">
             <input type="text" id="search-box" class="search-box" placeholder="🔍 Search videos by username or URL..." oninput="filterVideos()">
             <select id="status-filter" class="filter-select" onchange="filterVideos()">
                 <option value="all">All Status</option>
@@ -3634,8 +3680,16 @@ class DashboardHandler(BaseHTTPRequestHandler):
             </div>
         </div>
         
-        <div id="dashboard-content">
+        <div id="dashboard-content" class="tab-content active">
             <div class="loading">Loading...</div>
+        </div>
+        
+        <div id="campaigns-content" class="tab-content">
+            <div id="campaigns-summary"></div>
+        </div>
+        
+        <div id="order-log-content" class="tab-content">
+            <div class="loading">Loading order log...</div>
         </div>
     </div>
     
@@ -4538,7 +4592,21 @@ class DashboardHandler(BaseHTTPRequestHandler):
         
         function renderCampaignsSummary() {
             const container = document.getElementById('campaigns-summary');
-            if (!container) return;
+            if (!container) {
+                // If campaigns tab is active, create container
+                const campaignsContent = document.getElementById('campaigns-content');
+                if (campaignsContent) {
+                    campaignsContent.innerHTML = '<div id="campaigns-summary"></div>';
+                    const newContainer = document.getElementById('campaigns-summary');
+                    if (newContainer) {
+                        container = newContainer;
+                    } else {
+                        return;
+                    }
+                } else {
+                    return;
+                }
+            }
             
             const campaigns = Object.entries(campaignsData);
             
@@ -6559,39 +6627,154 @@ class DashboardHandler(BaseHTTPRequestHandler):
             const html = `
                 <div class="summary-stats">
                     <div class="summary-stat-card">
-                        <div class="summary-stat-label">Total Campaigns</div>
+                        <div class="summary-stat-label">Campaigns:</div>
                         <div class="summary-stat-value">${totalVideos}</div>
-                        <div class="summary-stat-change">${completedVideos} completed, ${activeVideos} active</div>
                     </div>
                     <div class="summary-stat-card">
-                        <div class="summary-stat-label">Total Views</div>
+                        <div class="summary-stat-label">Views:</div>
                         <div class="summary-stat-value">${formatNumber(totalViews)}</div>
-                        <div class="summary-stat-change">Across all campaigns</div>
                     </div>
                     <div class="summary-stat-card">
-                        <div class="summary-stat-label">Total Likes</div>
+                        <div class="summary-stat-label">Likes:</div>
                         <div class="summary-stat-value">${formatNumber(totalLikes)}</div>
-                        <div class="summary-stat-change">Across all campaigns</div>
                     </div>
                     <div class="summary-stat-card">
-                        <div class="summary-stat-label">Total Comments</div>
+                        <div class="summary-stat-label">Comments:</div>
                         <div class="summary-stat-value">${formatNumber(totalComments)}</div>
-                        <div class="summary-stat-change">Across all campaigns</div>
                     </div>
                     <div class="summary-stat-card">
-                        <div class="summary-stat-label">Total Cost</div>
+                        <div class="summary-stat-label">Spent:</div>
                         <div class="summary-stat-value">$${totalCost.toFixed(2)}</div>
-                        <div class="summary-stat-change">Total spent</div>
-                    </div>
-                    <div class="summary-stat-card">
-                        <div class="summary-stat-label">Avg Progress</div>
-                        <div class="summary-stat-value">${avgProgress.toFixed(1)}%</div>
-                        <div class="summary-stat-change">Average completion</div>
                     </div>
                 </div>
             `;
             
             document.getElementById('summary-stats-container').innerHTML = html;
+        }
+        
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-tab') === tabName) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Show/hide controls bar based on tab
+            const controlsBar = document.getElementById('dashboard-controls');
+            if (controlsBar) {
+                controlsBar.style.display = tabName === 'dashboard' ? 'flex' : 'none';
+            }
+            
+            if (tabName === 'dashboard') {
+                document.getElementById('dashboard-content').classList.add('active');
+                loadDashboard(false);
+            } else if (tabName === 'campaigns') {
+                document.getElementById('campaigns-content').classList.add('active');
+                loadCampaigns();
+            } else if (tabName === 'order-log') {
+                document.getElementById('order-log-content').classList.add('active');
+                renderOrderLog();
+            }
+        }
+        
+        async function renderOrderLog() {
+            const container = document.getElementById('order-log-content');
+            container.innerHTML = '<div class="loading">Loading order log...</div>';
+            
+            try {
+                const response = await fetch('/api/progress');
+                const progress = await response.json();
+                
+                // Collect all orders from all videos
+                const allOrders = [];
+                for (const [videoUrl, videoData] of Object.entries(progress)) {
+                    const orderHistory = videoData.order_history || [];
+                    for (const order of orderHistory) {
+                        allOrders.push({
+                            ...order,
+                            video_url: videoUrl
+                        });
+                    }
+                }
+                
+                // Sort by timestamp (newest first)
+                allOrders.sort((a, b) => {
+                    const timeA = new Date(a.timestamp || 0).getTime();
+                    const timeB = new Date(b.timestamp || 0).getTime();
+                    return timeB - timeA;
+                });
+                
+                if (allOrders.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <h2>No Orders Yet</h2>
+                            <p>Orders will appear here once they are placed.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let html = '<div style="background: #1a1a1a; border-radius: 8px; padding: 20px; border: 1px solid rgba(255,255,255,0.1);">';
+                html += '<h2 style="color: #fff; margin-bottom: 20px; font-size: 1.5em;">Order History</h2>';
+                html += '<div style="display: grid; gap: 12px;">';
+                
+                for (const order of allOrders) {
+                    const { username, videoId } = extractVideoInfo(order.video_url);
+                    const orderDate = order.timestamp ? new Date(order.timestamp).toLocaleString() : 'Unknown';
+                    const orderType = order.type || 'scheduled';
+                    const typeColor = orderType === 'manual' ? '#10b981' : orderType === 'catch_up' ? '#ef4444' : '#667eea';
+                    
+                    html += `
+                        <div style="background: #2a2a2a; border-radius: 6px; padding: 16px; border: 1px solid rgba(255,255,255,0.08);">
+                            <div style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 12px;">
+                                <div style="flex: 1; min-width: 200px;">
+                                    <div style="color: #fff; font-weight: 600; margin-bottom: 6px;">${order.service ? order.service.charAt(0).toUpperCase() + order.service.slice(1) : 'Unknown'}</div>
+                                    <div style="color: #888; font-size: 0.85em; margin-bottom: 4px;">${username || 'Video'}: ${videoId || order.video_url.substring(0, 40)}...</div>
+                                    <div style="color: #666; font-size: 0.8em;">${orderDate}</div>
+                                </div>
+                                <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+                                    <div style="text-align: right;">
+                                        <div style="color: #888; font-size: 0.8em; margin-bottom: 2px;">Quantity</div>
+                                        <div style="color: #fff; font-weight: 600;">${formatNumber(order.quantity || 0)}</div>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="color: #888; font-size: 0.8em; margin-bottom: 2px;">Order ID</div>
+                                        <div style="color: #667eea; font-weight: 600; font-family: monospace; font-size: 0.9em;">${order.order_id || 'N/A'}</div>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="color: #888; font-size: 0.8em; margin-bottom: 2px;">Type</div>
+                                        <div style="color: ${typeColor}; font-weight: 600; font-size: 0.85em; text-transform: capitalize;">${orderType}</div>
+                                    </div>
+                                    ${order.cost ? `
+                                    <div style="text-align: right;">
+                                        <div style="color: #888; font-size: 0.8em; margin-bottom: 2px;">Cost</div>
+                                        <div style="color: #ef4444; font-weight: 600;">$${parseFloat(order.cost).toFixed(4)}</div>
+                                    </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                html += '</div></div>';
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('Error loading order log:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h2>Error Loading Order Log</h2>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
         }
         
         function filterVideos() {

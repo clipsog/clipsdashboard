@@ -26,6 +26,8 @@ def run_continuous_bot():
     # Wait a bit for dashboard to start
     time.sleep(10)
     
+    from datetime import datetime
+    
     while True:
         try:
             # Load progress to get all videos
@@ -41,44 +43,98 @@ def run_continuous_bot():
             
             if not progress:
                 print("📭 No videos in progress, waiting...")
-                time.sleep(300)  # Check every 5 minutes
+                time.sleep(60)  # Check every 1 minute
                 continue
             
             # Process each video (run delivery plan in a non-blocking way)
+            now = datetime.now()
+            videos_need_check = []
+            
             for video_url in list(progress.keys()):
                 try:
-                    print(f"📹 Checking video: {video_url[:50]}...")
-                    bot = DeliveryBot(video_url)
-                    
-                    # Check if there are pending orders by checking next_orders or completed_purchases
                     video_progress = progress.get(video_url, {})
-                    next_orders = video_progress.get('next_orders', [])
-                    completed_purchases = video_progress.get('completed_purchases', [])
                     
-                    # Only run if there are orders to process
-                    if next_orders or (not completed_purchases and video_progress.get('target_completion_time')):
-                        print(f"🚀 Running delivery plan for: {video_url[:50]}...")
-                        # Run in a thread to avoid blocking
-                        bot_thread = threading.Thread(target=bot.run_delivery_plan, daemon=True)
-                        bot_thread.start()
-                        bot_thread.join(timeout=30)  # Wait max 30 seconds per video
-                    else:
-                        print(f"✓ No pending orders for: {video_url[:50]}")
+                    # Check if there are pending orders by checking next_*_purchase_time fields
+                    next_views_time = video_progress.get('next_views_purchase_time')
+                    next_likes_time = video_progress.get('next_likes_purchase_time')
+                    next_comments_time = video_progress.get('next_comments_purchase_time')
+                    next_comment_likes_time = video_progress.get('next_comment_likes_purchase_time')
+                    
+                    # Check if any timer has expired
+                    time_to_order = False
+                    if next_views_time:
+                        try:
+                            purchase_time = datetime.fromisoformat(next_views_time.replace('Z', '+00:00'))
+                            if purchase_time <= now:
+                                time_to_order = True
+                                print(f"⏰ Views timer expired for: {video_url[:50]}")
+                        except:
+                            pass
+                    
+                    if next_likes_time:
+                        try:
+                            purchase_time = datetime.fromisoformat(next_likes_time.replace('Z', '+00:00'))
+                            if purchase_time <= now:
+                                time_to_order = True
+                                print(f"⏰ Likes timer expired for: {video_url[:50]}")
+                        except:
+                            pass
+                    
+                    if next_comments_time:
+                        try:
+                            purchase_time = datetime.fromisoformat(next_comments_time.replace('Z', '+00:00'))
+                            if purchase_time <= now:
+                                time_to_order = True
+                                print(f"⏰ Comments timer expired for: {video_url[:50]}")
+                        except:
+                            pass
+                    
+                    if next_comment_likes_time:
+                        try:
+                            purchase_time = datetime.fromisoformat(next_comment_likes_time.replace('Z', '+00:00'))
+                            if purchase_time <= now:
+                                time_to_order = True
+                                print(f"⏰ Comment likes timer expired for: {video_url[:50]}")
+                        except:
+                            pass
+                    
+                    # Also check if there are next_orders or if campaign is active
+                    next_orders = video_progress.get('next_orders', [])
+                    has_target = video_progress.get('target_completion_time')
+                    
+                    if time_to_order or next_orders or (has_target and not video_progress.get('completed_purchases')):
+                        videos_need_check.append(video_url)
                         
+                except Exception as e:
+                    print(f"❌ Error checking {video_url}: {e}")
+                    import traceback
+                    traceback.print_exc()
+            
+            # Run delivery plan for videos that need checking
+            for video_url in videos_need_check:
+                try:
+                    print(f"🚀 Running delivery plan for: {video_url[:50]}...")
+                    bot = DeliveryBot(video_url)
+                    # Run in a thread to avoid blocking
+                    bot_thread = threading.Thread(target=bot.run_delivery_plan, daemon=True)
+                    bot_thread.start()
+                    bot_thread.join(timeout=60)  # Wait max 60 seconds per video
                 except Exception as e:
                     print(f"❌ Error processing {video_url}: {e}")
                     import traceback
                     traceback.print_exc()
             
-            # Wait before next cycle (check every 5 minutes)
-            print("⏳ Waiting 5 minutes before next cycle...")
-            time.sleep(300)
+            if not videos_need_check:
+                print("✓ No orders due, checking again in 1 minute...")
+            
+            # Wait before next cycle (check every 1 minute for more accurate timing)
+            time.sleep(60)
             
         except Exception as e:
             print(f"❌ Error in continuous bot: {e}")
             import traceback
             traceback.print_exc()
-            time.sleep(300)
+            time.sleep(60)
 
 def start_health_pinger():
     """Send periodic health pings to keep Render instance alive"""

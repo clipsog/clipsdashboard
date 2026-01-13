@@ -71,10 +71,46 @@ You can access this from:
 
 ## Notes
 
-- Render's free tier may spin down after 15 minutes of inactivity, but the health checks keep it alive
-- The service will automatically restart if it crashes
-- **Data persistence**: The `data/` directory is mounted to a persistent disk that survives across deploys
-  - Your campaigns, videos, and progress data will NOT be lost when you redeploy
-  - The disk is configured in `render.yaml` with 1GB storage
-  - **Important**: If you delete and recreate the service, you'll need to configure the disk again
-- **First deployment**: The disk will be created automatically with any existing data from your repository
+- Free tier may spin down after 15 min inactivity, but health checks keep it alive
+- **Data Persistence (Free Tier Solution)**: Since persistent disks are a premium feature, the app uses automatic rebuild on startup
+  - On every startup, campaigns are automatically rebuilt from `progress.json`
+  - Videos with `campaign_id` set are restored to their campaigns
+  - **Important**: The `progress.json` file is the source of truth for all video-campaign relationships
+  - As long as `progress.json` persists (it's in git), campaigns can be rebuilt
+- **Backup Strategy**: Periodically commit your `data/*.json` files to git to preserve state across redeployments
+- API keys are in code (consider using environment variables for production)
+
+## Free Tier Data Persistence Strategy
+
+Since Render's free tier doesn't include persistent disks, use this approach:
+
+### Automatic Rebuild (Already Configured)
+
+The app automatically rebuilds campaigns from `progress.json` on every startup. This means:
+- If `campaigns.json` is outdated after redeploy → automatically fixed on startup
+- As long as videos have `campaign_id` in `progress.json`, they'll be restored
+- No manual intervention needed after redeployment
+
+### Optional: Commit Data Files
+
+To preserve the exact state across redeployments, you can periodically commit data files:
+
+```bash
+# Commit current state
+git add data/campaigns.json data/progress.json
+git commit -m "Update campaign data"
+git push
+```
+
+Then redeploy on Render - it will pull the latest data files.
+
+### How It Works
+
+1. **During Runtime**: Videos added to campaigns update both `campaigns.json` and `progress.json` (with `campaign_id`)
+2. **On Redeploy**: Render pulls code from git (may have old `campaigns.json`)
+3. **On Startup**: App automatically runs rebuild logic:
+   - Reads `progress.json` 
+   - Finds all videos with `campaign_id`
+   - Restores them to campaigns
+   - Saves updated `campaigns.json`
+4. **Result**: All videos back in their campaigns, even with free tier!

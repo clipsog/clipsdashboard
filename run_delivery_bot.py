@@ -404,6 +404,32 @@ class DeliveryBot:
             
             video_progress = progress[self.video_url]
             
+            # FIRST: Check explicit next purchase timers (set by previous orders or manually)
+            # These timers should be respected immediately when they expire
+            now = datetime.now()
+            timer_based_orders = []
+            
+            # Check each timer and create a minimal order if expired
+            timer_services = {
+                'next_views_purchase_time': 'Views',
+                'next_likes_purchase_time': 'Likes',
+                'next_comments_purchase_time': 'Comments',
+                'next_comment_likes_purchase_time': 'Comment Likes'
+            }
+            
+            for timer_key, service_name in timer_services.items():
+                timer_str = video_progress.get(timer_key)
+                if timer_str:
+                    try:
+                        timer_dt = datetime.fromisoformat(timer_str.replace('Z', '+00:00'))
+                        # Timer has expired - need to place order
+                        if timer_dt <= now:
+                            print(f"{Fore.CYAN}⏰ Timer expired for {service_name} - placing next scheduled order{Style.RESET_ALL}")
+                            # We'll handle this below with the schedule-based logic
+                            # Just log it for now
+                    except:
+                        pass
+            
             # Get start time (when campaign started)
             # This is critical - timing is always relative to campaign start, not server restart
             start_time_str = video_progress.get('start_time') or video_progress.get('campaign_start_time')
@@ -445,27 +471,21 @@ class DeliveryBot:
             
             # Find due orders (time has passed, not completed)
             # This catches up on missed orders after server restarts/downtime
-            now = datetime.now()
             due_orders = []
             
-            # Maximum catch-up window: 7 days (to allow catching up on older campaigns)
-            # Combined with goal-checking to prevent over-ordering
-            MAX_CATCHUP_SECONDS = 7 * 24 * 60 * 60  # 7 days
-            
+            # For timer-based ordering: Find the NEXT pending order for each service
+            # This ensures we respect the timers and place the next order when timer expires
             for purchase in views_likes_purchases:
                 purchase_id = get_purchase_id(purchase)
                 if purchase_id in completed_purchases:
                     continue  # Already completed
                 
                 purchase_time = start_time + timedelta(seconds=purchase.get('time_seconds', 0))
-                
-                # Check if order is due (catch up on missed orders)
                 time_diff = (now - purchase_time).total_seconds()
                 
-                # Order is due if:
-                # 1. Time has passed (or within 1 minute before for early execution)
-                # 2. Not too old (within catch-up window)
-                if -60 <= time_diff <= MAX_CATCHUP_SECONDS:
+                # Order is due if time has passed (allow 1 minute early execution)
+                # We removed the catch-up window restriction to respect timers
+                if time_diff >= -60:
                     due_orders.append((purchase, purchase_time))
             
             if not due_orders:

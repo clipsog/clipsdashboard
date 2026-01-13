@@ -3632,8 +3632,18 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     </div>
                     <div style="color: #888; font-size: 12px; margin-top: 6px;">If you choose a campaign, we’ll apply that campaign’s goals & speed to this post.</div>
                 </div>
-                <textarea id="new-video-url" placeholder="Enter one or more TikTok URLs (one per line)&#10;https://www.tiktok.com/@username/video/1234567890&#10;https://www.tiktok.com/@username/video/0987654321" style="width: 100%; padding: 8px; border-radius: 0; border: 1px solid rgba(255,255,255,0.2); background: #252525; color: #fff; font-size: 14px; margin-bottom: 12px; box-sizing: border-box; min-height: 120px; resize: vertical; font-family: monospace;"></textarea>
-                <div style="color: #888; font-size: 12px; margin-bottom: 12px;">💡 Tip: Paste multiple URLs, one per line</div>
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; color: #fff; margin-bottom: 8px; font-weight: 600;">Add Video URL</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" id="new-video-url-input" placeholder="https://www.tiktok.com/@username/video/1234567890" style="flex: 1; padding: 10px 12px; border-radius: 0; border: 1px solid rgba(255,255,255,0.2); background: #252525; color: #fff; font-size: 14px; font-family: monospace;" onkeypress="if(event.key === 'Enter') { event.preventDefault(); addUrlToList(); }">
+                        <button onclick="addUrlToList()" style="background: #667eea; color: white; border: none; padding: 10px 16px; border-radius: 0; cursor: pointer; font-weight: 700; font-size: 18px; min-width: 48px; line-height: 1;">+</button>
+                    </div>
+                </div>
+                <div id="url-list-container" style="margin-bottom: 12px; display: none;">
+                    <label style="display: block; color: #fff; margin-bottom: 8px; font-weight: 600;">URLs to Add (<span id="url-count">0</span>)</label>
+                    <div id="url-list" style="background: #252525; border: 1px solid rgba(255,255,255,0.1); padding: 8px; max-height: 200px; overflow-y: auto;"></div>
+                </div>
+                <textarea id="new-video-url" style="display: none;"></textarea>
                 <div id="add-video-progress" style="display: none; margin-bottom: 15px;">
                     <div style="color: #667eea; font-size: 13px; margin-bottom: 8px;">Adding videos...</div>
                     <div style="background: #252525; border-radius: 0; padding: 8px; max-height: 200px; overflow-y: auto;">
@@ -7029,14 +7039,22 @@ class DashboardHandler(BaseHTTPRequestHandler):
         
         function showAddVideoModal(campaignId = null) {
             const modal = document.getElementById('add-video-modal');
-            const input = document.getElementById('new-video-url');
+            const input = document.getElementById('new-video-url-input');
+            const textarea = document.getElementById('new-video-url');
             const errorDiv = document.getElementById('add-video-error');
             const campaignSelector = document.getElementById('add-video-campaign-selector');
+            const urlListContainer = document.getElementById('url-list-container');
+            const urlList = document.getElementById('url-list');
+            const urlCount = document.getElementById('url-count');
             
             modal.style.display = 'flex';
             input.value = '';
+            textarea.value = '';
             errorDiv.style.display = 'none';
             errorDiv.textContent = '';
+            urlListContainer.style.display = 'none';
+            urlList.innerHTML = '';
+            urlCount.textContent = '0';
             if (campaignSelector) {
                 populateAddVideoCampaignSelector();
                 campaignSelector.value = campaignId || '';
@@ -7044,6 +7062,94 @@ class DashboardHandler(BaseHTTPRequestHandler):
             
             // Focus input after modal appears
             setTimeout(() => input.focus(), 100);
+        }
+        
+        function addUrlToList() {
+            const input = document.getElementById('new-video-url-input');
+            const textarea = document.getElementById('new-video-url');
+            const urlListContainer = document.getElementById('url-list-container');
+            const urlList = document.getElementById('url-list');
+            const urlCount = document.getElementById('url-count');
+            const errorDiv = document.getElementById('add-video-error');
+            
+            const url = input.value.trim();
+            
+            // Validate URL
+            if (!url) {
+                return;
+            }
+            
+            if (!url.includes('tiktok.com')) {
+                errorDiv.textContent = 'Please enter a valid TikTok URL';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            // Hide error
+            errorDiv.style.display = 'none';
+            
+            // Get existing URLs from textarea
+            const existingUrls = textarea.value.trim().split('\\n').filter(u => u.trim().length > 0);
+            
+            // Check for duplicates
+            if (existingUrls.includes(url)) {
+                errorDiv.textContent = 'This URL is already in the list';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            // Add URL to list
+            existingUrls.push(url);
+            textarea.value = existingUrls.join('\\n');
+            
+            // Update UI
+            const urlItem = document.createElement('div');
+            urlItem.style.cssText = 'display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); font-family: monospace; font-size: 12px;';
+            urlItem.innerHTML = `
+                <span style="color: #b0b0b0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">${url}</span>
+                <button onclick="removeUrlFromList('${url.replace(/'/g, "\\\\'")')" style="background: transparent; border: none; color: #ef4444; cursor: pointer; padding: 2px 6px; font-size: 14px; margin-left: 8px;">×</button>
+            `;
+            urlList.appendChild(urlItem);
+            
+            // Show container and update count
+            urlListContainer.style.display = 'block';
+            urlCount.textContent = existingUrls.length;
+            
+            // Clear input
+            input.value = '';
+            input.focus();
+        }
+        
+        function removeUrlFromList(urlToRemove) {
+            const textarea = document.getElementById('new-video-url');
+            const urlListContainer = document.getElementById('url-list-container');
+            const urlList = document.getElementById('url-list');
+            const urlCount = document.getElementById('url-count');
+            
+            // Get existing URLs
+            const existingUrls = textarea.value.trim().split('\\n').filter(u => u.trim().length > 0);
+            
+            // Remove URL
+            const filteredUrls = existingUrls.filter(u => u !== urlToRemove);
+            textarea.value = filteredUrls.join('\\n');
+            
+            // Rebuild list
+            urlList.innerHTML = '';
+            filteredUrls.forEach(url => {
+                const urlItem = document.createElement('div');
+                urlItem.style.cssText = 'display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); font-family: monospace; font-size: 12px;';
+                urlItem.innerHTML = `
+                    <span style="color: #b0b0b0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">${url}</span>
+                    <button onclick="removeUrlFromList('${url.replace(/'/g, "\\\\'")')" style="background: transparent; border: none; color: #ef4444; cursor: pointer; padding: 2px 6px; font-size: 14px; margin-left: 8px;">×</button>
+                `;
+                urlList.appendChild(urlItem);
+            });
+            
+            // Update count and hide container if empty
+            urlCount.textContent = filteredUrls.length;
+            if (filteredUrls.length === 0) {
+                urlListContainer.style.display = 'none';
+            }
         }
         
         function showAddVideoToCampaignModal(campaignId) {
@@ -7409,9 +7515,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         if (campaignVideos.length === 0) {
                             html += `<div style="text-align: center; padding: 40px; color: #b0b0b0;">No videos in this campaign yet. Add videos using the "➕ Add Video" button.</div>`;
                         } else {
-                            // Show loading indicator while rendering videos
+                            // Show comparison table for better metrics analysis
                             html += '<div id="campaign-videos-loading" style="text-align: center; padding: 8px; color: #b0b0b0;">Loading videos...</div>';
-                            html += '<div id="campaign-videos-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px;"></div>';
+                            html += '<div id="campaign-videos-table-container" style="overflow-x: auto;"></div>';
                         }
                     }
                 } else if (route.type === 'detail') {
@@ -7497,41 +7603,86 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     if (campaign) {
                         const campaignVideos = campaign.videos || [];
                         if (campaignVideos.length > 0) {
-                            // Render videos in batches to avoid blocking UI
-                            const batchSize = 5;
-                            let currentIndex = 0;
-                            const container = document.getElementById('campaign-videos-container');
+                            // Render comparison table for campaign videos
+                            const container = document.getElementById('campaign-videos-table-container');
                             const loading = document.getElementById('campaign-videos-loading');
                             
-                            function renderBatch() {
-                                if (!container) return;
+                            if (container) {
+                                let tableHtml = `
+                                    <table style="width: 100%; border-collapse: collapse; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1);">
+                                        <thead>
+                                            <tr style="background: #252525; border-bottom: 2px solid rgba(255,255,255,0.1);">
+                                                <th style="padding: 12px 8px; text-align: left; color: #fff; font-weight: 600; font-size: 14px; border-right: 1px solid rgba(255,255,255,0.05);">Video</th>
+                                                <th style="padding: 12px 8px; text-align: center; color: #fff; font-weight: 600; font-size: 14px; border-right: 1px solid rgba(255,255,255,0.05);">Real Views</th>
+                                                <th style="padding: 12px 8px; text-align: center; color: #fff; font-weight: 600; font-size: 14px; border-right: 1px solid rgba(255,255,255,0.05);">Real Likes</th>
+                                                <th style="padding: 12px 8px; text-align: center; color: #fff; font-weight: 600; font-size: 14px; border-right: 1px solid rgba(255,255,255,0.05);">Ordered Views</th>
+                                                <th style="padding: 12px 8px; text-align: center; color: #fff; font-weight: 600; font-size: 14px; border-right: 1px solid rgba(255,255,255,0.05);">Ordered Likes</th>
+                                                <th style="padding: 12px 8px; text-align: center; color: #fff; font-weight: 600; font-size: 14px; border-right: 1px solid rgba(255,255,255,0.05);">Target Views</th>
+                                                <th style="padding: 12px 8px; text-align: center; color: #fff; font-weight: 600; font-size: 14px; border-right: 1px solid rgba(255,255,255,0.05);">Target Likes</th>
+                                                <th style="padding: 12px 8px; text-align: center; color: #fff; font-weight: 600; font-size: 14px; border-right: 1px solid rgba(255,255,255,0.05);">Spent</th>
+                                                <th style="padding: 12px 8px; text-align: center; color: #fff; font-weight: 600; font-size: 14px;">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                `;
                                 
-                                const batch = campaignVideos.slice(currentIndex, currentIndex + batchSize);
-                                let batchHtml = '';
-                                
-                                for (const videoUrl of batch) {
+                                for (const videoUrl of campaignVideos) {
                                     const videoData = progress[videoUrl];
                                     if (videoData) {
-                                        batchHtml += renderVideoCard(videoUrl, videoData);
+                                        const real_views = videoData.real_views || 0;
+                                        const real_likes = videoData.real_likes || 0;
+                                        const orders_placed = videoData.orders_placed || {};
+                                        const ordered_views = orders_placed.views || 0;
+                                        const ordered_likes = orders_placed.likes || 0;
+                                        const target_views = videoData.target_views || 0;
+                                        const target_likes = videoData.target_likes || 0;
+                                        const spent = videoData.spent || 0;
+                                        
+                                        // Calculate progress
+                                        const total_views = real_views + ordered_views;
+                                        const total_likes = real_likes + ordered_likes;
+                                        const views_progress = target_views > 0 ? Math.min(100, (total_views / target_views) * 100) : 0;
+                                        const likes_progress = target_likes > 0 ? Math.min(100, (total_likes / target_likes) * 100) : 0;
+                                        
+                                        // Determine status
+                                        let status = '🔄 Active';
+                                        let statusColor = '#667eea';
+                                        if (views_progress >= 100 && likes_progress >= 100) {
+                                            status = '✓ Complete';
+                                            statusColor = '#10b981';
+                                        } else if (views_progress >= 100 || likes_progress >= 100) {
+                                            status = '⚡ Near Goal';
+                                            statusColor = '#f59e0b';
+                                        }
+                                        
+                                        // Shorten video URL for display
+                                        const videoIdMatch = videoUrl.match(/video\\/(\\d+)/);
+                                        const videoId = videoIdMatch ? videoIdMatch[1] : videoUrl.substring(videoUrl.length - 15);
+                                        
+                                        tableHtml += `
+                                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer;" onclick="navigateToVideo('${escapeTemplateLiteral(videoUrl)}')" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='transparent'">
+                                                <td style="padding: 10px 8px; color: #667eea; font-family: monospace; font-size: 13px; border-right: 1px solid rgba(255,255,255,0.05);" title="${escapeTemplateLiteral(videoUrl)}">...${videoId}</td>
+                                                <td style="padding: 10px 8px; text-align: center; color: #fff; font-size: 14px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(real_views)}</td>
+                                                <td style="padding: 10px 8px; text-align: center; color: #fff; font-size: 14px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(real_likes)}</td>
+                                                <td style="padding: 10px 8px; text-align: center; color: #b0b0b0; font-size: 14px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(ordered_views)}</td>
+                                                <td style="padding: 10px 8px; text-align: center; color: #b0b0b0; font-size: 14px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(ordered_likes)}</td>
+                                                <td style="padding: 10px 8px; text-align: center; color: #667eea; font-size: 14px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(target_views)}</td>
+                                                <td style="padding: 10px 8px; text-align: center; color: #667eea; font-size: 14px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(target_likes)}</td>
+                                                <td style="padding: 10px 8px; text-align: center; color: #ef4444; font-size: 14px; border-right: 1px solid rgba(255,255,255,0.05);">$${spent.toFixed(2)}</td>
+                                                <td style="padding: 10px 8px; text-align: center; color: ${statusColor}; font-size: 13px; font-weight: 600;">${status}</td>
+                                            </tr>
+                                        `;
                                     }
                                 }
                                 
-                                container.innerHTML += batchHtml;
-                                currentIndex += batchSize;
+                                tableHtml += `
+                                        </tbody>
+                                    </table>
+                                `;
                                 
-                                if (currentIndex < campaignVideos.length) {
-                                    // Continue with next batch
-                                    setTimeout(renderBatch, 50);
-                                } else {
-                                    // All videos rendered
-                                    if (loading) loading.style.display = 'none';
-                                    // Initialize charts after all videos are rendered
-                                    setTimeout(initializeGrowthCharts, 100);
-                                }
+                                container.innerHTML = tableHtml;
+                                if (loading) loading.style.display = 'none';
                             }
-                            
-                            // Start rendering
-                            setTimeout(renderBatch, 0);
                         }
                     }
                 }

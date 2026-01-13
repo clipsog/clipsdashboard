@@ -448,8 +448,9 @@ class DeliveryBot:
             now = datetime.now()
             due_orders = []
             
-            # Maximum catch-up window: 24 hours (to avoid placing huge backlogs)
-            MAX_CATCHUP_SECONDS = 24 * 60 * 60
+            # Maximum catch-up window: 7 days (to allow catching up on older campaigns)
+            # This was increased from 24 hours because campaigns can be paused/delayed
+            MAX_CATCHUP_SECONDS = 7 * 24 * 60 * 60  # 7 days
             
             for purchase in views_likes_purchases:
                 purchase_id = get_purchase_id(purchase)

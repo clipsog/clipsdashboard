@@ -61,5 +61,41 @@ git push -u origin main
 ## Notes
 
 - Free tier may spin down after 15 min inactivity, but health checks keep it alive
-- Data persists in `data/` directory
+- **IMPORTANT**: Configure persistent disk to prevent data loss on redeploy (see below)
 - API keys are in code (consider using environment variables for production)
+
+## Preventing Data Loss on Redeploy
+
+**CRITICAL**: By default, Render does NOT persist the `data/` directory across deployments. To prevent videos from disappearing from campaigns when you redeploy:
+
+### Configure Persistent Disk
+
+1. Go to your Render dashboard: https://dashboard.render.com
+2. Click on your `smmfollows-dashboard` service  
+3. Go to **Settings** tab
+4. Scroll down to **Disks**
+5. Click **Add Disk**
+6. Configure:
+   - **Name**: `smmfollows-data`
+   - **Mount Path**: `/opt/render/project/src/data`
+   - **Size**: 1 GB (free)
+7. Click **Save**
+8. Service will automatically redeploy with persistent storage
+
+### What This Does
+
+- Your `campaigns.json` and `progress.json` files persist across deployments
+- Videos added to campaigns won't disappear when you redeploy
+- The app also includes automatic rebuild logic on startup as a fallback
+
+### Verification
+
+After configuring the disk and redeploying, check the startup logs:
+
+```
+🚀 Starting SMM Follows Dashboard and Bot...
+🔄 Rebuilding campaigns from progress.json...
+✅ Campaigns already in sync with progress.json
+```
+
+If you see videos being restored, that's normal for the first deploy after adding the disk.

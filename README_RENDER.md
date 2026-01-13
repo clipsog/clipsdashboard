@@ -73,4 +73,8 @@ You can access this from:
 
 - Render's free tier may spin down after 15 minutes of inactivity, but the health checks keep it alive
 - The service will automatically restart if it crashes
-- Data is stored in the `data/` directory (persists across restarts)
+- **Data persistence**: The `data/` directory is mounted to a persistent disk that survives across deploys
+  - Your campaigns, videos, and progress data will NOT be lost when you redeploy
+  - The disk is configured in `render.yaml` with 1GB storage
+  - **Important**: If you delete and recreate the service, you'll need to configure the disk again
+- **First deployment**: The disk will be created automatically with any existing data from your repository

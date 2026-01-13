@@ -148,6 +148,63 @@ def start_health_pinger():
 if __name__ == '__main__':
     print("🚀 Starting SMM Follows Dashboard and Bot...")
     
+    # CRITICAL: Rebuild campaigns from progress.json on startup
+    # This ensures videos don't disappear after redeployment
+    print("🔄 Rebuilding campaigns from progress.json...")
+    try:
+        import json
+        from pathlib import Path
+        
+        campaigns_file = Path(__file__).parent / 'data' / 'campaigns.json'
+        progress_file = Path(__file__).parent / 'data' / 'progress.json'
+        
+        if campaigns_file.exists() and progress_file.exists():
+            with open(campaigns_file, 'r') as f:
+                campaigns = json.load(f)
+            
+            with open(progress_file, 'r') as f:
+                progress = json.load(f)
+            
+            rebuild_count = 0
+            campaigns_changed = False
+            
+            # Ensure all campaigns have a videos list
+            for campaign_id, campaign_data in campaigns.items():
+                if 'videos' not in campaign_data:
+                    campaign_data['videos'] = []
+                    campaigns_changed = True
+            
+            # Rebuild videos from progress.json
+            for video_url, video_data in progress.items():
+                campaign_id = video_data.get('campaign_id')
+                if campaign_id and campaign_id in campaigns:
+                    if video_url not in campaigns[campaign_id].get('videos', []):
+                        if 'videos' not in campaigns[campaign_id]:
+                            campaigns[campaign_id]['videos'] = []
+                        campaigns[campaign_id]['videos'].append(video_url)
+                        campaigns_changed = True
+                        rebuild_count += 1
+                        print(f"  ✓ Restored video to {campaign_id}: {video_url[:50]}...")
+            
+            if campaigns_changed:
+                # Use atomic write
+                import tempfile
+                import shutil
+                temp_fd, temp_path = tempfile.mkstemp(dir=campaigns_file.parent, suffix='.tmp')
+                try:
+                    with os.fdopen(temp_fd, 'w') as f:
+                        json.dump(campaigns, f, indent=2)
+                    shutil.move(temp_path, campaigns_file)
+                    print(f"✅ Rebuilt {rebuild_count} video(s) to campaigns")
+                except Exception as e:
+                    if Path(temp_path).exists():
+                        os.remove(temp_path)
+                    print(f"❌ Failed to save campaigns: {e}")
+            else:
+                print("✅ Campaigns already in sync with progress.json")
+    except Exception as e:
+        print(f"⚠️ Error rebuilding campaigns: {e}")
+    
     # Start continuous bot in background thread
     bot_thread = threading.Thread(target=run_continuous_bot, daemon=True)
     bot_thread.start()

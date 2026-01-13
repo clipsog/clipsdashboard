@@ -3580,9 +3580,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
             <select id="status-filter" class="filter-select" onchange="filterVideos()">
                 <option value="all">All Status</option>
                 <option value="complete">✅ Complete</option>
-                <option value="good">🟢 Good Progress</option>
-                <option value="moderate">🟡 Moderate</option>
-                <option value="early">🔴 Early Stage</option>
+                <option value="good">Good Progress</option>
+                <option value="moderate">Moderate</option>
+                <option value="early">Early Stage</option>
             </select>
             <select id="sort-by" class="filter-select" onchange="filterVideos()">
                 <option value="progress-desc">Progress: High to Low</option>
@@ -3665,7 +3665,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
         <!-- Create Campaign Modal -->
         <div id="create-campaign-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10002; align-items: center; justify-content: center;">
             <div style="background: #1a1a1a; border-radius: 0; padding: 10px; max-width: 500px; width: 90%; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 8px 32px rgba(0,0,0,0.5);">
-                <h2 style="margin: 0 0 20px 0; color: #fff; font-size: 24px;">📊 Create New Campaign</h2>
+                <h2 style="margin: 0 0 20px 0; color: #fff; font-size: 24px;">Create New Campaign</h2>
                 <p style="color: #b0b0b0; margin-bottom: 12px; font-size: 14px;">Create a new campaign to group videos and track financial performance.</p>
                 <div style="margin-bottom: 12px;">
                     <label style="display: block; color: #fff; margin-bottom: 8px; font-weight: 600;">Campaign Name</label>
@@ -3817,9 +3817,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
         
         function getStatusText(progress) {
             if (progress >= 100) return '✅ Complete';
-            if (progress >= 75) return '🟢 Good Progress';
-            if (progress >= 50) return '🟡 Moderate';
-            return '🔴 Early Stage';
+            if (progress >= 75) return 'Good Progress';
+            if (progress >= 50) return 'Moderate';
+            return 'Early Stage';
         }
         
         function formatTimeElapsed(startTime) {
@@ -3917,11 +3917,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         loadDashboard(false);
                     }
                 } else {
-                    alert('❌ Error: ' + (data.error || 'Failed to remove video'));
+                    alert('Error: ' + (data.error || 'Failed to remove video'));
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('❌ Error removing video: ' + error.message);
+                alert('Error removing video: ' + error.message);
             }
         }
         
@@ -3982,13 +3982,13 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     // Reload dashboard to show updated stats
                     await loadDashboard(true);
                 } else {
-                    alert('❌ Error: ' + (data.error || 'Failed to place catch-up order'));
+                    alert('Error: ' + (data.error || 'Failed to place catch-up order'));
                     button.disabled = false;
                     button.textContent = originalText;
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('❌ Error placing catch-up order: ' + error.message);
+                alert('Error placing catch-up order: ' + error.message);
                 button.disabled = false;
                 button.textContent = originalText;
             }
@@ -4037,13 +4037,13 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     // Reload dashboard to show updated stats
                     await loadDashboard(true);
                 } else {
-                    alert('❌ Error: ' + (data.error || 'Failed to place manual order'));
+                    alert('Error: ' + (data.error || 'Failed to place manual order'));
                     button.disabled = false;
                     button.textContent = originalText;
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('❌ Error placing manual order: ' + error.message);
+                alert('Error placing manual order: ' + error.message);
                 button.disabled = false;
                 button.textContent = originalText;
             }
@@ -4093,12 +4093,12 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     }, 2000);
                 } else {
                     statusDiv.className = 'comments-save-status error';
-                    statusDiv.textContent = `❌ Error: ${data.error || 'Failed to save comments'}`;
+                    statusDiv.textContent = `Error: ${data.error || 'Failed to save comments'}`;
                 }
             } catch (error) {
                 console.error('Error:', error);
                 statusDiv.className = 'comments-save-status error';
-                statusDiv.textContent = `❌ Error: ${error.message}`;
+                statusDiv.textContent = `Error: ${error.message}`;
             }
         }
         
@@ -4131,13 +4131,13 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     // Refresh dashboard to show updated status
                     await loadDashboard(false);
                 } else {
-                    alert('❌ Error: ' + (data.error || 'Failed to order comments'));
+                    alert('Error: ' + (data.error || 'Failed to order comments'));
                     button.disabled = false;
                     button.textContent = originalText;
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('❌ Error ordering comments: ' + error.message);
+                alert('Error ordering comments: ' + error.message);
                 button.disabled = false;
                 button.textContent = originalText;
             }
@@ -4294,13 +4294,13 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     hideCommentSelectionModal();
                     await loadDashboard(false);
                 } else {
-                    alert('❌ Error: ' + (data.error || 'Failed to order comment likes'));
+                    alert('Error: ' + (data.error || 'Failed to order comment likes'));
                     orderBtn.disabled = false;
                     orderBtn.textContent = originalText;
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('❌ Error ordering comment likes: ' + error.message);
+                alert('Error ordering comment likes: ' + error.message);
                 orderBtn.disabled = false;
                 orderBtn.textContent = originalText;
             }
@@ -4365,11 +4365,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     alert('✅ Target time updated successfully!');
                     loadDashboard(false); // Silent refresh after update
                 } else {
-                    alert('❌ Error: ' + (data.error || 'Failed to update'));
+                    alert('Error: ' + (data.error || 'Failed to update'));
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('❌ Error updating target time: ' + error.message);
+                alert('Error updating target time: ' + error.message);
             }
         }
         
@@ -4538,10 +4538,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     await loadCampaigns();
                     await loadDashboard(false);
                 } else {
-                    alert('❌ Error: ' + (data.error || 'Failed to end campaign'));
+                    alert('Error: ' + (data.error || 'Failed to end campaign'));
                 }
             } catch (error) {
-                alert('❌ Error: ' + error.message);
+                alert('Error: ' + error.message);
             }
         }
         
@@ -4679,10 +4679,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     await loadCampaigns();
                     await loadDashboard(false);
                 } else {
-                    alert('❌ Error: ' + (data.error || 'Failed to assign videos'));
+                    alert('Error: ' + (data.error || 'Failed to assign videos'));
                 }
             } catch (error) {
-                alert('❌ Error: ' + error.message);
+                alert('Error: ' + error.message);
             }
         }
         
@@ -4708,14 +4708,14 @@ class DashboardHandler(BaseHTTPRequestHandler):
             
             let html = '<div style="background: #1a1a1a; border-radius: 0; padding: 8px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.1);">';
             html += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">';
-            html += '<h3 style="margin: 0; color: #fff; font-size: 1.2em; font-weight: 600;">📊 Campaigns Overview</h3>';
+            html += '<h3 style="margin: 0; color: #fff; font-size: 1.2em; font-weight: 600;">Campaigns Overview</h3>';
             html += '<button id="add-campaign-btn-header" class="add-campaign-btn">Add Campaign</button>';
             html += '</div>';
 
             // CPM + Goals calculator (home)
             html += '<div style="background: #252525; border-radius: 0; padding: 10px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 12px;">';
             html += '<div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap;">';
-            html += '<div style="color: #fff; font-weight: 700;">💰 CPM & Goals Calculator</div>';
+            html += '<div style="color: #fff; font-weight: 700;">CPM & Goals Calculator</div>';
             if (campaigns.length > 0) {
                 html += '<select id="calc-campaign-select" style="padding: 8px 10px; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.2); border-radius: 0; color: #fff; font-size: 13px;">';
                 html += '<option value="">Use campaign defaults…</option>';
@@ -5521,7 +5521,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 ${getStatusText(overallProgress)}
                             </div>
                             <button class="remove-video-btn" data-video-url="${safeVideoUrlAttr}" title="Remove video from process">
-                                🗑️ Remove
+                                Remove
                             </button>
                         </div>
                     </div>
@@ -5545,7 +5545,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     `}
                     
                     <div class="target-time-section">
-                        <h3>🎯 Target Completion Time</h3>
+                        <h3>Target Completion Time</h3>
                         <div style="margin-bottom: 15px;">
                             <div style="color: #b0b0b0; font-size: 0.9em; margin-bottom: 10px;">Quick Set (from now):</div>
                             <div class="target-input-group" style="margin-bottom: 10px;">
@@ -5578,17 +5578,17 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             <div class="metric-label">Views</div>
                             <div class="metric-value">${formatNumber(totalViews)}</div>
                             <div class="metric-target">/ ${formatNumber(targetViews)} (${formatPercentage(totalViews, targetViews)})</div>
-                            ${viewsOrdered > 0 ? `<div style="color: #667eea; font-size: 0.85em; margin-top: 3px;">📦 Orders placed: <strong>${viewsOrdersCount}</strong> (${formatNumber(viewsOrdered)} total ordered)</div>` : ''}
+                            ${viewsOrdered > 0 ? `<div style="color: #667eea; font-size: 0.85em; margin-top: 3px;">Orders placed: <strong>${viewsOrdersCount}</strong> (${formatNumber(viewsOrdered)} total ordered)</div>` : ''}
                             ${viewsCatchUp > 0 && targetCompletionTime ? `<div style="background: rgba(239, 68, 68, 0.1); border-radius: 0; padding: 8px; margin-top: 8px; font-size: 0.85em; border: 1px solid rgba(239, 68, 68, 0.3);">
-                                <div style="color: #ef4444; font-weight: 600; margin-bottom: 4px;">⚠️ Behind Schedule</div>
+                                <div style="color: #ef4444; font-weight: 600; margin-bottom: 4px;">Behind Schedule</div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Expected: <span style="color: #fff;">${formatNumber(Math.ceil(expectedViewsNow))}</span></div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Actual: <span style="color: #fff;">${formatNumber(totalViews)}</span></div>
                                 <div style="color: #b0b0b0; margin-bottom: 6px;">Gap: <span style="color: #ef4444; font-weight: 600;">${formatNumber(viewsCatchUp)}</span></div>
                                 <button class="catch-up-btn" data-video-url="${safeVideoUrlAttr}" data-metric="views" data-amount="${viewsCatchUp}" style="width: 100%; background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 0; cursor: pointer; font-weight: 600; font-size: 0.9em;">Catch Up (${formatNumber(viewsCatchUp)})</button>
                             </div>` : ''}
-                            ${viewsNeeded > 0 && hoursToViewsGoal > 0 ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;" data-time-to-goal data-hours="${hoursToViewsGoal}" data-metric="views">⏱️ <span data-countdown-to-goal>${formatTimeRemaining(hoursToViewsGoal)}</span> to goal</div>` : viewsNeeded <= 0 ? `<div style="color: #10b981; font-size: 0.85em; margin-top: 5px;">✓ Target reached</div>` : viewsNeeded > 0 && isTargetOverdue ? `<div style="color: #ef4444; font-size: 0.85em; margin-top: 5px;">⚠️ Past due</div>` : ''}
+                            ${viewsNeeded > 0 && hoursToViewsGoal > 0 ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;" data-time-to-goal data-hours="${hoursToViewsGoal}" data-metric="views"><span data-countdown-to-goal>${formatTimeRemaining(hoursToViewsGoal)}</span> to goal</div>` : viewsNeeded <= 0 ? `<div style="color: #10b981; font-size: 0.85em; margin-top: 5px;">Target reached</div>` : viewsNeeded > 0 && isTargetOverdue ? `<div style="color: #ef4444; font-size: 0.85em; margin-top: 5px;">Past due</div>` : ''}
                             ${nextViewsPurchase ? `<div style="background: rgba(102, 126, 234, 0.1); border-radius: 0; padding: 8px; margin-top: 8px; font-size: 0.85em;">
-                                <div style="color: #667eea; font-weight: 600; margin-bottom: 4px;">🛒 Next Purchase</div>
+                                <div style="color: #667eea; font-weight: 600; margin-bottom: 4px;">Next Purchase</div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Time: <span data-next-purchase data-purchase-time="${nextViewsPurchase.nextPurchaseTime.toISOString()}" data-metric="views" style="color: #fff;"><span data-countdown-display>${formatTimeRemaining(nextViewsPurchase.timeUntilNext)}</span></span></div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Units: <span style="color: #fff;">${formatNumber(nextViewsPurchase.units)}</span> (min order)</div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Orders: <span style="color: #fff;">${nextViewsPurchase.purchasesCount}x</span> (${formatNumber(nextViewsPurchase.purchasesCount * nextViewsPurchase.units)} total)</div>
@@ -5596,9 +5596,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Already ordered: <span style="color: #10b981; font-weight: 600;">${formatNumber(viewsOrdered)}</span></div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Per order: <span style="color: #10b981; font-weight: 600;">$${nextViewsPurchase.cost.toFixed(4)}</span></div>
                                 <div style="color: #b0b0b0; margin-bottom: 6px;">Total cost: <span style="color: #10b981; font-weight: 600;">$${nextViewsPurchase.totalCost.toFixed(4)}</span></div>
-                                <button class="manual-order-btn" data-video-url="${safeVideoUrlAttr}" data-metric="views" data-minimum="50" style="width: 100%; background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 0; cursor: pointer; font-weight: 600; font-size: 0.9em; margin-top: 4px;">📦 Manual Order</button>
-                            </div>` : nextViewsPurchaseTime ? `<div style="color: #667eea; font-size: 0.85em; margin-top: 3px;" data-next-purchase data-purchase-time="${nextViewsPurchaseTime.toISOString()}" data-metric="views">🛒 Next purchase: <span data-countdown-display>${formatTimeRemaining((nextViewsPurchaseTime - now) / (1000 * 60 * 60))}</span></div>` : ''}
-                            ${targetViews > 0 ? `<button class="manual-order-btn" data-video-url="${safeVideoUrlAttr}" data-metric="views" data-minimum="50" style="width: 100%; background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 0; cursor: pointer; font-weight: 600; font-size: 0.85em; margin-top: 8px;">📦 Manual Order Views</button>` : ''}
+                                <button class="manual-order-btn" data-video-url="${safeVideoUrlAttr}" data-metric="views" data-minimum="50" style="width: 100%; background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 0; cursor: pointer; font-weight: 600; font-size: 0.9em; margin-top: 4px;">Manual Order</button>
+                            </div>` : nextViewsPurchaseTime ? `<div style="color: #667eea; font-size: 0.85em; margin-top: 3px;" data-next-purchase data-purchase-time="${nextViewsPurchaseTime.toISOString()}" data-metric="views">Next purchase: <span data-countdown-display>${formatTimeRemaining((nextViewsPurchaseTime - now) / (1000 * 60 * 60))}</span></div>` : ''}
+                            ${targetViews > 0 ? `<button class="manual-order-btn" data-video-url="${safeVideoUrlAttr}" data-metric="views" data-minimum="50" style="width: 100%; background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 0; cursor: pointer; font-weight: 600; font-size: 0.85em; margin-top: 8px;">Manual Order Views</button>` : ''}
                             <div class="progress-bar-container">
                                 <div class="progress-bar" style="width: ${Math.min(viewsProgress, 100)}%">${formatPercentage(totalViews, targetViews)}</div>
                             </div>
@@ -5608,17 +5608,17 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             <div class="metric-label">Likes</div>
                             <div class="metric-value">${formatNumber(totalLikes)}</div>
                             <div class="metric-target">/ ${formatNumber(targetLikes)} (${formatPercentage(totalLikes, targetLikes)})</div>
-                            ${likesOrdered > 0 ? `<div style="color: #667eea; font-size: 0.85em; margin-top: 3px;">📦 Orders placed: <strong>${likesOrdersCount}</strong> (${formatNumber(likesOrdered)} total ordered)</div>` : ''}
+                            ${likesOrdered > 0 ? `<div style="color: #667eea; font-size: 0.85em; margin-top: 3px;">Orders placed: <strong>${likesOrdersCount}</strong> (${formatNumber(likesOrdered)} total ordered)</div>` : ''}
                             ${likesCatchUp > 0 && targetCompletionTime ? `<div style="background: rgba(239, 68, 68, 0.1); border-radius: 0; padding: 8px; margin-top: 8px; font-size: 0.85em; border: 1px solid rgba(239, 68, 68, 0.3);">
-                                <div style="color: #ef4444; font-weight: 600; margin-bottom: 4px;">⚠️ Behind Schedule</div>
+                                <div style="color: #ef4444; font-weight: 600; margin-bottom: 4px;">Behind Schedule</div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Expected: <span style="color: #fff;">${formatNumber(Math.ceil(expectedLikesNow))}</span></div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Actual: <span style="color: #fff;">${formatNumber(totalLikes)}</span></div>
                                 <div style="color: #b0b0b0; margin-bottom: 6px;">Gap: <span style="color: #ef4444; font-weight: 600;">${formatNumber(likesCatchUp)}</span></div>
                                 <button class="catch-up-btn" data-video-url="${safeVideoUrlAttr}" data-metric="likes" data-amount="${likesCatchUp}" style="width: 100%; background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 0; cursor: pointer; font-weight: 600; font-size: 0.9em;">Catch Up (${formatNumber(likesCatchUp)})</button>
                             </div>` : ''}
-                            ${likesNeeded > 0 && hoursToLikesGoal > 0 ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;" data-time-to-goal data-hours="${hoursToLikesGoal}" data-metric="likes">⏱️ <span data-countdown-to-goal>${formatTimeRemaining(hoursToLikesGoal)}</span> to goal</div>` : likesNeeded <= 0 ? `<div style="color: #10b981; font-size: 0.85em; margin-top: 5px;">✓ Target reached</div>` : likesNeeded > 0 && isTargetOverdue ? `<div style="color: #ef4444; font-size: 0.85em; margin-top: 5px;">⚠️ Past due</div>` : likesNeeded > 0 && targetCompletionTime ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;" data-time-to-goal data-hours="${hoursToTarget}" data-metric="likes">⏱️ <span data-countdown-to-goal>${formatTimeRemaining(hoursToTarget)}</span> to goal</div>` : ''}
+                            ${likesNeeded > 0 && hoursToLikesGoal > 0 ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;" data-time-to-goal data-hours="${hoursToLikesGoal}" data-metric="likes"><span data-countdown-to-goal>${formatTimeRemaining(hoursToLikesGoal)}</span> to goal</div>` : likesNeeded <= 0 ? `<div style="color: #10b981; font-size: 0.85em; margin-top: 5px;">Target reached</div>` : likesNeeded > 0 && isTargetOverdue ? `<div style="color: #ef4444; font-size: 0.85em; margin-top: 5px;">Past due</div>` : likesNeeded > 0 && targetCompletionTime ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;" data-time-to-goal data-hours="${hoursToTarget}" data-metric="likes"><span data-countdown-to-goal>${formatTimeRemaining(hoursToTarget)}</span> to goal</div>` : ''}
                             ${nextLikesPurchase ? `<div style="background: rgba(102, 126, 234, 0.1); border-radius: 0; padding: 8px; margin-top: 8px; font-size: 0.85em;">
-                                <div style="color: #667eea; font-weight: 600; margin-bottom: 4px;">🛒 Next Purchase</div>
+                                <div style="color: #667eea; font-weight: 600; margin-bottom: 4px;">Next Purchase</div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Time: <span data-next-purchase data-purchase-time="${nextLikesPurchase.nextPurchaseTime.toISOString()}" data-metric="likes" style="color: #fff;"><span data-countdown-display>${formatTimeRemaining(nextLikesPurchase.timeUntilNext)}</span></span></div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Units: <span style="color: #fff;">${formatNumber(nextLikesPurchase.units)}</span> (min order)</div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Orders: <span style="color: #fff;">${nextLikesPurchase.purchasesCount}x</span> (${formatNumber(nextLikesPurchase.purchasesCount * nextLikesPurchase.units)} total)</div>
@@ -5626,9 +5626,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Already ordered: <span style="color: #10b981; font-weight: 600;">${formatNumber(likesOrdered)}</span></div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Per order: <span style="color: #10b981; font-weight: 600;">$${nextLikesPurchase.cost.toFixed(4)}</span></div>
                                 <div style="color: #b0b0b0; margin-bottom: 6px;">Total cost: <span style="color: #10b981; font-weight: 600;">$${nextLikesPurchase.totalCost.toFixed(4)}</span></div>
-                                <button class="manual-order-btn" data-video-url="${safeVideoUrlAttr}" data-metric="likes" data-minimum="10" style="width: 100%; background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 0; cursor: pointer; font-weight: 600; font-size: 0.9em; margin-top: 4px;">📦 Manual Order</button>
-                            </div>` : nextLikesPurchaseTime ? `<div style="color: #667eea; font-size: 0.85em; margin-top: 3px;" data-next-purchase data-purchase-time="${nextLikesPurchaseTime.toISOString()}" data-metric="likes">🛒 Next purchase: <span data-countdown-display>${formatTimeRemaining((nextLikesPurchaseTime - now) / (1000 * 60 * 60))}</span></div>` : ''}
-                            ${targetLikes > 0 ? `<button class="manual-order-btn" data-video-url="${safeVideoUrlAttr}" data-metric="likes" data-minimum="10" style="width: 100%; background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 0; cursor: pointer; font-weight: 600; font-size: 0.85em; margin-top: 8px;">📦 Manual Order Likes</button>` : ''}
+                                <button class="manual-order-btn" data-video-url="${safeVideoUrlAttr}" data-metric="likes" data-minimum="10" style="width: 100%; background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 0; cursor: pointer; font-weight: 600; font-size: 0.9em; margin-top: 4px;">Manual Order</button>
+                            </div>` : nextLikesPurchaseTime ? `<div style="color: #667eea; font-size: 0.85em; margin-top: 3px;" data-next-purchase data-purchase-time="${nextLikesPurchaseTime.toISOString()}" data-metric="likes">Next purchase: <span data-countdown-display>${formatTimeRemaining((nextLikesPurchaseTime - now) / (1000 * 60 * 60))}</span></div>` : ''}
+                            ${targetLikes > 0 ? `<button class="manual-order-btn" data-video-url="${safeVideoUrlAttr}" data-metric="likes" data-minimum="10" style="width: 100%; background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 0; cursor: pointer; font-weight: 600; font-size: 0.85em; margin-top: 8px;">Manual Order Likes</button>` : ''}
                             <div class="progress-bar-container">
                                 <div class="progress-bar" style="width: ${Math.min(likesProgress, 100)}%">${formatPercentage(totalLikes, targetLikes)}</div>
                             </div>
@@ -5638,10 +5638,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             <div class="metric-label">Comments</div>
                             <div class="metric-value">${totalComments}</div>
                             <div class="metric-target">/ ${targetComments} (${formatPercentage(totalComments, targetComments)})</div>
-                            ${commentsOrdered > 0 ? `<div style="color: #667eea; font-size: 0.85em; margin-top: 3px;">📦 Orders placed: <strong>${commentsOrdersCount}</strong> (${formatNumber(commentsOrdered)} total ordered)</div>` : ''}
-                            ${commentsNeeded > 0 && hoursToCommentsGoal > 0 ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;" data-time-to-goal data-hours="${hoursToCommentsGoal}" data-metric="comments">⏱️ <span data-countdown-to-goal>${formatTimeRemaining(hoursToCommentsGoal)}</span> to goal</div>` : commentsNeeded <= 0 ? `<div style="color: #10b981; font-size: 0.85em; margin-top: 5px;">✓ Target reached</div>` : commentsNeeded > 0 && isTargetOverdue ? `<div style="color: #ef4444; font-size: 0.85em; margin-top: 5px;">⚠️ Past due</div>` : commentsNeeded > 0 && targetCompletionTime ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;" data-time-to-goal data-hours="${hoursToTarget}" data-metric="comments">⏱️ <span data-countdown-to-goal>${formatTimeRemaining(hoursToTarget)}</span> to goal</div>` : ''}
+                            ${commentsOrdered > 0 ? `<div style="color: #667eea; font-size: 0.85em; margin-top: 3px;">Orders placed: <strong>${commentsOrdersCount}</strong> (${formatNumber(commentsOrdered)} total ordered)</div>` : ''}
+                            ${commentsNeeded > 0 && hoursToCommentsGoal > 0 ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;" data-time-to-goal data-hours="${hoursToCommentsGoal}" data-metric="comments"><span data-countdown-to-goal>${formatTimeRemaining(hoursToCommentsGoal)}</span> to goal</div>` : commentsNeeded <= 0 ? `<div style="color: #10b981; font-size: 0.85em; margin-top: 5px;">Target reached</div>` : commentsNeeded > 0 && isTargetOverdue ? `<div style="color: #ef4444; font-size: 0.85em; margin-top: 5px;">Past due</div>` : commentsNeeded > 0 && targetCompletionTime ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;" data-time-to-goal data-hours="${hoursToTarget}" data-metric="comments"><span data-countdown-to-goal>${formatTimeRemaining(hoursToTarget)}</span> to goal</div>` : ''}
                             ${nextCommentsPurchase ? `<div style="background: rgba(102, 126, 234, 0.1); border-radius: 0; padding: 8px; margin-top: 8px; font-size: 0.85em;">
-                                <div style="color: #667eea; font-weight: 600; margin-bottom: 4px;">🛒 Next Purchase</div>
+                                <div style="color: #667eea; font-weight: 600; margin-bottom: 4px;">Next Purchase</div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Time: <span data-next-purchase data-purchase-time="${nextCommentsPurchase.nextPurchaseTime.toISOString()}" data-metric="comments" style="color: #fff;"><span data-countdown-display>${formatTimeRemaining(nextCommentsPurchase.timeUntilNext)}</span></span></div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Units: <span style="color: #fff;">${formatNumber(nextCommentsPurchase.units)}</span> (min order)</div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Orders: <span style="color: #fff;">${nextCommentsPurchase.purchasesCount}x</span> (${formatNumber(nextCommentsPurchase.purchasesCount * nextCommentsPurchase.units)} total)</div>
@@ -5649,7 +5649,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Already ordered: <span style="color: #10b981; font-weight: 600;">${formatNumber(commentsOrdered)}</span></div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Per order: <span style="color: #10b981; font-weight: 600;">$${nextCommentsPurchase.cost.toFixed(4)}</span></div>
                                 <div style="color: #b0b0b0;">Total cost: <span style="color: #10b981; font-weight: 600;">$${nextCommentsPurchase.totalCost.toFixed(4)}</span></div>
-                            </div>` : nextCommentsPurchaseTime ? `<div style="color: #667eea; font-size: 0.85em; margin-top: 3px;" data-next-purchase data-purchase-time="${nextCommentsPurchaseTime.toISOString()}" data-metric="comments">🛒 Next purchase: <span data-countdown-display>${formatTimeRemaining((nextCommentsPurchaseTime - now) / (1000 * 60 * 60))}</span></div>` : ''}
+                            </div>` : nextCommentsPurchaseTime ? `<div style="color: #667eea; font-size: 0.85em; margin-top: 3px;" data-next-purchase data-purchase-time="${nextCommentsPurchaseTime.toISOString()}" data-metric="comments">Next purchase: <span data-countdown-display>${formatTimeRemaining((nextCommentsPurchaseTime - now) / (1000 * 60 * 60))}</span></div>` : ''}
                             <div class="progress-bar-container">
                                 <div class="progress-bar" style="width: ${Math.min(commentsProgress, 100)}%">${formatPercentage(totalComments, targetComments)}</div>
                             </div>
@@ -5659,10 +5659,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             <div class="metric-label">Comment Likes</div>
                             <div class="metric-value">${commentLikesOrdered}</div>
                             <div class="metric-target">/ ${targetCommentLikes} (${formatPercentage(commentLikesOrdered, targetCommentLikes)})</div>
-                            ${commentLikesOrdered > 0 ? `<div style="color: #667eea; font-size: 0.85em; margin-top: 3px;">📦 Orders placed: <strong>${commentLikesOrdersCount}</strong> (${formatNumber(commentLikesOrdered)} total ordered)</div>` : ''}
-                            ${commentLikesNeeded > 0 && hoursToCommentLikesGoal > 0 ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;" data-time-to-goal data-hours="${hoursToCommentLikesGoal}" data-metric="comment_likes">⏱️ <span data-countdown-to-goal>${formatTimeRemaining(hoursToCommentLikesGoal)}</span> to goal</div>` : commentLikesNeeded <= 0 ? `<div style="color: #10b981; font-size: 0.85em; margin-top: 5px;">✓ Target reached</div>` : commentLikesNeeded > 0 && isTargetOverdue ? `<div style="color: #ef4444; font-size: 0.85em; margin-top: 5px;">⚠️ Past due</div>` : commentLikesNeeded > 0 && targetCompletionTime ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;" data-time-to-goal data-hours="${hoursToTarget}" data-metric="comment_likes">⏱️ <span data-countdown-to-goal>${formatTimeRemaining(hoursToTarget)}</span> to goal</div>` : ''}
+                            ${commentLikesOrdered > 0 ? `<div style="color: #667eea; font-size: 0.85em; margin-top: 3px;">Orders placed: <strong>${commentLikesOrdersCount}</strong> (${formatNumber(commentLikesOrdered)} total ordered)</div>` : ''}
+                            ${commentLikesNeeded > 0 && hoursToCommentLikesGoal > 0 ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;" data-time-to-goal data-hours="${hoursToCommentLikesGoal}" data-metric="comment_likes"><span data-countdown-to-goal>${formatTimeRemaining(hoursToCommentLikesGoal)}</span> to goal</div>` : commentLikesNeeded <= 0 ? `<div style="color: #10b981; font-size: 0.85em; margin-top: 5px;">Target reached</div>` : commentLikesNeeded > 0 && isTargetOverdue ? `<div style="color: #ef4444; font-size: 0.85em; margin-top: 5px;">Past due</div>` : commentLikesNeeded > 0 && targetCompletionTime ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;" data-time-to-goal data-hours="${hoursToTarget}" data-metric="comment_likes"><span data-countdown-to-goal>${formatTimeRemaining(hoursToTarget)}</span> to goal</div>` : ''}
                             ${nextCommentLikesPurchase ? `<div style="background: rgba(102, 126, 234, 0.1); border-radius: 0; padding: 8px; margin-top: 8px; font-size: 0.85em;">
-                                <div style="color: #667eea; font-weight: 600; margin-bottom: 4px;">🛒 Next Purchase</div>
+                                <div style="color: #667eea; font-weight: 600; margin-bottom: 4px;">Next Purchase</div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Time: <span data-next-purchase data-purchase-time="${nextCommentLikesPurchase.nextPurchaseTime.toISOString()}" data-metric="comment_likes" style="color: #fff;"><span data-countdown-display>${formatTimeRemaining(nextCommentLikesPurchase.timeUntilNext)}</span></span></div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Units: <span style="color: #fff;">${formatNumber(nextCommentLikesPurchase.units)}</span> (min order)</div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Orders: <span style="color: #fff;">${nextCommentLikesPurchase.purchasesCount}x</span> (${formatNumber(nextCommentLikesPurchase.purchasesCount * nextCommentLikesPurchase.units)} total)</div>
@@ -5670,7 +5670,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Already ordered: <span style="color: #10b981; font-weight: 600;">${formatNumber(commentLikesOrdered)}</span></div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Per order: <span style="color: #10b981; font-weight: 600;">$${nextCommentLikesPurchase.cost.toFixed(4)}</span></div>
                                 <div style="color: #b0b0b0;">Total cost: <span style="color: #10b981; font-weight: 600;">$${nextCommentLikesPurchase.totalCost.toFixed(4)}</span></div>
-                            </div>` : nextCommentLikesPurchaseTime ? `<div style="color: #667eea; font-size: 0.85em; margin-top: 3px;" data-next-purchase data-purchase-time="${nextCommentLikesPurchaseTime.toISOString()}" data-metric="comment_likes">🛒 Next purchase: <span data-countdown-display>${formatTimeRemaining((nextCommentLikesPurchaseTime - now) / (1000 * 60 * 60))}</span></div>` : ''}
+                            </div>` : nextCommentLikesPurchaseTime ? `<div style="color: #667eea; font-size: 0.85em; margin-top: 3px;" data-next-purchase data-purchase-time="${nextCommentLikesPurchaseTime.toISOString()}" data-metric="comment_likes">Next purchase: <span data-countdown-display>${formatTimeRemaining((nextCommentLikesPurchaseTime - now) / (1000 * 60 * 60))}</span></div>` : ''}
                             <div class="progress-bar-container">
                                 <div class="progress-bar" style="width: ${Math.min(commentLikesProgress, 100)}%">${formatPercentage(commentLikesOrdered, targetCommentLikes)}</div>
                             </div>
@@ -5904,7 +5904,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 <span class="milestone-icon">💬</span>
                                 <span class="milestone-title">Comments Milestone</span>
                                 <span class="milestone-status">
-                                    ${currentTotalViews >= commentsMilestone ? (hasCommentsOrdered ? '✓ Ordered' : '⚠ Ready to Order') : '⏳ Pending'}
+                                    ${currentTotalViews >= commentsMilestone ? (hasCommentsOrdered ? 'Ordered' : '⚠ Ready to Order') : ' Pending'}
                                 </span>
                             </div>
                             <div class="milestone-details">
@@ -5941,7 +5941,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 </div>
                                 ` : currentTotalViews >= commentsMilestone ? `
                                 <div class="milestone-comments">
-                                    <strong>Status:</strong> ⚠️ No comments saved. Please add comments below to order.
+                                    <strong>Status:</strong> No comments saved. Please add comments below to order.
                                 </div>
                                 ` : `
                                 <div class="milestone-comments">
@@ -5956,7 +5956,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 <span class="milestone-icon">❤️</span>
                                 <span class="milestone-title">Comment Likes Milestone</span>
                                 <span class="milestone-status">
-                                    ${currentTotalViews >= commentLikesMilestone ? (hasCommentLikesOrdered ? '✓ Ordered' : '⚠ Ready to Order') : '⏳ Pending'}
+                                    ${currentTotalViews >= commentLikesMilestone ? (hasCommentLikesOrdered ? 'Ordered' : '⚠ Ready to Order') : ' Pending'}
                                 </span>
                             </div>
                             <div class="milestone-details">
@@ -6103,7 +6103,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 }
                                 
                                 statusHtml = '<div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">' +
-                                    '<div style="font-size: 24px;">⏳</div>' +
+                                    '<div style="font-size: 24px;"></div>' +
                                     '<div style="flex: 1;">' +
                                     '<div style="font-weight: 600; font-size: 16px; margin-bottom: 5px;">Waiting to Order</div>' +
                                     '<div style="opacity: 0.9; font-size: 14px;">' + (currentActivity.waiting_for || 'Next order') + '</div>' +
@@ -6386,7 +6386,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 ${getStatusText(overallProgress)}
                             </div>
                         </div>
-                        ${campaignId ? `<div style="font-size: 0.75em; color: #667eea; margin-top: 5px; opacity: 0.8;">📊 Campaign: <span id="campaign-name-${safeVideoUrlAttr.replace(/[^a-zA-Z0-9]/g, '_')}">Loading...</span></div>` : ''}
+                        ${campaignId ? `<div style="font-size: 0.75em; color: #667eea; margin-top: 5px; opacity: 0.8;">Campaign: <span id="campaign-name-${safeVideoUrlAttr.replace(/[^a-zA-Z0-9]/g, '_')}">Loading...</span></div>` : ''}
                         ${embedUrl ? `
                         <div class="video-embed-mini" data-action="stop-propagation">
                             <iframe src="${safeEmbedUrl}" allowfullscreen></iframe>
@@ -6503,7 +6503,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 
                                 statusHtml = '<div class="video-card-mini-activity" style="padding: 8px; margin: 12px 0; background: #1a1a1a; border-radius: 0; border-left: 3px solid #667eea;">' +
                                     '<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">' +
-                                    '<span style="font-size: 18px;">⏳</span>' +
+                                    '<span style="font-size: 18px;"></span>' +
                                     '<div style="flex: 1;">' +
                                     '<div style="font-weight: 600; font-size: 13px; color: #fff;">Waiting to Order</div>' +
                                     '<div style="opacity: 0.8; font-size: 11px; color: #ccc;">' + (currentActivity.waiting_for || 'Next order') + '</div>' +
@@ -6638,7 +6638,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         }())}
                         <div class="video-card-mini-actions" style="padding: 10px; border-top: 1px solid rgba(255,255,255,0.1);">
                             <button class="show-analytics-btn" data-video-url="${safeVideoUrlAttr}" style="width: 100%; padding: 8px; background: #1a1a1a; border: none; border-radius: 0; color: white; font-weight: 600; cursor: pointer; font-size: 14px; transition: transform 0.2s, box-shadow 0.2s;">
-                                📊 Show Analytics
+                                Show Analytics
                             </button>
                         </div>
                     </div>

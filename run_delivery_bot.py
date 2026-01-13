@@ -449,7 +449,7 @@ class DeliveryBot:
             due_orders = []
             
             # Maximum catch-up window: 7 days (to allow catching up on older campaigns)
-            # This was increased from 24 hours because campaigns can be paused/delayed
+            # Combined with goal-checking to prevent over-ordering
             MAX_CATCHUP_SECONDS = 7 * 24 * 60 * 60  # 7 days
             
             for purchase in views_likes_purchases:
@@ -491,6 +491,32 @@ class DeliveryBot:
                 if not service_id:
                     print(f"{Fore.RED}Unknown service: {service}{Style.RESET_ALL}")
                     continue
+                
+                # CHECK IF GOAL REACHED - Don't place order if target already met
+                progress = self.load_progress()
+                if self.video_url in progress:
+                    video_progress = progress[self.video_url]
+                    
+                    # Get current stats
+                    orders_placed = video_progress.get('orders_placed', {})
+                    real_views = video_progress.get('real_views', 0) or video_progress.get('initial_views', 0)
+                    real_likes = video_progress.get('real_likes', 0) or video_progress.get('initial_likes', 0)
+                    
+                    # Calculate total (ordered + real)
+                    total_views = orders_placed.get('views', 0) + real_views
+                    total_likes = orders_placed.get('likes', 0) + real_likes
+                    
+                    # Get targets
+                    target_views = video_progress.get('target_views', 4000)
+                    target_likes = video_progress.get('target_likes', 125)
+                    
+                    # Check if goal already reached for this service
+                    if service_key == 'views' and total_views >= target_views:
+                        print(f"{Fore.GREEN}✓ Views goal reached ({total_views}/{target_views}) - skipping order{Style.RESET_ALL}")
+                        continue
+                    elif service_key == 'likes' and total_likes >= target_likes:
+                        print(f"{Fore.GREEN}✓ Likes goal reached ({total_likes}/{target_likes}) - skipping order{Style.RESET_ALL}")
+                        continue
                 
                 print(f"{Fore.YELLOW}[{purchase['time_str']}] Placing order: {quantity} {service.lower()}...{Style.RESET_ALL}")
                 

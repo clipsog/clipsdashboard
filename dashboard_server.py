@@ -6679,6 +6679,21 @@ class DashboardHandler(BaseHTTPRequestHandler):
             loadDashboard(false);
         }
         
+        function handleManualOrder(videoUrl, service) {
+            if (!confirm('Place manual order for ' + service + '?')) {
+                return;
+            }
+            
+            // Navigate to the video detail page where manual order can be placed
+            window.location.hash = '#video/' + encodeURIComponent(videoUrl);
+            loadDashboard(false);
+            
+            // Show a message about where to place the order
+            setTimeout(function() {
+                alert('Scroll down to the manual order section to complete your ' + service + ' order.');
+            }, 500);
+        }
+        
         function renderSummaryStats(videos) {
             if (Object.keys(videos).length === 0) {
                 document.getElementById('summary-stats-container').innerHTML = '';
@@ -7609,18 +7624,28 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             
                             if (container) {
                                 let tableHtml = `
-                                    <table style="width: 100%; border-collapse: collapse; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); font-size: 13px;">
+                                    <table style="width: 100%; border-collapse: collapse; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); font-size: 11px;">
                                         <thead>
                                             <tr style="background: #252525; border-bottom: 2px solid rgba(255,255,255,0.1);">
-                                                <th style="padding: 8px 6px; text-align: left; color: #fff; font-weight: 600; font-size: 12px; border-right: 1px solid rgba(255,255,255,0.05);">Video</th>
-                                                <th style="padding: 8px 6px; text-align: center; color: #fff; font-weight: 600; font-size: 12px; border-right: 1px solid rgba(255,255,255,0.05);">Real Views</th>
-                                                <th style="padding: 8px 6px; text-align: center; color: #fff; font-weight: 600; font-size: 12px; border-right: 1px solid rgba(255,255,255,0.05);">Real Likes</th>
-                                                <th style="padding: 8px 6px; text-align: center; color: #fff; font-weight: 600; font-size: 12px; border-right: 1px solid rgba(255,255,255,0.05);">Ordered Views</th>
-                                                <th style="padding: 8px 6px; text-align: center; color: #fff; font-weight: 600; font-size: 12px; border-right: 1px solid rgba(255,255,255,0.05);">Ordered Likes</th>
-                                                <th style="padding: 8px 6px; text-align: center; color: #fff; font-weight: 600; font-size: 12px; border-right: 1px solid rgba(255,255,255,0.05);">Target Views</th>
-                                                <th style="padding: 8px 6px; text-align: center; color: #fff; font-weight: 600; font-size: 12px; border-right: 1px solid rgba(255,255,255,0.05);">Target Likes</th>
-                                                <th style="padding: 8px 6px; text-align: center; color: #fff; font-weight: 600; font-size: 12px; border-right: 1px solid rgba(255,255,255,0.05);">Spent</th>
-                                                <th style="padding: 8px 6px; text-align: center; color: #fff; font-weight: 600; font-size: 12px;">Status</th>
+                                                <th style="padding: 6px 4px; text-align: left; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Video ID</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Upload Time</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Time Diff</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">$ Invested</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">$ Returned</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Curr Views</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Exp Views</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Time to Next</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Manual Orders</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Sched Orders</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Units/Order</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">$/Order</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Curr Likes</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Exp Likes</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Likes Next</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Likes Manual</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Likes Sched</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Likes Units</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px;">Likes $/Order</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -7629,47 +7654,138 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 for (const videoUrl of campaignVideos) {
                                     const videoData = progress[videoUrl];
                                     if (videoData) {
-                                        const real_views = videoData.real_views || 0;
-                                        const real_likes = videoData.real_likes || 0;
-                                        const orders_placed = videoData.orders_placed || {};
-                                        const ordered_views = orders_placed.views || 0;
-                                        const ordered_likes = orders_placed.likes || 0;
-                                        const target_views = videoData.target_views || 0;
-                                        const target_likes = videoData.target_likes || 0;
-                                        const spent = videoData.spent || 0;
-                                        
-                                        // Calculate progress
-                                        const total_views = real_views + ordered_views;
-                                        const total_likes = real_likes + ordered_likes;
-                                        const views_progress = target_views > 0 ? Math.min(100, (total_views / target_views) * 100) : 0;
-                                        const likes_progress = target_likes > 0 ? Math.min(100, (total_likes / target_likes) * 100) : 0;
-                                        
-                                        // Determine status
-                                        let status = 'Active';
-                                        let statusColor = '#667eea';
-                                        if (views_progress >= 100 && likes_progress >= 100) {
-                                            status = 'Complete';
-                                            statusColor = '#10b981';
-                                        } else if (views_progress >= 100 || likes_progress >= 100) {
-                                            status = 'Near Goal';
-                                            statusColor = '#f59e0b';
-                                        }
-                                        
-                                        // Shorten video URL for display
+                                        // Extract video ID
                                         const videoIdMatch = videoUrl.match(/video\\/(\\d+)/);
                                         const videoId = videoIdMatch ? videoIdMatch[1] : videoUrl.substring(videoUrl.length - 15);
                                         
+                                        // Get start time and calculate time difference
+                                        const startTime = videoData.start_time ? new Date(videoData.start_time) : null;
+                                        const campaignStartTime = campaign.start_time ? new Date(campaign.start_time) : null;
+                                        const uploadTime = startTime ? startTime.toLocaleString('en-US', {month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'}) : 'N/A';
+                                        
+                                        let timeDiff = 'N/A';
+                                        if (startTime && campaignStartTime) {
+                                            const diffHours = Math.floor((startTime - campaignStartTime) / (1000 * 60 * 60));
+                                            const diffMinutes = Math.floor(((startTime - campaignStartTime) % (1000 * 60 * 60)) / (1000 * 60));
+                                            timeDiff = diffHours + 'h ' + diffMinutes + 'm';
+                                        }
+                                        
+                                        // Financial data
+                                        const invested = videoData.spent || videoData.total_cost || 0;
+                                        const real_views = videoData.real_views || 0;
+                                        const real_likes = videoData.real_likes || 0;
+                                        const cpm = 0.50; // Example CPM for calculation
+                                        const returned = (real_views / 1000) * cpm;
+                                        
+                                        // Views data
+                                        const orders_placed = videoData.orders_placed || {};
+                                        const ordered_views = orders_placed.views || 0;
+                                        const target_views = videoData.target_views || 0;
+                                        const target_completion = videoData.target_completion_time || videoData.target_completion_datetime;
+                                        
+                                        // Calculate expected views at this time
+                                        let expected_views = 0;
+                                        if (startTime && target_completion && target_views > 0) {
+                                            const now = new Date();
+                                            const endTime = new Date(target_completion);
+                                            const totalDuration = endTime - startTime;
+                                            const elapsed = now - startTime;
+                                            if (totalDuration > 0 && elapsed > 0) {
+                                                const progress = Math.min(1, elapsed / totalDuration);
+                                                expected_views = Math.floor(target_views * progress);
+                                            }
+                                        }
+                                        
+                                        // Time to next order
+                                        const nextViewsTime = videoData.next_views_purchase_time ? new Date(videoData.next_views_purchase_time) : null;
+                                        let timeToNext = 'N/A';
+                                        if (nextViewsTime) {
+                                            const now = new Date();
+                                            const diff = nextViewsTime - now;
+                                            if (diff > 0) {
+                                                const hours = Math.floor(diff / (1000 * 60 * 60));
+                                                const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                                                timeToNext = hours + 'h ' + mins + 'm';
+                                            } else {
+                                                timeToNext = 'Ready';
+                                            }
+                                        }
+                                        
+                                        // Order counts
+                                        const orderHistory = videoData.order_history || [];
+                                        const viewsOrders = orderHistory.filter(o => o.service === 'views');
+                                        const manualViewsOrders = viewsOrders.filter(o => o.manual).length;
+                                        const schedViewsOrders = viewsOrders.filter(o => !o.manual).length;
+                                        
+                                        // Units and cost per order (average)
+                                        let avgViewsUnits = 0;
+                                        let avgViewsCost = 0;
+                                        if (viewsOrders.length > 0) {
+                                            avgViewsUnits = Math.floor(viewsOrders.reduce((sum, o) => sum + (o.quantity || 0), 0) / viewsOrders.length);
+                                            avgViewsCost = viewsOrders.reduce((sum, o) => sum + (o.cost || 0), 0) / viewsOrders.length;
+                                        }
+                                        
+                                        // Likes data
+                                        const ordered_likes = orders_placed.likes || 0;
+                                        const target_likes = videoData.target_likes || 0;
+                                        let expected_likes = 0;
+                                        if (startTime && target_completion && target_likes > 0) {
+                                            const now = new Date();
+                                            const endTime = new Date(target_completion);
+                                            const totalDuration = endTime - startTime;
+                                            const elapsed = now - startTime;
+                                            if (totalDuration > 0 && elapsed > 0) {
+                                                const progress = Math.min(1, elapsed / totalDuration);
+                                                expected_likes = Math.floor(target_likes * progress);
+                                            }
+                                        }
+                                        
+                                        const nextLikesTime = videoData.next_likes_purchase_time ? new Date(videoData.next_likes_purchase_time) : null;
+                                        let likesTimeToNext = 'N/A';
+                                        if (nextLikesTime) {
+                                            const now = new Date();
+                                            const diff = nextLikesTime - now;
+                                            if (diff > 0) {
+                                                const hours = Math.floor(diff / (1000 * 60 * 60));
+                                                const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                                                likesTimeToNext = hours + 'h ' + mins + 'm';
+                                            } else {
+                                                likesTimeToNext = 'Ready';
+                                            }
+                                        }
+                                        
+                                        const likesOrders = orderHistory.filter(o => o.service === 'likes');
+                                        const manualLikesOrders = likesOrders.filter(o => o.manual).length;
+                                        const schedLikesOrders = likesOrders.filter(o => !o.manual).length;
+                                        
+                                        let avgLikesUnits = 0;
+                                        let avgLikesCost = 0;
+                                        if (likesOrders.length > 0) {
+                                            avgLikesUnits = Math.floor(likesOrders.reduce((sum, o) => sum + (o.quantity || 0), 0) / likesOrders.length);
+                                            avgLikesCost = likesOrders.reduce((sum, o) => sum + (o.cost || 0), 0) / likesOrders.length;
+                                        }
+                                        
                                         tableHtml += `
                                             <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer;" onclick="navigateToVideo('${escapeTemplateLiteral(videoUrl)}')" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='transparent'">
-                                                <td style="padding: 7px 6px; color: #667eea; font-family: monospace; font-size: 12px; border-right: 1px solid rgba(255,255,255,0.05);" title="${escapeTemplateLiteral(videoUrl)}">...${videoId}</td>
-                                                <td style="padding: 7px 6px; text-align: center; color: #fff; font-size: 13px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(real_views)}</td>
-                                                <td style="padding: 7px 6px; text-align: center; color: #fff; font-size: 13px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(real_likes)}</td>
-                                                <td style="padding: 7px 6px; text-align: center; color: #b0b0b0; font-size: 13px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(ordered_views)}</td>
-                                                <td style="padding: 7px 6px; text-align: center; color: #b0b0b0; font-size: 13px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(ordered_likes)}</td>
-                                                <td style="padding: 7px 6px; text-align: center; color: #667eea; font-size: 13px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(target_views)}</td>
-                                                <td style="padding: 7px 6px; text-align: center; color: #667eea; font-size: 13px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(target_likes)}</td>
-                                                <td style="padding: 7px 6px; text-align: center; color: #ef4444; font-size: 13px; border-right: 1px solid rgba(255,255,255,0.05);">$${spent.toFixed(2)}</td>
-                                                <td style="padding: 7px 6px; text-align: center; color: ${statusColor}; font-size: 12px; font-weight: 600;">${status}</td>
+                                                <td style="padding: 5px 4px; color: #667eea; font-family: monospace; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);" title="${escapeTemplateLiteral(videoUrl)}"><a href="${escapeTemplateLiteral(videoUrl)}" target="_blank" style="color: #667eea; text-decoration: none;" onclick="event.stopPropagation();">...${videoId}</a></td>
+                                                <td style="padding: 5px 4px; text-align: center; color: #fff; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${uploadTime}</td>
+                                                <td style="padding: 5px 4px; text-align: center; color: #fff; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${timeDiff}</td>
+                                                <td style="padding: 5px 4px; text-align: center; color: #ef4444; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">$${invested.toFixed(2)}</td>
+                                                <td style="padding: 5px 4px; text-align: center; color: #10b981; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">$${returned.toFixed(2)}</td>
+                                                <td style="padding: 5px 4px; text-align: center; color: #fff; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(real_views)}</td>
+                                                <td style="padding: 5px 4px; text-align: center; color: ${real_views >= expected_views ? '#10b981' : '#f59e0b'}; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(expected_views)}</td>
+                                                <td style="padding: 5px 4px; text-align: center; color: ${timeToNext === 'Ready' ? '#10b981' : '#fff'}; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${timeToNext}</td>
+                                                <td style="padding: 5px 4px; text-align: center; color: #b0b0b0; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);"><button onclick="event.stopPropagation(); handleManualOrder('${escapeTemplateLiteral(videoUrl)}', 'views');" style="background: none; border: 1px solid #667eea; color: #667eea; padding: 2px 6px; cursor: pointer; font-size: 9px;">${manualViewsOrders}</button></td>
+                                                <td style="padding: 5px 4px; text-align: center; color: #b0b0b0; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${schedViewsOrders}</td>
+                                                <td style="padding: 5px 4px; text-align: center; color: #fff; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${avgViewsUnits}</td>
+                                                <td style="padding: 5px 4px; text-align: center; color: #fff; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">$${avgViewsCost.toFixed(2)}</td>
+                                                <td style="padding: 5px 4px; text-align: center; color: #fff; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(real_likes)}</td>
+                                                <td style="padding: 5px 4px; text-align: center; color: ${real_likes >= expected_likes ? '#10b981' : '#f59e0b'}; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(expected_likes)}</td>
+                                                <td style="padding: 5px 4px; text-align: center; color: ${likesTimeToNext === 'Ready' ? '#10b981' : '#fff'}; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${likesTimeToNext}</td>
+                                                <td style="padding: 5px 4px; text-align: center; color: #b0b0b0; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);"><button onclick="event.stopPropagation(); handleManualOrder('${escapeTemplateLiteral(videoUrl)}', 'likes');" style="background: none; border: 1px solid #667eea; color: #667eea; padding: 2px 6px; cursor: pointer; font-size: 9px;">${manualLikesOrders}</button></td>
+                                                <td style="padding: 5px 4px; text-align: center; color: #b0b0b0; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${schedLikesOrders}</td>
+                                                <td style="padding: 5px 4px; text-align: center; color: #fff; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${avgLikesUnits}</td>
+                                                <td style="padding: 5px 4px; text-align: center; color: #fff; font-size: 10px;">$${avgLikesCost.toFixed(2)}</td>
                                             </tr>
                                         `;
                                     }

@@ -3606,7 +3606,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         <select id="campaign-selector" style="flex: 1; padding: 8px 12px; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.2); border-radius: 0; color: #fff; font-size: 14px;">
                             <option value="">Select Campaign...</option>
                         </select>
-                        <button id="new-campaign-btn-bar" style="background: #10b981; color: white; border: none; padding: 8px 16px; border-radius: 0; cursor: pointer; font-weight: 600; font-size: 14px;">➕ New Campaign</button>
+                        <button id="new-campaign-btn-bar" style="background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 0; cursor: pointer; font-weight: 600; font-size: 13px;">New Campaign</button>
                         <button onclick="assignToCampaign()" id="assign-campaign-btn" style="background: #667eea; color: white; border: none; padding: 8px 16px; border-radius: 0; cursor: pointer; font-weight: 600; font-size: 14px;" disabled>Assign</button>
                         <button onclick="clearSelection()" style="background: #444; color: white; border: none; padding: 8px 16px; border-radius: 0; cursor: pointer; font-size: 14px;">Clear</button>
                     </div>
@@ -3620,7 +3620,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
         <!-- Add Video Modal -->
         <div id="add-video-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10000; align-items: center; justify-content: center;">
             <div style="background: #1a1a1a; border-radius: 0; padding: 10px; max-width: 500px; width: 90%; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 8px 32px rgba(0,0,0,0.5);">
-                <h2 style="margin: 0 0 20px 0; color: #fff; font-size: 24px;">➕ Add Video to Campaign</h2>
+                <h2 style="margin: 0 0 15px 0; color: #fff; font-size: 20px;">Add Video to Campaign</h2>
                 <p style="color: #b0b0b0; margin-bottom: 12px; font-size: 14px;">Enter a TikTok video URL to start tracking it in your campaign.</p>
                 <div style="margin-bottom: 12px;">
                     <label style="display: block; color: #fff; margin-bottom: 8px; font-weight: 600;">Assign to Campaign (optional)</label>
@@ -3628,7 +3628,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         <select id="add-video-campaign-selector" style="flex: 1; padding: 10px 12px; background: #252525; border: 1px solid rgba(255,255,255,0.2); border-radius: 0; color: #fff; font-size: 14px;">
                             <option value="">No campaign</option>
                         </select>
-                        <button id="add-video-new-campaign-btn" style="background: #10b981; color: white; border: none; padding: 10px 14px; border-radius: 0; cursor: pointer; font-weight: 700; font-size: 13px;">➕ New</button>
+                        <button id="add-video-new-campaign-btn" style="background: #10b981; color: white; border: none; padding: 8px 12px; border-radius: 0; cursor: pointer; font-weight: 700; font-size: 12px;">New</button>
                     </div>
                     <div style="color: #888; font-size: 12px; margin-top: 6px;">If you choose a campaign, we’ll apply that campaign’s goals & speed to this post.</div>
                 </div>
@@ -3978,7 +3978,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 
                 const data = await response.json();
                 if (data.success) {
-                    alert(`✓ Catch-up order placed! Order ID: ${data.order_id}\nAmount: ${data.amount.toLocaleString()} ${metric}`);
+                    alert(`Order placed! Order ID: ${data.order_id}\nAmount: ${data.amount.toLocaleString()} ${metric}`);
                     // Reload dashboard to show updated stats
                     await loadDashboard(true);
                 } else {
@@ -4033,7 +4033,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 
                 const data = await response.json();
                 if (data.success) {
-                    alert(`✓ Manual order placed! Order ID: ${data.order_id}\nAmount: ${data.amount.toLocaleString()} ${metric}`);
+                    alert(`Manual order placed! Order ID: ${data.order_id}\nAmount: ${data.amount.toLocaleString()} ${metric}`);
                     // Reload dashboard to show updated stats
                     await loadDashboard(true);
                 } else {
@@ -4534,7 +4534,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 const data = await response.json();
                 
                 if (data.success) {
-                    showNotification('✓ Campaign ended successfully', 'success');
+                    showNotification('Campaign ended successfully', 'success');
                     await loadCampaigns();
                     await loadDashboard(false);
                 } else {
@@ -6023,7 +6023,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     </div>
                     
                     <div class="live-activity-section" style="background: #1a1a1a; padding: 8px; border-radius: 0; margin-bottom: 16px; color: white;">
-                        <h3 style="margin: 0 0 15px 0; color: white; font-size: 18px;">⚡ Live Activity Status</h3>
+                        <h3 style="margin: 0 0 12px 0; color: white; font-size: 16px;">Live Activity Status</h3>
                         ${(function() {
                             const currentActivity = videoData.current_activity || {};
                             const activityStatus = currentActivity.status || 'idle';
@@ -6115,11 +6115,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                     '</div>' +
                                     '<div data-countdown data-next-action-time="' + (currentActivity.next_action_time || '') + '" style="display:none;"></div>';
                             } else if (activityStatus === 'ordering') {
-                                statusHtml = '<div style="display: flex; align-items: center; gap: 15px;">' +
-                                    '<div style="font-size: 24px;">🔄</div>' +
+                                statusHtml = '<div style="display: flex; align-items: center; gap: 12px;">' +
+                                    '<div style="font-size: 20px; font-weight: 700;">...</div>' +
                                     '<div style="flex: 1;">' +
-                                    '<div style="font-weight: 600; font-size: 16px; margin-bottom: 5px;">Ordering Now</div>' +
-                                    '<div style="opacity: 0.9; font-size: 14px;">' + (currentActivity.action || 'Placing order') + '</div>' +
+                                    '<div style="font-weight: 600; font-size: 15px; margin-bottom: 4px;">Ordering Now</div>' +
+                                    '<div style="opacity: 0.9; font-size: 13px;">' + (currentActivity.action || 'Placing order') + '</div>' +
                                     '</div>' +
                                     '</div>';
                             } else {
@@ -6551,11 +6551,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 
                                 statusHtml += '</div>';
                             } else if (activityStatus === 'ordering') {
-                                statusHtml = '<div class="video-card-mini-activity" style="padding: 8px; margin: 12px 0; background: #1a1a1a; border-radius: 0; border-left: 3px solid #667eea;">' +
-                                    '<div style="display: flex; align-items: center; gap: 10px;">' +
-                                    '<span style="font-size: 18px;">🔄</span>' +
+                                statusHtml = '<div class="video-card-mini-activity" style="padding: 6px; margin: 10px 0; background: #1a1a1a; border-radius: 0; border-left: 3px solid #667eea;">' +
+                                    '<div style="display: flex; align-items: center; gap: 8px;">' +
+                                    '<span style="font-size: 16px; font-weight: 700;">...</span>' +
                                     '<div style="flex: 1;">' +
-                                    '<div style="font-weight: 600; font-size: 13px; color: #fff;">Ordering Now</div>' +
+                                    '<div style="font-weight: 600; font-size: 12px; color: #fff;">Ordering Now</div>' +
                                     '<div style="opacity: 0.8; font-size: 11px; color: #ccc;">' + (currentActivity.action || 'Placing order') + '</div>' +
                                     '</div>' +
                                     '</div>';
@@ -7246,7 +7246,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     
                     if (data.success) {
                         successCount++;
-                        statusLine.innerHTML = `[${i + 1}/${urls.length}] ${url.substring(0, 60)}... <span style="color: #10b981;">✓ Added</span>`;
+                        statusLine.innerHTML = `[${i + 1}/${urls.length}] ${url.substring(0, 60)}... <span style="color: #10b981;">Added</span>`;
                         results.push({ url, success: true, data });
                     } else {
                         errorCount++;
@@ -7268,11 +7268,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
             
             // Show results
             if (successCount > 0) {
-                successDiv.textContent = `✓ Successfully added ${successCount} video(s)${errorCount > 0 ? ` (${errorCount} failed)` : ''}`;
+                successDiv.textContent = `Successfully added ${successCount} video(s)${errorCount > 0 ? ` (${errorCount} failed)` : ''}`;
                 successDiv.style.display = 'block';
                 
                 // Show notification
-                showNotification(`✓ ${successCount} video(s) added successfully`, 'success');
+                showNotification(`${successCount} video(s) added successfully`, 'success');
                 
                 // Refresh dashboard after a short delay
                 setTimeout(async () => {
@@ -7513,7 +7513,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         html += `<h2 style="color: #fff; font-size: 1.5em; margin: 30px 0 20px 0;">Posts in Campaign</h2>`;
                         
                         if (campaignVideos.length === 0) {
-                            html += `<div style="text-align: center; padding: 40px; color: #b0b0b0;">No videos in this campaign yet. Add videos using the "➕ Add Video" button.</div>`;
+                            html += `<div style="text-align: center; padding: 30px; color: #b0b0b0;">No videos in this campaign yet. Add videos using the "Add Video" button.</div>`;
                         } else {
                             // Show comparison table for better metrics analysis
                             html += '<div id="campaign-videos-loading" style="text-align: center; padding: 8px; color: #b0b0b0;">Loading videos...</div>';
@@ -7609,18 +7609,18 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             
                             if (container) {
                                 let tableHtml = `
-                                    <table style="width: 100%; border-collapse: collapse; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1);">
+                                    <table style="width: 100%; border-collapse: collapse; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); font-size: 13px;">
                                         <thead>
                                             <tr style="background: #252525; border-bottom: 2px solid rgba(255,255,255,0.1);">
-                                                <th style="padding: 12px 8px; text-align: left; color: #fff; font-weight: 600; font-size: 14px; border-right: 1px solid rgba(255,255,255,0.05);">Video</th>
-                                                <th style="padding: 12px 8px; text-align: center; color: #fff; font-weight: 600; font-size: 14px; border-right: 1px solid rgba(255,255,255,0.05);">Real Views</th>
-                                                <th style="padding: 12px 8px; text-align: center; color: #fff; font-weight: 600; font-size: 14px; border-right: 1px solid rgba(255,255,255,0.05);">Real Likes</th>
-                                                <th style="padding: 12px 8px; text-align: center; color: #fff; font-weight: 600; font-size: 14px; border-right: 1px solid rgba(255,255,255,0.05);">Ordered Views</th>
-                                                <th style="padding: 12px 8px; text-align: center; color: #fff; font-weight: 600; font-size: 14px; border-right: 1px solid rgba(255,255,255,0.05);">Ordered Likes</th>
-                                                <th style="padding: 12px 8px; text-align: center; color: #fff; font-weight: 600; font-size: 14px; border-right: 1px solid rgba(255,255,255,0.05);">Target Views</th>
-                                                <th style="padding: 12px 8px; text-align: center; color: #fff; font-weight: 600; font-size: 14px; border-right: 1px solid rgba(255,255,255,0.05);">Target Likes</th>
-                                                <th style="padding: 12px 8px; text-align: center; color: #fff; font-weight: 600; font-size: 14px; border-right: 1px solid rgba(255,255,255,0.05);">Spent</th>
-                                                <th style="padding: 12px 8px; text-align: center; color: #fff; font-weight: 600; font-size: 14px;">Status</th>
+                                                <th style="padding: 8px 6px; text-align: left; color: #fff; font-weight: 600; font-size: 12px; border-right: 1px solid rgba(255,255,255,0.05);">Video</th>
+                                                <th style="padding: 8px 6px; text-align: center; color: #fff; font-weight: 600; font-size: 12px; border-right: 1px solid rgba(255,255,255,0.05);">Real Views</th>
+                                                <th style="padding: 8px 6px; text-align: center; color: #fff; font-weight: 600; font-size: 12px; border-right: 1px solid rgba(255,255,255,0.05);">Real Likes</th>
+                                                <th style="padding: 8px 6px; text-align: center; color: #fff; font-weight: 600; font-size: 12px; border-right: 1px solid rgba(255,255,255,0.05);">Ordered Views</th>
+                                                <th style="padding: 8px 6px; text-align: center; color: #fff; font-weight: 600; font-size: 12px; border-right: 1px solid rgba(255,255,255,0.05);">Ordered Likes</th>
+                                                <th style="padding: 8px 6px; text-align: center; color: #fff; font-weight: 600; font-size: 12px; border-right: 1px solid rgba(255,255,255,0.05);">Target Views</th>
+                                                <th style="padding: 8px 6px; text-align: center; color: #fff; font-weight: 600; font-size: 12px; border-right: 1px solid rgba(255,255,255,0.05);">Target Likes</th>
+                                                <th style="padding: 8px 6px; text-align: center; color: #fff; font-weight: 600; font-size: 12px; border-right: 1px solid rgba(255,255,255,0.05);">Spent</th>
+                                                <th style="padding: 8px 6px; text-align: center; color: #fff; font-weight: 600; font-size: 12px;">Status</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -7645,13 +7645,13 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                         const likes_progress = target_likes > 0 ? Math.min(100, (total_likes / target_likes) * 100) : 0;
                                         
                                         // Determine status
-                                        let status = '🔄 Active';
+                                        let status = 'Active';
                                         let statusColor = '#667eea';
                                         if (views_progress >= 100 && likes_progress >= 100) {
-                                            status = '✓ Complete';
+                                            status = 'Complete';
                                             statusColor = '#10b981';
                                         } else if (views_progress >= 100 || likes_progress >= 100) {
-                                            status = '⚡ Near Goal';
+                                            status = 'Near Goal';
                                             statusColor = '#f59e0b';
                                         }
                                         
@@ -7661,15 +7661,15 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                         
                                         tableHtml += `
                                             <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer;" onclick="navigateToVideo('${escapeTemplateLiteral(videoUrl)}')" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='transparent'">
-                                                <td style="padding: 10px 8px; color: #667eea; font-family: monospace; font-size: 13px; border-right: 1px solid rgba(255,255,255,0.05);" title="${escapeTemplateLiteral(videoUrl)}">...${videoId}</td>
-                                                <td style="padding: 10px 8px; text-align: center; color: #fff; font-size: 14px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(real_views)}</td>
-                                                <td style="padding: 10px 8px; text-align: center; color: #fff; font-size: 14px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(real_likes)}</td>
-                                                <td style="padding: 10px 8px; text-align: center; color: #b0b0b0; font-size: 14px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(ordered_views)}</td>
-                                                <td style="padding: 10px 8px; text-align: center; color: #b0b0b0; font-size: 14px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(ordered_likes)}</td>
-                                                <td style="padding: 10px 8px; text-align: center; color: #667eea; font-size: 14px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(target_views)}</td>
-                                                <td style="padding: 10px 8px; text-align: center; color: #667eea; font-size: 14px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(target_likes)}</td>
-                                                <td style="padding: 10px 8px; text-align: center; color: #ef4444; font-size: 14px; border-right: 1px solid rgba(255,255,255,0.05);">$${spent.toFixed(2)}</td>
-                                                <td style="padding: 10px 8px; text-align: center; color: ${statusColor}; font-size: 13px; font-weight: 600;">${status}</td>
+                                                <td style="padding: 7px 6px; color: #667eea; font-family: monospace; font-size: 12px; border-right: 1px solid rgba(255,255,255,0.05);" title="${escapeTemplateLiteral(videoUrl)}">...${videoId}</td>
+                                                <td style="padding: 7px 6px; text-align: center; color: #fff; font-size: 13px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(real_views)}</td>
+                                                <td style="padding: 7px 6px; text-align: center; color: #fff; font-size: 13px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(real_likes)}</td>
+                                                <td style="padding: 7px 6px; text-align: center; color: #b0b0b0; font-size: 13px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(ordered_views)}</td>
+                                                <td style="padding: 7px 6px; text-align: center; color: #b0b0b0; font-size: 13px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(ordered_likes)}</td>
+                                                <td style="padding: 7px 6px; text-align: center; color: #667eea; font-size: 13px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(target_views)}</td>
+                                                <td style="padding: 7px 6px; text-align: center; color: #667eea; font-size: 13px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(target_likes)}</td>
+                                                <td style="padding: 7px 6px; text-align: center; color: #ef4444; font-size: 13px; border-right: 1px solid rgba(255,255,255,0.05);">$${spent.toFixed(2)}</td>
+                                                <td style="padding: 7px 6px; text-align: center; color: ${statusColor}; font-size: 12px; font-weight: 600;">${status}</td>
                                             </tr>
                                         `;
                                     }

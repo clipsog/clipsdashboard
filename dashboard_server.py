@@ -6521,6 +6521,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
         }
         
         function navigateToCampaign(campaignId) {
+            // Switch to dashboard tab and navigate to campaign detail
+            switchTab('dashboard');
             window.location.hash = '#campaign/' + encodeURIComponent(campaignId);
             loadDashboard(false);
         }
@@ -7362,9 +7364,27 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 let html = '';
                 
                 if (route.type === 'campaign') {
-                    // Show campaign detail view with all posts
+                    // Show campaign detail view with all posts - full page view
                     const campaignId = route.campaignId;
                     const campaign = campaignsData[campaignId];
+                    
+                    // Hide campaigns tab content when viewing campaign detail
+                    const campaignsContent = document.getElementById('campaigns-content');
+                    if (campaignsContent) {
+                        campaignsContent.classList.remove('active');
+                    }
+                    // Ensure dashboard content is visible
+                    const dashboardContent = document.getElementById('dashboard-content');
+                    if (dashboardContent) {
+                        dashboardContent.classList.add('active');
+                    }
+                    // Activate dashboard tab button
+                    document.querySelectorAll('.tab-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                        if (btn.getAttribute('data-tab') === 'dashboard') {
+                            btn.classList.add('active');
+                        }
+                    });
                     
                     if (!campaign) {
                         html = `
@@ -7378,7 +7398,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         const campaignVideos = campaign.videos || [];
                         const financial = campaign.financial || {};
                         
-                        html += '<div class="back-button" data-action="navigate-home">← Back to All Campaigns</div>';
+                        html += '<div class="back-button" data-action="navigate-home" onclick="switchTab(\'campaigns\'); navigateToHome();">← Back to All Campaigns</div>';
                         html += `<div style="background: #1a1a1a; border-radius: 0; padding: 10px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.1);">`;
                         html += `<h1 style="color: #fff; font-size: 2em; margin-bottom: 10px;">${campaign.name || 'Unnamed Campaign'}</h1>`;
                         html += `<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px;">`;
@@ -8159,6 +8179,12 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         e.preventDefault();
                         e.stopPropagation();
                         try {
+                            // Check if we're in a campaign view
+                            const route = getCurrentRoute();
+                            if (route.type === 'campaign') {
+                                // Switch to campaigns tab first
+                                switchTab('campaigns');
+                            }
                             if (typeof navigateToHome === 'function') {
                                 navigateToHome();
                             } else {

@@ -7122,7 +7122,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             urlItem.style.cssText = 'display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); font-family: monospace; font-size: 12px;';
             urlItem.innerHTML = `
                 <span style="color: #b0b0b0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">${url}</span>
-                <button onclick="removeUrlFromList('${url.replace(/'/g, "\\\\'")')" style="background: transparent; border: none; color: #ef4444; cursor: pointer; padding: 2px 6px; font-size: 14px; margin-left: 8px;">×</button>
+                <button onclick="removeUrlFromList('${url.replace(/'/g, "\\\\'")}')" style="background: transparent; border: none; color: #ef4444; cursor: pointer; padding: 2px 6px; font-size: 14px; margin-left: 8px;">×</button>
             `;
             urlList.appendChild(urlItem);
             
@@ -7155,7 +7155,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 urlItem.style.cssText = 'display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); font-family: monospace; font-size: 12px;';
                 urlItem.innerHTML = `
                     <span style="color: #b0b0b0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">${url}</span>
-                    <button onclick="removeUrlFromList('${url.replace(/'/g, "\\\\'")')" style="background: transparent; border: none; color: #ef4444; cursor: pointer; padding: 2px 6px; font-size: 14px; margin-left: 8px;">×</button>
+                    <button onclick="removeUrlFromList('${url.replace(/'/g, "\\\\'")}')" style="background: transparent; border: none; color: #ef4444; cursor: pointer; padding: 2px 6px; font-size: 14px; margin-left: 8px;">×</button>
                 `;
                 urlList.appendChild(urlItem);
             });

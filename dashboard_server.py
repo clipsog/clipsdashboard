@@ -3322,8 +3322,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
         /* Tab Navigation */
         .tab-navigation {
             display: flex;
-            gap: 4px;
-            margin-bottom: 6px;
+            gap: 2px;
+            margin-bottom: 3px;
             border-bottom: 1px solid rgba(255,255,255,0.05);
         }
         
@@ -3331,8 +3331,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
             background: transparent;
             border: none;
             color: #888;
-            padding: 4px 12px;
-            font-size: 11px;
+            padding: 2px 8px;
+            font-size: 10px;
             font-weight: 500;
             cursor: pointer;
             border-bottom: 2px solid transparent;

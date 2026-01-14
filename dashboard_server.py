@@ -3996,7 +3996,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
         }
         
         async function manualOrder(videoUrl, metric, minimum, buttonElement) {
-            const button = buttonElement || event.target;
+            const button = buttonElement || (event && event.target) || null;
             const amountStr = prompt(`Enter amount of ${metric} to order (minimum: ${minimum}):`, minimum);
             
             if (!amountStr) {
@@ -4013,9 +4013,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 return;
             }
             
-            const originalText = button.textContent;
-            button.disabled = true;
-            button.textContent = 'Placing order...';
+            const originalText = button ? button.textContent : '';
+            if (button) {
+                button.disabled = true;
+                button.textContent = 'Placing order...';
+            }
             
             try {
                 const params = new URLSearchParams({
@@ -4039,14 +4041,18 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     await loadDashboard(true);
                 } else {
                     alert('Error: ' + (data.error || 'Failed to place manual order'));
-                    button.disabled = false;
-                    button.textContent = originalText;
+                    if (button) {
+                        button.disabled = false;
+                        button.textContent = originalText;
+                    }
                 }
             } catch (error) {
                 console.error('Error:', error);
                 alert('Error placing manual order: ' + error.message);
-                button.disabled = false;
-                button.textContent = originalText;
+                if (button) {
+                    button.disabled = false;
+                    button.textContent = originalText;
+                }
             }
         }
         
@@ -6687,18 +6693,32 @@ class DashboardHandler(BaseHTTPRequestHandler):
         }
         
         function handleManualOrder(videoUrl, service) {
-            if (!confirm('Place manual order for ' + service + '?')) {
-                return;
+            // Map service name to metric name
+            const metricMap = {
+                'views': 'views',
+                'likes': 'likes',
+                'comments': 'comments',
+                'comment_likes': 'comment_likes'
+            };
+            const metric = metricMap[service] || service;
+            
+            // Get minimum order amount (defaults)
+            const minimums = {
+                'views': 100,
+                'likes': 50,
+                'comments': 10,
+                'comment_likes': 5
+            };
+            const minimum = minimums[metric] || 10;
+            
+            // Call the manualOrder function to prompt and place order
+            if (typeof manualOrder === 'function') {
+                manualOrder(videoUrl, metric, minimum, null);
+            } else {
+                // Fallback: navigate to video page
+                window.location.hash = '#video/' + encodeURIComponent(videoUrl);
+                loadDashboard(false);
             }
-            
-            // Navigate to the video detail page where manual order can be placed
-            window.location.hash = '#video/' + encodeURIComponent(videoUrl);
-            loadDashboard(false);
-            
-            // Show a message about where to place the order
-            setTimeout(function() {
-                alert('Scroll down to the manual order section to complete your ' + service + ' order.');
-            }, 500);
         }
         
         function renderSummaryStats(videos) {
@@ -7631,26 +7651,26 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             
                             if (container) {
                                 let tableHtml = `
-                                    <table style="width: 100%; border-collapse: collapse; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); font-size: 11px;">
+                                    <table style="width: 100%; border-collapse: collapse; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); font-family: monospace; font-size: 10px;">
                                         <thead>
                                             <tr style="background: #252525; border-bottom: 2px solid rgba(255,255,255,0.1);">
-                                                <th style="padding: 6px 4px; text-align: left; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Video ID</th>
-                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Date Posted</th>
-                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Time Left</th>
-                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Curr Views</th>
-                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Exp Views</th>
-                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Manual Order</th>
-                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Sched Orders</th>
-                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Time to Next</th>
-                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Units/Order</th>
-                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">$/Unit</th>
-                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Curr Likes</th>
-                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Exp Likes</th>
-                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Likes Manual</th>
-                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Likes Sched</th>
-                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Likes Next</th>
-                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Likes Units</th>
-                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px;">Likes $/Unit</th>
+                                                <th style="padding: 6px 4px; text-align: left; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">VIDEO ID</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">DATE POSTED</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">TIME LEFT</th>
+                                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">CURR VIEWS</th>
+                                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">EXP VIEWS</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">MANUAL ORD</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">SCHED ORD</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">TIME NEXT</th>
+                                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">UNITS/ORD</th>
+                                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">$/UNIT</th>
+                                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">CURR LIKES</th>
+                                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">EXP LIKES</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">LIKES MAN</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">LIKES SCH</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">LIKES NEXT</th>
+                                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">LIKES UNITS</th>
+                                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px;">LIKES $/U</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -7665,21 +7685,24 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                         
                                         // Get start time (date posted) and calculate time left
                                         const startTime = videoData.start_time ? new Date(videoData.start_time) : null;
-                                        const uploadTime = startTime ? startTime.toLocaleString('en-US', {month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'}) : 'N/A';
+                                        const uploadTime = startTime ? startTime.toLocaleString('en-US', {month: '2-digit', day: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit'}) : 'N/A';
                                         
                                         // Calculate time left to reach goal (target_completion_time - now)
+                                        // This is used to calculate order intervals: (target_completion_time - video_post_date) / number_of_orders
                                         const target_completion = videoData.target_completion_time || videoData.target_completion_datetime;
                                         let timeLeft = 'N/A';
-                                        if (target_completion) {
+                                        let timeLeftHours = 0;
+                                        if (target_completion && startTime) {
                                             const now = new Date();
                                             const endTime = new Date(target_completion);
                                             const remainingMs = endTime - now;
                                             if (remainingMs > 0) {
-                                                const remainingHours = Math.floor(remainingMs / (1000 * 60 * 60));
+                                                timeLeftHours = remainingMs / (1000 * 60 * 60);
+                                                const remainingHours = Math.floor(timeLeftHours);
                                                 const remainingMinutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
-                                                timeLeft = remainingHours + 'h ' + remainingMinutes + 'm';
+                                                timeLeft = remainingHours + 'h' + (remainingMinutes > 0 ? remainingMinutes + 'm' : '');
                                             } else {
-                                                timeLeft = 'Overdue';
+                                                timeLeft = 'OVERDUE';
                                             }
                                         }
                                         
@@ -7717,9 +7740,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                             if (diff > 0) {
                                                 const hours = Math.floor(diff / (1000 * 60 * 60));
                                                 const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                                                timeToNext = hours + 'h ' + mins + 'm';
+                                                timeToNext = hours + 'h' + (mins > 0 ? mins + 'm' : '');
                                             } else {
-                                                timeToNext = 'Ready';
+                                                timeToNext = 'READY';
                                             }
                                         }
                                         
@@ -7729,13 +7752,14 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                         const manualViewsOrders = viewsOrders.filter(o => o.manual).length;
                                         const schedViewsOrders = viewsOrders.filter(o => !o.manual).length;
                                         
-                                        // Units and cost per unit (average)
+                                        // Units and cost per unit (average of scheduled orders only)
                                         let avgViewsUnits = 0;
                                         let avgViewsCostPerUnit = 0;
-                                        if (viewsOrders.length > 0) {
-                                            const totalViewsUnits = viewsOrders.reduce((sum, o) => sum + (o.quantity || 0), 0);
-                                            const totalViewsCost = viewsOrders.reduce((sum, o) => sum + (o.cost || 0), 0);
-                                            avgViewsUnits = Math.floor(totalViewsUnits / viewsOrders.length);
+                                        const schedViewsOrdersList = viewsOrders.filter(o => !o.manual);
+                                        if (schedViewsOrdersList.length > 0) {
+                                            const totalViewsUnits = schedViewsOrdersList.reduce((sum, o) => sum + (o.quantity || 0), 0);
+                                            const totalViewsCost = schedViewsOrdersList.reduce((sum, o) => sum + (o.cost || 0), 0);
+                                            avgViewsUnits = Math.floor(totalViewsUnits / schedViewsOrdersList.length);
                                             avgViewsCostPerUnit = totalViewsUnits > 0 ? totalViewsCost / totalViewsUnits : 0;
                                         }
                                         
@@ -7762,9 +7786,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                             if (diff > 0) {
                                                 const hours = Math.floor(diff / (1000 * 60 * 60));
                                                 const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                                                likesTimeToNext = hours + 'h ' + mins + 'm';
+                                                likesTimeToNext = hours + 'h' + (mins > 0 ? mins + 'm' : '');
                                             } else {
-                                                likesTimeToNext = 'Ready';
+                                                likesTimeToNext = 'READY';
                                             }
                                         }
                                         
@@ -7772,34 +7796,36 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                         const manualLikesOrders = likesOrders.filter(o => o.manual).length;
                                         const schedLikesOrders = likesOrders.filter(o => !o.manual).length;
                                         
+                                        // Units and cost per unit (average of scheduled orders only)
                                         let avgLikesUnits = 0;
                                         let avgLikesCostPerUnit = 0;
-                                        if (likesOrders.length > 0) {
-                                            const totalLikesUnits = likesOrders.reduce((sum, o) => sum + (o.quantity || 0), 0);
-                                            const totalLikesCost = likesOrders.reduce((sum, o) => sum + (o.cost || 0), 0);
-                                            avgLikesUnits = Math.floor(totalLikesUnits / likesOrders.length);
+                                        const schedLikesOrdersList = likesOrders.filter(o => !o.manual);
+                                        if (schedLikesOrdersList.length > 0) {
+                                            const totalLikesUnits = schedLikesOrdersList.reduce((sum, o) => sum + (o.quantity || 0), 0);
+                                            const totalLikesCost = schedLikesOrdersList.reduce((sum, o) => sum + (o.cost || 0), 0);
+                                            avgLikesUnits = Math.floor(totalLikesUnits / schedLikesOrdersList.length);
                                             avgLikesCostPerUnit = totalLikesUnits > 0 ? totalLikesCost / totalLikesUnits : 0;
                                         }
                                         
                                         tableHtml += `
                                             <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer;" onclick="navigateToVideo('${escapeTemplateLiteral(videoUrl)}')" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='transparent'">
-                                                <td style="padding: 5px 4px; color: #667eea; font-family: monospace; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);" title="${escapeTemplateLiteral(videoUrl)}"><a href="${escapeTemplateLiteral(videoUrl)}" target="_blank" style="color: #667eea; text-decoration: none;" onclick="event.stopPropagation();">...${videoId}</a></td>
-                                                <td style="padding: 5px 4px; text-align: center; color: #fff; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${uploadTime}</td>
-                                                <td style="padding: 5px 4px; text-align: center; color: ${timeLeft === 'Overdue' ? '#ef4444' : '#fff'}; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${timeLeft}</td>
-                                                <td style="padding: 5px 4px; text-align: center; color: #fff; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(real_views)}</td>
-                                                <td style="padding: 5px 4px; text-align: center; color: ${real_views >= expected_views ? '#10b981' : '#f59e0b'}; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(expected_views)}</td>
-                                                <td style="padding: 5px 4px; text-align: center; color: #b0b0b0; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);"><button onclick="event.stopPropagation(); handleManualOrder('${escapeTemplateLiteral(videoUrl)}', 'views');" style="background: none; border: 1px solid #667eea; color: #667eea; padding: 2px 6px; cursor: pointer; font-size: 9px;">Order</button></td>
-                                                <td style="padding: 5px 4px; text-align: center; color: #b0b0b0; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${schedViewsOrders}</td>
-                                                <td style="padding: 5px 4px; text-align: center; color: ${timeToNext === 'Ready' ? '#10b981' : '#fff'}; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${timeToNext}</td>
-                                                <td style="padding: 5px 4px; text-align: center; color: #fff; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${avgViewsUnits}</td>
-                                                <td style="padding: 5px 4px; text-align: center; color: #fff; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">$${avgViewsCostPerUnit.toFixed(4)}</td>
-                                                <td style="padding: 5px 4px; text-align: center; color: #fff; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(real_likes)}</td>
-                                                <td style="padding: 5px 4px; text-align: center; color: ${real_likes >= expected_likes ? '#10b981' : '#f59e0b'}; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(expected_likes)}</td>
-                                                <td style="padding: 5px 4px; text-align: center; color: #b0b0b0; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);"><button onclick="event.stopPropagation(); handleManualOrder('${escapeTemplateLiteral(videoUrl)}', 'likes');" style="background: none; border: 1px solid #667eea; color: #667eea; padding: 2px 6px; cursor: pointer; font-size: 9px;">Order</button></td>
-                                                <td style="padding: 5px 4px; text-align: center; color: #b0b0b0; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${schedLikesOrders}</td>
-                                                <td style="padding: 5px 4px; text-align: center; color: ${likesTimeToNext === 'Ready' ? '#10b981' : '#fff'}; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${likesTimeToNext}</td>
-                                                <td style="padding: 5px 4px; text-align: center; color: #fff; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${avgLikesUnits}</td>
-                                                <td style="padding: 5px 4px; text-align: center; color: #fff; font-size: 10px;">$${avgLikesCostPerUnit.toFixed(4)}</td>
+                                                <td style="padding: 4px 3px; color: #667eea; font-family: monospace; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); text-align: left;" title="${escapeTemplateLiteral(videoUrl)}"><a href="#video/${encodeURIComponent(videoUrl)}" style="color: #667eea; text-decoration: none;" onclick="event.stopPropagation(); navigateToVideo('${escapeTemplateLiteral(videoUrl)}'); return false;">${videoId}</a></td>
+                                                <td style="padding: 4px 3px; text-align: center; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${uploadTime}</td>
+                                                <td style="padding: 4px 3px; text-align: center; color: ${timeLeft === 'OVERDUE' ? '#ef4444' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${timeLeft}</td>
+                                                <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(real_views)}</td>
+                                                <td style="padding: 4px 3px; text-align: right; color: ${real_views >= expected_views ? '#10b981' : '#f59e0b'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(expected_views)}</td>
+                                                <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);"><span onclick="event.stopPropagation(); handleManualOrder('${escapeTemplateLiteral(videoUrl)}', 'views');" style="cursor: pointer; text-decoration: underline; color: #667eea;">${manualViewsOrders}</span></td>
+                                                <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${schedViewsOrders}</td>
+                                                <td style="padding: 4px 3px; text-align: center; color: ${timeToNext === 'READY' ? '#10b981' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${timeToNext}</td>
+                                                <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${avgViewsUnits > 0 ? formatNumber(avgViewsUnits) : '-'}</td>
+                                                <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${avgViewsCostPerUnit > 0 ? '$' + avgViewsCostPerUnit.toFixed(4) : '-'}</td>
+                                                <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(real_likes)}</td>
+                                                <td style="padding: 4px 3px; text-align: right; color: ${real_likes >= expected_likes ? '#10b981' : '#f59e0b'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(expected_likes)}</td>
+                                                <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);"><span onclick="event.stopPropagation(); handleManualOrder('${escapeTemplateLiteral(videoUrl)}', 'likes');" style="cursor: pointer; text-decoration: underline; color: #667eea;">${manualLikesOrders}</span></td>
+                                                <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${schedLikesOrders}</td>
+                                                <td style="padding: 4px 3px; text-align: center; color: ${likesTimeToNext === 'READY' ? '#10b981' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${likesTimeToNext}</td>
+                                                <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${avgLikesUnits > 0 ? formatNumber(avgLikesUnits) : '-'}</td>
+                                                <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px;">${avgLikesCostPerUnit > 0 ? '$' + avgLikesCostPerUnit.toFixed(4) : '-'}</td>
                                             </tr>
                                         `;
                                     }

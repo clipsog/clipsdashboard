@@ -7628,24 +7628,22 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                         <thead>
                                             <tr style="background: #252525; border-bottom: 2px solid rgba(255,255,255,0.1);">
                                                 <th style="padding: 6px 4px; text-align: left; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Video ID</th>
-                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Upload Time</th>
-                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Time Diff</th>
-                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">$ Invested</th>
-                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">$ Returned</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Date Posted</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Time Left</th>
                                                 <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Curr Views</th>
                                                 <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Exp Views</th>
-                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Time to Next</th>
-                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Manual Orders</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Manual Order</th>
                                                 <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Sched Orders</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Time to Next</th>
                                                 <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Units/Order</th>
-                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">$/Order</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">$/Unit</th>
                                                 <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Curr Likes</th>
                                                 <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Exp Likes</th>
-                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Likes Next</th>
                                                 <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Likes Manual</th>
                                                 <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Likes Sched</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Likes Next</th>
                                                 <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">Likes Units</th>
-                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px;">Likes $/Order</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 10px;">Likes $/Unit</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -7658,16 +7656,24 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                         const videoIdMatch = videoUrl.match(/video\\/(\\d+)/);
                                         const videoId = videoIdMatch ? videoIdMatch[1] : videoUrl.substring(videoUrl.length - 15);
                                         
-                                        // Get start time and calculate time difference
+                                        // Get start time (date posted) and calculate time left
                                         const startTime = videoData.start_time ? new Date(videoData.start_time) : null;
-                                        const campaignStartTime = campaign.start_time ? new Date(campaign.start_time) : null;
                                         const uploadTime = startTime ? startTime.toLocaleString('en-US', {month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'}) : 'N/A';
                                         
-                                        let timeDiff = 'N/A';
-                                        if (startTime && campaignStartTime) {
-                                            const diffHours = Math.floor((startTime - campaignStartTime) / (1000 * 60 * 60));
-                                            const diffMinutes = Math.floor(((startTime - campaignStartTime) % (1000 * 60 * 60)) / (1000 * 60));
-                                            timeDiff = diffHours + 'h ' + diffMinutes + 'm';
+                                        // Calculate time left to reach goal (target_completion_time - now)
+                                        const target_completion = videoData.target_completion_time || videoData.target_completion_datetime;
+                                        let timeLeft = 'N/A';
+                                        if (target_completion) {
+                                            const now = new Date();
+                                            const endTime = new Date(target_completion);
+                                            const remainingMs = endTime - now;
+                                            if (remainingMs > 0) {
+                                                const remainingHours = Math.floor(remainingMs / (1000 * 60 * 60));
+                                                const remainingMinutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+                                                timeLeft = remainingHours + 'h ' + remainingMinutes + 'm';
+                                            } else {
+                                                timeLeft = 'Overdue';
+                                            }
                                         }
                                         
                                         // Financial data
@@ -7717,12 +7723,14 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                         const manualViewsOrders = viewsOrders.filter(o => o.manual).length;
                                         const schedViewsOrders = viewsOrders.filter(o => !o.manual).length;
                                         
-                                        // Units and cost per order (average)
+                                        // Units and cost per unit (average)
                                         let avgViewsUnits = 0;
-                                        let avgViewsCost = 0;
+                                        let avgViewsCostPerUnit = 0;
                                         if (viewsOrders.length > 0) {
-                                            avgViewsUnits = Math.floor(viewsOrders.reduce((sum, o) => sum + (o.quantity || 0), 0) / viewsOrders.length);
-                                            avgViewsCost = viewsOrders.reduce((sum, o) => sum + (o.cost || 0), 0) / viewsOrders.length;
+                                            const totalViewsUnits = viewsOrders.reduce((sum, o) => sum + (o.quantity || 0), 0);
+                                            const totalViewsCost = viewsOrders.reduce((sum, o) => sum + (o.cost || 0), 0);
+                                            avgViewsUnits = Math.floor(totalViewsUnits / viewsOrders.length);
+                                            avgViewsCostPerUnit = totalViewsUnits > 0 ? totalViewsCost / totalViewsUnits : 0;
                                         }
                                         
                                         // Likes data
@@ -7759,33 +7767,33 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                         const schedLikesOrders = likesOrders.filter(o => !o.manual).length;
                                         
                                         let avgLikesUnits = 0;
-                                        let avgLikesCost = 0;
+                                        let avgLikesCostPerUnit = 0;
                                         if (likesOrders.length > 0) {
-                                            avgLikesUnits = Math.floor(likesOrders.reduce((sum, o) => sum + (o.quantity || 0), 0) / likesOrders.length);
-                                            avgLikesCost = likesOrders.reduce((sum, o) => sum + (o.cost || 0), 0) / likesOrders.length;
+                                            const totalLikesUnits = likesOrders.reduce((sum, o) => sum + (o.quantity || 0), 0);
+                                            const totalLikesCost = likesOrders.reduce((sum, o) => sum + (o.cost || 0), 0);
+                                            avgLikesUnits = Math.floor(totalLikesUnits / likesOrders.length);
+                                            avgLikesCostPerUnit = totalLikesUnits > 0 ? totalLikesCost / totalLikesUnits : 0;
                                         }
                                         
                                         tableHtml += `
                                             <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer;" onclick="navigateToVideo('${escapeTemplateLiteral(videoUrl)}')" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='transparent'">
                                                 <td style="padding: 5px 4px; color: #667eea; font-family: monospace; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);" title="${escapeTemplateLiteral(videoUrl)}"><a href="${escapeTemplateLiteral(videoUrl)}" target="_blank" style="color: #667eea; text-decoration: none;" onclick="event.stopPropagation();">...${videoId}</a></td>
                                                 <td style="padding: 5px 4px; text-align: center; color: #fff; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${uploadTime}</td>
-                                                <td style="padding: 5px 4px; text-align: center; color: #fff; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${timeDiff}</td>
-                                                <td style="padding: 5px 4px; text-align: center; color: #ef4444; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">$${invested.toFixed(2)}</td>
-                                                <td style="padding: 5px 4px; text-align: center; color: #10b981; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">$${returned.toFixed(2)}</td>
+                                                <td style="padding: 5px 4px; text-align: center; color: ${timeLeft === 'Overdue' ? '#ef4444' : '#fff'}; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${timeLeft}</td>
                                                 <td style="padding: 5px 4px; text-align: center; color: #fff; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(real_views)}</td>
                                                 <td style="padding: 5px 4px; text-align: center; color: ${real_views >= expected_views ? '#10b981' : '#f59e0b'}; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(expected_views)}</td>
-                                                <td style="padding: 5px 4px; text-align: center; color: ${timeToNext === 'Ready' ? '#10b981' : '#fff'}; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${timeToNext}</td>
-                                                <td style="padding: 5px 4px; text-align: center; color: #b0b0b0; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);"><button onclick="event.stopPropagation(); handleManualOrder('${escapeTemplateLiteral(videoUrl)}', 'views');" style="background: none; border: 1px solid #667eea; color: #667eea; padding: 2px 6px; cursor: pointer; font-size: 9px;">${manualViewsOrders}</button></td>
+                                                <td style="padding: 5px 4px; text-align: center; color: #b0b0b0; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);"><button onclick="event.stopPropagation(); handleManualOrder('${escapeTemplateLiteral(videoUrl)}', 'views');" style="background: none; border: 1px solid #667eea; color: #667eea; padding: 2px 6px; cursor: pointer; font-size: 9px;">Order</button></td>
                                                 <td style="padding: 5px 4px; text-align: center; color: #b0b0b0; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${schedViewsOrders}</td>
+                                                <td style="padding: 5px 4px; text-align: center; color: ${timeToNext === 'Ready' ? '#10b981' : '#fff'}; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${timeToNext}</td>
                                                 <td style="padding: 5px 4px; text-align: center; color: #fff; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${avgViewsUnits}</td>
-                                                <td style="padding: 5px 4px; text-align: center; color: #fff; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">$${avgViewsCost.toFixed(2)}</td>
+                                                <td style="padding: 5px 4px; text-align: center; color: #fff; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">$${avgViewsCostPerUnit.toFixed(4)}</td>
                                                 <td style="padding: 5px 4px; text-align: center; color: #fff; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(real_likes)}</td>
                                                 <td style="padding: 5px 4px; text-align: center; color: ${real_likes >= expected_likes ? '#10b981' : '#f59e0b'}; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(expected_likes)}</td>
-                                                <td style="padding: 5px 4px; text-align: center; color: ${likesTimeToNext === 'Ready' ? '#10b981' : '#fff'}; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${likesTimeToNext}</td>
-                                                <td style="padding: 5px 4px; text-align: center; color: #b0b0b0; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);"><button onclick="event.stopPropagation(); handleManualOrder('${escapeTemplateLiteral(videoUrl)}', 'likes');" style="background: none; border: 1px solid #667eea; color: #667eea; padding: 2px 6px; cursor: pointer; font-size: 9px;">${manualLikesOrders}</button></td>
+                                                <td style="padding: 5px 4px; text-align: center; color: #b0b0b0; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);"><button onclick="event.stopPropagation(); handleManualOrder('${escapeTemplateLiteral(videoUrl)}', 'likes');" style="background: none; border: 1px solid #667eea; color: #667eea; padding: 2px 6px; cursor: pointer; font-size: 9px;">Order</button></td>
                                                 <td style="padding: 5px 4px; text-align: center; color: #b0b0b0; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${schedLikesOrders}</td>
+                                                <td style="padding: 5px 4px; text-align: center; color: ${likesTimeToNext === 'Ready' ? '#10b981' : '#fff'}; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${likesTimeToNext}</td>
                                                 <td style="padding: 5px 4px; text-align: center; color: #fff; font-size: 10px; border-right: 1px solid rgba(255,255,255,0.05);">${avgLikesUnits}</td>
-                                                <td style="padding: 5px 4px; text-align: center; color: #fff; font-size: 10px;">$${avgLikesCost.toFixed(2)}</td>
+                                                <td style="padding: 5px 4px; text-align: center; color: #fff; font-size: 10px;">$${avgLikesCostPerUnit.toFixed(4)}</td>
                                             </tr>
                                         `;
                                     }

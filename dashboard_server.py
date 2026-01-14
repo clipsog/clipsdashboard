@@ -7007,7 +7007,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             timeToNext = 'DONE';
                         } else {
                             // Calculate average units per scheduled order, or use minimum if no orders
-                            const schedViewsOrdersList = viewsOrders.filter(o => !o.manual);
+                            const schedViewsOrdersList = viewsOrders.filter(o => o.type === 'scheduled' || (!o.type && !o.manual));
                             let unitsPerOrder = MIN_VIEWS_ORDER; // Default to minimum
                             
                             if (schedViewsOrdersList.length > 0) {
@@ -7054,7 +7054,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             likesTimeToNext = 'DONE';
                         } else {
                             // Calculate average units per scheduled order, or use minimum if no orders
-                            const schedLikesOrdersList = likesOrders.filter(o => !o.manual);
+                            const schedLikesOrdersList = likesOrders.filter(o => o.type === 'scheduled' || (!o.type && !o.manual));
                             let unitsPerOrder = MIN_LIKES_ORDER; // Default to minimum
                             
                             if (schedLikesOrdersList.length > 0) {
@@ -8174,7 +8174,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                     // Units and cost per unit (average of scheduled orders only)
                                     let avgViewsUnits = 0;
                                     let avgViewsCostPerUnit = 0;
-                                    const schedViewsOrdersList = viewsOrders.filter(o => !o.manual);
+                                    const schedViewsOrdersList = viewsOrders.filter(o => o.type === 'scheduled' || (!o.type && !o.manual));
                                     if (schedViewsOrdersList.length > 0) {
                                         const totalViewsUnits = schedViewsOrdersList.reduce((sum, o) => sum + (o.quantity || 0), 0);
                                         const totalViewsCost = schedViewsOrdersList.reduce((sum, o) => sum + (o.cost || 0), 0);
@@ -8184,7 +8184,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                     
                                     let avgLikesUnits = 0;
                                     let avgLikesCostPerUnit = 0;
-                                    const schedLikesOrdersList = likesOrders.filter(o => !o.manual);
+                                    const schedLikesOrdersList = likesOrders.filter(o => o.type === 'scheduled' || (!o.type && !o.manual));
                                     if (schedLikesOrdersList.length > 0) {
                                         const totalLikesUnits = schedLikesOrdersList.reduce((sum, o) => sum + (o.quantity || 0), 0);
                                         const totalLikesCost = schedLikesOrdersList.reduce((sum, o) => sum + (o.cost || 0), 0);

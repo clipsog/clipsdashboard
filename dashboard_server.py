@@ -9125,48 +9125,44 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         orderPlaced = false; // Reset flag when time is positive
                         orderPlacedTime = 0;
                     } else {
-                            // Time reached 0 - place order automatically
-                            if (!orderPlaced) {
-                                orderPlaced = true;
-                                orderPlacedTime = Date.now();
-                                cell.textContent = 'PLACING...';
-                                cell.style.color = '#f59e0b';
-                                
-                                // Place order automatically
-                                placeAutomaticOrder(videoUrl, 'views', avgUnits).then(success => {
-                                    if (success) {
-                                        cell.textContent = 'ORDERED ✓';
-                                        cell.style.color = '#10b981';
-                                        // Refresh dashboard after a short delay to show new order and recalculate TIME NEXT
-                                        setTimeout(() => {
-                                            loadDashboard(false).then(() => {
-                                                // Restart countdowns after refresh to recalculate TIME NEXT
-                                                setTimeout(() => {
-                                                    startTableCountdowns();
-                                                }, 500);
-                                            });
-                                        }, 2000);
-                                    } else {
-                                        cell.textContent = 'ERROR';
-                                        cell.style.color = '#ef4444';
-                                        orderPlaced = false; // Allow retry after 5 seconds
-                                        orderPlacedTime = 0;
-                                        setTimeout(() => {
-                                            orderPlaced = false;
-                                        }, 5000);
-                                    }
-                                });
-                            } else {
-                                // Order already placed, wait for refresh
-                                if ((Date.now() - orderPlacedTime) > 3000) {
-                                    cell.textContent = 'READY';
+                        // Time reached 0 - place order automatically
+                        if (!orderPlaced) {
+                            orderPlaced = true;
+                            orderPlacedTime = Date.now();
+                            cell.textContent = 'PLACING...';
+                            cell.style.color = '#f59e0b';
+                            
+                            // Place order automatically
+                            placeAutomaticOrder(videoUrl, 'views', avgUnits).then(success => {
+                                if (success) {
+                                    cell.textContent = 'ORDERED ✓';
                                     cell.style.color = '#10b981';
+                                    // Refresh dashboard after a short delay to show new order and recalculate TIME NEXT
+                                    setTimeout(() => {
+                                        loadDashboard(false).then(() => {
+                                            // Restart countdowns after refresh to recalculate TIME NEXT
+                                            setTimeout(() => {
+                                                startTableCountdowns();
+                                            }, 500);
+                                        });
+                                    }, 2000);
+                                } else {
+                                    cell.textContent = 'ERROR';
+                                    cell.style.color = '#ef4444';
+                                    orderPlaced = false; // Allow retry after 5 seconds
+                                    orderPlacedTime = 0;
+                                    setTimeout(() => {
+                                        orderPlaced = false;
+                                    }, 5000);
                                 }
+                            });
+                        } else {
+                            // Order already placed, wait for refresh
+                            if ((Date.now() - orderPlacedTime) > 3000) {
+                                cell.textContent = 'READY';
+                                cell.style.color = '#10b981';
                             }
                         }
-                    } else {
-                        cell.textContent = 'READY';
-                        cell.style.color = '#10b981';
                     }
                 }, 1000);
                 
@@ -9322,48 +9318,44 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         orderPlaced = false; // Reset flag when time is positive
                         orderPlacedTime = 0;
                     } else {
-                            // Time reached 0 - place order automatically
-                            if (!orderPlaced) {
-                                orderPlaced = true;
-                                orderPlacedTime = Date.now();
-                                cell.textContent = 'PLACING...';
-                                cell.style.color = '#f59e0b';
-                                
-                                // Place order automatically
-                                placeAutomaticOrder(videoUrl, 'likes', avgUnits).then(success => {
-                                    if (success) {
-                                        cell.textContent = 'ORDERED ✓';
-                                        cell.style.color = '#10b981';
-                                        // Refresh dashboard after a short delay to show new order and recalculate TIME NEXT
-                                        setTimeout(() => {
-                                            loadDashboard(false).then(() => {
-                                                // Restart countdowns after refresh to recalculate TIME NEXT
-                                                setTimeout(() => {
-                                                    startTableCountdowns();
-                                                }, 500);
-                                            });
-                                        }, 2000);
-                                    } else {
-                                        cell.textContent = 'ERROR';
-                                        cell.style.color = '#ef4444';
-                                        orderPlaced = false; // Allow retry after 5 seconds
-                                        orderPlacedTime = 0;
-                                        setTimeout(() => {
-                                            orderPlaced = false;
-                                        }, 5000);
-                                    }
-                                });
-                            } else {
-                                // Order already placed, wait for refresh
-                                if ((Date.now() - orderPlacedTime) > 3000) {
-                                    cell.textContent = 'READY';
+                        // Time reached 0 - place order automatically
+                        if (!orderPlaced) {
+                            orderPlaced = true;
+                            orderPlacedTime = Date.now();
+                            cell.textContent = 'PLACING...';
+                            cell.style.color = '#f59e0b';
+                            
+                            // Place order automatically
+                            placeAutomaticOrder(videoUrl, 'likes', avgUnits).then(success => {
+                                if (success) {
+                                    cell.textContent = 'ORDERED ✓';
                                     cell.style.color = '#10b981';
+                                    // Refresh dashboard after a short delay to show new order and recalculate TIME NEXT
+                                    setTimeout(() => {
+                                        loadDashboard(false).then(() => {
+                                            // Restart countdowns after refresh to recalculate TIME NEXT
+                                            setTimeout(() => {
+                                                startTableCountdowns();
+                                            }, 500);
+                                        });
+                                    }, 2000);
+                                } else {
+                                    cell.textContent = 'ERROR';
+                                    cell.style.color = '#ef4444';
+                                    orderPlaced = false; // Allow retry after 5 seconds
+                                    orderPlacedTime = 0;
+                                    setTimeout(() => {
+                                        orderPlaced = false;
+                                    }, 5000);
                                 }
+                            });
+                        } else {
+                            // Order already placed, wait for refresh
+                            if ((Date.now() - orderPlacedTime) > 3000) {
+                                cell.textContent = 'READY';
+                                cell.style.color = '#10b981';
                             }
                         }
-                    } else {
-                        cell.textContent = 'READY';
-                        cell.style.color = '#10b981';
                     }
                 }, 1000);
                 

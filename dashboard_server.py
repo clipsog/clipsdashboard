@@ -2629,21 +2629,31 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.wfile.write(response_data.encode())
     
     def load_progress(self):
-        """Load progress from database ONLY - database is source of truth"""
+        """Load progress from database, with JSON fallback if database fails"""
         if DATABASE_AVAILABLE:
             try:
                 progress = database.load_progress()
                 if progress:
                     print(f"[LOAD] Loaded {len(progress)} videos from database")
-                return progress
+                    return progress
             except Exception as e:
                 print(f"⚠️ Database load failed: {e}")
                 import traceback
                 traceback.print_exc()
         
-        # CRITICAL: If database fails, return empty dict - don't use JSON files
-        # JSON files are ephemeral on Render and will cause data loss
-        print("⚠️ Database unavailable, returning empty progress (will be rebuilt)")
+        # Fallback to JSON file if database fails (temporary measure)
+        # This ensures videos added during database outages aren't lost
+        if PROGRESS_FILE.exists():
+            try:
+                with open(PROGRESS_FILE, 'r') as f:
+                    progress = json.load(f)
+                    if progress:
+                        print(f"[LOAD] Loaded {len(progress)} videos from JSON fallback")
+                        return progress
+            except Exception as e:
+                print(f"⚠️ JSON fallback load failed: {e}")
+        
+        print("⚠️ Database unavailable and no JSON fallback, returning empty progress")
         return {}
     
     def save_progress(self, progress):
@@ -2673,7 +2683,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             raise
     
     def load_campaigns(self):
-        """Load campaigns from database ONLY - database is source of truth"""
+        """Load campaigns from database, with JSON fallback if database fails"""
         if DATABASE_AVAILABLE:
             try:
                 campaigns = database.load_campaigns()
@@ -2684,15 +2694,25 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         video_count = len(campaign_data.get('videos', []))
                         if video_count > 0:
                             print(f"       {campaign_id}: {video_count} videos")
-                return campaigns
+                    return campaigns
             except Exception as e:
                 print(f"⚠️ Database load failed: {e}")
                 import traceback
                 traceback.print_exc()
         
-        # CRITICAL: If database fails, return empty dict - don't use JSON files
-        # JSON files are ephemeral on Render and will cause data loss
-        print("⚠️ Database unavailable, returning empty campaigns (will be rebuilt)")
+        # Fallback to JSON file if database fails (temporary measure)
+        # This ensures videos added during database outages aren't lost
+        if CAMPAIGNS_FILE.exists():
+            try:
+                with open(CAMPAIGNS_FILE, 'r') as f:
+                    campaigns = json.load(f)
+                    if campaigns:
+                        print(f"[LOAD] Loaded {len(campaigns)} campaigns from JSON fallback")
+                        return campaigns
+            except Exception as e:
+                print(f"⚠️ JSON fallback load failed: {e}")
+        
+        print("⚠️ Database unavailable and no JSON fallback, returning empty campaigns")
         return {}
     
     def save_campaigns(self, campaigns):

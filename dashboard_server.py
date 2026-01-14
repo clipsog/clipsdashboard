@@ -1540,6 +1540,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             
             # VERIFICATION: Check for videos that have campaign_id but aren't in campaigns
             # This helps diagnose the "videos disappearing" issue
+            # If found, automatically fix them (this is a safety net)
             orphaned_videos = []
             for video_url, video_data in progress.items():
                 campaign_id = video_data.get('campaign_id')
@@ -1548,11 +1549,19 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         orphaned_videos.append((video_url, campaign_id, 'campaign_not_found'))
                     elif video_url not in campaigns[campaign_id].get('videos', []):
                         orphaned_videos.append((video_url, campaign_id, 'not_in_campaign_list'))
+                        # AUTO-FIX: Add the orphaned video back to its campaign
+                        if 'videos' not in campaigns[campaign_id]:
+                            campaigns[campaign_id]['videos'] = []
+                        campaigns[campaign_id]['videos'].append(video_url)
+                        campaigns_changed = True
+                        print(f"[AUTO-FIX] Restored orphaned video {video_url[:50]}... to campaign {campaign_id}")
             
             if orphaned_videos:
-                print(f"[WARNING] Found {len(orphaned_videos)} orphaned video(s):")
-                for video_url, campaign_id, reason in orphaned_videos:
-                    print(f"  - {video_url[:60]}... (campaign={campaign_id}, reason={reason})")
+                print(f"[WARNING] Found {len(orphaned_videos)} orphaned video(s), auto-fixed")
+                # Save again if we auto-fixed any
+                if campaigns_changed:
+                    self.save_campaigns(campaigns)
+                    print(f"[AUTO-FIX] Saved campaigns after restoring orphaned videos")
             
             response_data = json.dumps({'success': True, 'campaigns': campaigns})
             self.send_response(200)

@@ -4786,7 +4786,30 @@ class DashboardHandler(BaseHTTPRequestHandler):
         async function loadCampaigns() {
             try {
                 const response = await fetch('/api/campaigns');
-                const data = await response.json();
+                
+                // Handle server errors gracefully
+                if (!response.ok) {
+                    console.warn(`[loadCampaigns] Server error ${response.status}`);
+                    campaignsData = {}; // Use empty campaigns on error
+                    return;
+                }
+                
+                // Try to parse JSON, handle empty/invalid responses
+                let data;
+                try {
+                    const text = await response.text();
+                    if (!text || text.trim() === '') {
+                        console.warn('[loadCampaigns] Empty response');
+                        campaignsData = {};
+                        return;
+                    }
+                    data = JSON.parse(text);
+                } catch (parseError) {
+                    console.error('[loadCampaigns] Failed to parse JSON:', parseError);
+                    campaignsData = {};
+                    return;
+                }
+                
                 if (data.success) {
                     campaignsData = data.campaigns || {};
                     updateCampaignSelector();

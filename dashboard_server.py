@@ -6787,6 +6787,16 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     }
                 }
                 
+                // Order counts - MUST be calculated BEFORE TIME NEXT calculation
+                const orderHistory = videoData.order_history || [];
+                const viewsOrders = orderHistory.filter(o => o.service === 'views');
+                const manualViewsOrders = viewsOrders.filter(o => o.manual).length;
+                const schedViewsOrders = viewsOrders.filter(o => !o.manual).length;
+                
+                const likesOrders = orderHistory.filter(o => o.service === 'likes');
+                const manualLikesOrders = likesOrders.filter(o => o.manual).length;
+                const schedLikesOrders = likesOrders.filter(o => !o.manual).length;
+                
                 // Time to next order - calculate based on remaining time divided by orders needed
                 let timeToNext = 'N/A';
                 let likesTimeToNext = 'N/A';
@@ -6820,6 +6830,12 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             }
                         } else if (viewsNeeded <= 0) {
                             timeToNext = 'DONE';
+                        } else if (schedViewsOrdersList.length === 0) {
+                            // No scheduled orders yet, but we need views - estimate based on remaining time
+                            // Assume we'll need at least 1 order, so show remaining time
+                            const hours = Math.floor(remainingMs / (1000 * 60 * 60));
+                            const mins = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+                            timeToNext = hours + 'h' + (mins > 0 ? mins + 'm' : '');
                         }
                     } else {
                         timeToNext = 'OVERDUE';
@@ -6855,21 +6871,16 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             }
                         } else if (likesNeeded <= 0) {
                             likesTimeToNext = 'DONE';
+                        } else if (schedLikesOrdersList.length === 0) {
+                            // No scheduled orders yet, but we need likes - estimate based on remaining time
+                            const hours = Math.floor(remainingMs / (1000 * 60 * 60));
+                            const mins = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+                            likesTimeToNext = hours + 'h' + (mins > 0 ? mins + 'm' : '');
                         }
                     } else {
                         likesTimeToNext = 'OVERDUE';
                     }
                 }
-                
-                // Order counts
-                const orderHistory = videoData.order_history || [];
-                const viewsOrders = orderHistory.filter(o => o.service === 'views');
-                const manualViewsOrders = viewsOrders.filter(o => o.manual).length;
-                const schedViewsOrders = viewsOrders.filter(o => !o.manual).length;
-                
-                const likesOrders = orderHistory.filter(o => o.service === 'likes');
-                const manualLikesOrders = likesOrders.filter(o => o.manual).length;
-                const schedLikesOrders = likesOrders.filter(o => !o.manual).length;
                 
                 // Units and cost per unit (average of scheduled orders only)
                 let avgViewsUnits = 0;
@@ -7999,6 +8010,12 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                                 }
                                             } else if (viewsNeeded <= 0) {
                                                 timeToNext = 'DONE';
+                                            } else if (schedViewsOrdersList.length === 0) {
+                                                // No scheduled orders yet, but we need views - estimate based on remaining time
+                                                // Assume we'll need at least 1 order, so show remaining time
+                                                const hours = Math.floor(remainingMs / (1000 * 60 * 60));
+                                                const mins = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+                                                timeToNext = hours + 'h' + (mins > 0 ? mins + 'm' : '');
                                             }
                                         } else {
                                             timeToNext = 'OVERDUE';
@@ -8030,6 +8047,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                                 }
                                             } else if (likesNeeded <= 0) {
                                                 likesTimeToNext = 'DONE';
+                                            } else if (schedLikesOrdersList.length === 0) {
+                                                // No scheduled orders yet, but we need likes - estimate based on remaining time
+                                                const hours = Math.floor(remainingMs / (1000 * 60 * 60));
+                                                const mins = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+                                                likesTimeToNext = hours + 'h' + (mins > 0 ? mins + 'm' : '');
                                             }
                                         } else {
                                             likesTimeToNext = 'OVERDUE';

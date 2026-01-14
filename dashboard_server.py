@@ -9016,15 +9016,13 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 const videoUrl = cell.getAttribute('data-video-url');
                 let orderPlaced = false; // Track if order was already placed for this countdown
                 let orderPlacedTime = 0; // Track when order was placed
+                let nextOrderTime = null; // Fixed time when next order should be placed
+                let lastRecalcTime = Date.now(); // Track when we last recalculated
                 
                 if (!targetTimeStr || targetViews <= 0) return;
                 
-                const interval = setInterval(function() {
-                    // Skip updates if we're waiting for order confirmation (within 3 seconds of placing)
-                    if (orderPlaced && (Date.now() - orderPlacedTime) < 3000) {
-                        return; // Keep showing PLACING... or ORDERED status
-                    }
-                    
+                // Function to recalculate next order time
+                function recalculateNextOrderTime() {
                     // Get current real views from the DOM (updated by periodic refresh)
                     let realViews = parseFloat(cell.getAttribute('data-real-views')) || 0;
                     const realViewsCell = document.querySelector('[data-real-views][data-video-url="' + videoUrl + '"]');
@@ -9033,23 +9031,70 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         realViews = parseFloat(cellText) || realViews;
                     }
                     
-                    // Get updated avgUnits from DOM if available (recalculated after refresh)
+                    // Get updated avgUnits from DOM if available
                     const avgUnitsCell = cell.closest('tr')?.querySelector('[data-avg-units]');
                     if (avgUnitsCell) {
                         const newAvgUnits = parseFloat(avgUnitsCell.textContent.replace(/,/g, '')) || avgUnits;
                         if (newAvgUnits > 0) avgUnits = newAvgUnits;
                     }
                     
-                    // Always recalculate based on current time
                     const now = new Date();
                     const targetTime = new Date(targetTimeStr);
                     const remainingMs = targetTime - now;
                     
                     if (remainingMs <= 0) {
+                        nextOrderTime = null;
+                        return;
+                    }
+                    
+                    const viewsNeeded = Math.max(0, targetViews - realViews);
+                    if (viewsNeeded <= 0) {
+                        nextOrderTime = null;
+                        return;
+                    }
+                    
+                    const ordersNeeded = Math.ceil(viewsNeeded / avgUnits);
+                    if (ordersNeeded > 0) {
+                        // Calculate time per order and set next order time
+                        const timePerOrderMs = remainingMs / ordersNeeded;
+                        nextOrderTime = now.getTime() + timePerOrderMs;
+                    } else {
+                        nextOrderTime = null;
+                    }
+                    
+                    lastRecalcTime = Date.now();
+                }
+                
+                // Initial calculation
+                recalculateNextOrderTime();
+                
+                const interval = setInterval(function() {
+                    // Skip updates if we're waiting for order confirmation (within 3 seconds of placing)
+                    if (orderPlaced && (Date.now() - orderPlacedTime) < 3000) {
+                        return; // Keep showing PLACING... or ORDERED status
+                    }
+                    
+                    // Recalculate every 5 seconds or if nextOrderTime is null
+                    if (!nextOrderTime || (Date.now() - lastRecalcTime) > 5000) {
+                        recalculateNextOrderTime();
+                    }
+                    
+                    const now = Date.now();
+                    const targetTime = new Date(targetTimeStr).getTime();
+                    
+                    if (targetTime <= now) {
                         cell.textContent = 'OVERDUE';
                         cell.style.color = '#ef4444';
                         clearInterval(interval);
                         return;
+                    }
+                    
+                    // Check if we need to recalculate (views might have changed)
+                    let realViews = parseFloat(cell.getAttribute('data-real-views')) || 0;
+                    const realViewsCell = document.querySelector('[data-real-views][data-video-url="' + videoUrl + '"]');
+                    if (realViewsCell) {
+                        const cellText = realViewsCell.textContent.replace(/,/g, '');
+                        realViews = parseFloat(cellText) || realViews;
                     }
                     
                     const viewsNeeded = Math.max(0, targetViews - realViews);
@@ -9060,19 +9105,26 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         return;
                     }
                     
-                    const ordersNeeded = Math.ceil(viewsNeeded / avgUnits);
-                    if (ordersNeeded > 0) {
-                        // Calculate time per order in milliseconds (this decreases as time passes)
-                        const timePerOrderMs = remainingMs / ordersNeeded;
-                        // Convert to total seconds - this will decrease every second
-                        const remainingSeconds = Math.max(0, Math.floor(timePerOrderMs / 1000));
-                        if (remainingSeconds > 0) {
-                            // Update display every second - seconds will count down naturally
-                            cell.textContent = formatTimeWithSeconds(remainingSeconds);
-                            cell.style.color = '#fff';
-                            orderPlaced = false; // Reset flag when time is positive
-                            orderPlacedTime = 0;
-                        } else {
+                    if (!nextOrderTime) {
+                        recalculateNextOrderTime();
+                        if (!nextOrderTime) {
+                            cell.textContent = 'READY';
+                            cell.style.color = '#10b981';
+                            return;
+                        }
+                    }
+                    
+                    // Count down to the fixed next order time
+                    const remainingMs = nextOrderTime - now;
+                    const remainingSeconds = Math.max(0, Math.floor(remainingMs / 1000));
+                    
+                    if (remainingSeconds > 0) {
+                        // Update display every second - smooth countdown
+                        cell.textContent = formatTimeWithSeconds(remainingSeconds);
+                        cell.style.color = '#fff';
+                        orderPlaced = false; // Reset flag when time is positive
+                        orderPlacedTime = 0;
+                    } else {
                             // Time reached 0 - place order automatically
                             if (!orderPlaced) {
                                 orderPlaced = true;
@@ -9161,15 +9213,13 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 const videoUrl = cell.getAttribute('data-video-url');
                 let orderPlaced = false; // Track if order was already placed for this countdown
                 let orderPlacedTime = 0; // Track when order was placed
+                let nextOrderTime = null; // Fixed time when next order should be placed
+                let lastRecalcTime = Date.now(); // Track when we last recalculated
                 
                 if (!targetTimeStr || targetLikes <= 0) return;
                 
-                const interval = setInterval(function() {
-                    // Skip updates if we're waiting for order confirmation (within 3 seconds of placing)
-                    if (orderPlaced && (Date.now() - orderPlacedTime) < 3000) {
-                        return; // Keep showing PLACING... or ORDERED status
-                    }
-                    
+                // Function to recalculate next order time
+                function recalculateNextOrderTime() {
                     // Get current real likes from the DOM (updated by periodic refresh)
                     let realLikes = parseFloat(cell.getAttribute('data-real-likes')) || 0;
                     const realLikesCell = document.querySelector('[data-real-likes][data-video-url="' + videoUrl + '"]');
@@ -9178,23 +9228,70 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         realLikes = parseFloat(cellText) || realLikes;
                     }
                     
-                    // Get updated avgUnits from DOM if available (recalculated after refresh)
+                    // Get updated avgUnits from DOM if available
                     const avgUnitsCell = cell.closest('tr')?.querySelector('[data-avg-likes-units]');
                     if (avgUnitsCell) {
                         const newAvgUnits = parseFloat(avgUnitsCell.textContent.replace(/,/g, '')) || avgUnits;
                         if (newAvgUnits > 0) avgUnits = newAvgUnits;
                     }
                     
-                    // Always recalculate based on current time
                     const now = new Date();
                     const targetTime = new Date(targetTimeStr);
                     const remainingMs = targetTime - now;
                     
                     if (remainingMs <= 0) {
+                        nextOrderTime = null;
+                        return;
+                    }
+                    
+                    const likesNeeded = Math.max(0, targetLikes - realLikes);
+                    if (likesNeeded <= 0) {
+                        nextOrderTime = null;
+                        return;
+                    }
+                    
+                    const ordersNeeded = Math.ceil(likesNeeded / avgUnits);
+                    if (ordersNeeded > 0) {
+                        // Calculate time per order and set next order time
+                        const timePerOrderMs = remainingMs / ordersNeeded;
+                        nextOrderTime = now.getTime() + timePerOrderMs;
+                    } else {
+                        nextOrderTime = null;
+                    }
+                    
+                    lastRecalcTime = Date.now();
+                }
+                
+                // Initial calculation
+                recalculateNextOrderTime();
+                
+                const interval = setInterval(function() {
+                    // Skip updates if we're waiting for order confirmation (within 3 seconds of placing)
+                    if (orderPlaced && (Date.now() - orderPlacedTime) < 3000) {
+                        return; // Keep showing PLACING... or ORDERED status
+                    }
+                    
+                    // Recalculate every 5 seconds or if nextOrderTime is null
+                    if (!nextOrderTime || (Date.now() - lastRecalcTime) > 5000) {
+                        recalculateNextOrderTime();
+                    }
+                    
+                    const now = Date.now();
+                    const targetTime = new Date(targetTimeStr).getTime();
+                    
+                    if (targetTime <= now) {
                         cell.textContent = 'OVERDUE';
                         cell.style.color = '#ef4444';
                         clearInterval(interval);
                         return;
+                    }
+                    
+                    // Check if we need to recalculate (likes might have changed)
+                    let realLikes = parseFloat(cell.getAttribute('data-real-likes')) || 0;
+                    const realLikesCell = document.querySelector('[data-real-likes][data-video-url="' + videoUrl + '"]');
+                    if (realLikesCell) {
+                        const cellText = realLikesCell.textContent.replace(/,/g, '');
+                        realLikes = parseFloat(cellText) || realLikes;
                     }
                     
                     const likesNeeded = Math.max(0, targetLikes - realLikes);
@@ -9205,19 +9302,26 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         return;
                     }
                     
-                    const ordersNeeded = Math.ceil(likesNeeded / avgUnits);
-                    if (ordersNeeded > 0) {
-                        // Calculate time per order in milliseconds (this decreases as time passes)
-                        const timePerOrderMs = remainingMs / ordersNeeded;
-                        // Convert to total seconds - this will decrease every second
-                        const remainingSeconds = Math.max(0, Math.floor(timePerOrderMs / 1000));
-                        if (remainingSeconds > 0) {
-                            // Update display every second - seconds will count down naturally
-                            cell.textContent = formatTimeWithSeconds(remainingSeconds);
-                            cell.style.color = '#fff';
-                            orderPlaced = false; // Reset flag when time is positive
-                            orderPlacedTime = 0;
-                        } else {
+                    if (!nextOrderTime) {
+                        recalculateNextOrderTime();
+                        if (!nextOrderTime) {
+                            cell.textContent = 'READY';
+                            cell.style.color = '#10b981';
+                            return;
+                        }
+                    }
+                    
+                    // Count down to the fixed next order time
+                    const remainingMs = nextOrderTime - now;
+                    const remainingSeconds = Math.max(0, Math.floor(remainingMs / 1000));
+                    
+                    if (remainingSeconds > 0) {
+                        // Update display every second - smooth countdown
+                        cell.textContent = formatTimeWithSeconds(remainingSeconds);
+                        cell.style.color = '#fff';
+                        orderPlaced = false; // Reset flag when time is positive
+                        orderPlacedTime = 0;
+                    } else {
                             // Time reached 0 - place order automatically
                             if (!orderPlaced) {
                                 orderPlaced = true;

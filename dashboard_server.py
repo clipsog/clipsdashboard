@@ -6023,7 +6023,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 const seconds = remainingAfterHours % 60;
                 
                 if (days > 0) {
-                    return days + 'd ' + hoursVal + 'h ' + minutes + 'm';
+                    return days + 'd ' + hoursVal + 'h ' + minutes + 'm ' + seconds + 's';
                 } else if (hoursVal > 0) {
                     return hoursVal + 'h ' + minutes + 'm ' + seconds + 's';
                 } else if (minutes > 0) {
@@ -7118,19 +7118,19 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='transparent'">
                         <td style="padding: 4px 3px; color: #667eea; font-family: monospace; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); text-align: left;" title="${escapeTemplateLiteral(videoUrl)}"><a href="#" style="color: #667eea; text-decoration: none; cursor: pointer;" onclick="event.stopPropagation(); showVideoDetailsModal('${escapeTemplateLiteral(videoUrl)}'); return false;">${videoId}</a></td>
                         <td style="padding: 4px 3px; text-align: center; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${uploadTime}</td>
-                        <td style="padding: 4px 3px; text-align: center; color: ${timeLeft === 'OVERDUE' ? '#ef4444' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; text-decoration: underline;" onclick="event.stopPropagation(); showEditTimeLeftModal('${escapeTemplateLiteral(videoUrl)}', ${currentHours}, ${currentMinutes});" title="Click to edit time left">${timeLeft}</td>
-                        <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(real_views)}</td>
+                        <td style="padding: 4px 3px; text-align: center; color: ${timeLeft === 'OVERDUE' ? '#ef4444' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; text-decoration: underline;" onclick="event.stopPropagation(); showEditTimeLeftModal('${escapeTemplateLiteral(videoUrl)}', ${currentHours}, ${currentMinutes});" title="Click to edit time left" data-time-left data-target-time="${target_completion || ''}" data-video-url="${escapeTemplateLiteral(videoUrl)}">${timeLeft}</td>
+                        <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-real-views data-video-url="${escapeTemplateLiteral(videoUrl)}">${formatNumber(real_views)}</td>
                         <td style="padding: 4px 3px; text-align: right; color: ${real_views >= expected_views ? '#10b981' : '#f59e0b'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(expected_views)}</td>
-                        <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);"><span onclick="event.stopPropagation(); handleManualOrder('${escapeTemplateLiteral(videoUrl)}', 'views');" style="cursor: pointer; text-decoration: underline; color: #667eea;">${manualViewsOrders}</span></td>
-                        <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${schedViewsOrders}</td>
-                        <td style="padding: 4px 3px; text-align: center; color: ${timeToNext === 'READY' ? '#10b981' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${timeToNext}</td>
+                        <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-manual-views-orders data-video-url="${escapeTemplateLiteral(videoUrl)}"><span onclick="event.stopPropagation(); handleManualOrder('${escapeTemplateLiteral(videoUrl)}', 'views');" style="cursor: pointer; text-decoration: underline; color: #667eea;">${manualViewsOrders}</span></td>
+                        <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-sched-views-orders data-video-url="${escapeTemplateLiteral(videoUrl)}">${schedViewsOrders}</td>
+                        <td style="padding: 4px 3px; text-align: center; color: ${timeToNext === 'READY' ? '#10b981' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-time-next data-video-url="${escapeTemplateLiteral(videoUrl)}" data-target-time="${target_completion || ''}" data-target-views="${target_views}" data-real-views="${real_views}" data-avg-units="${avgViewsUnits || MIN_VIEWS_ORDER}">${timeToNext}</td>
                         <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${avgViewsUnits > 0 ? formatNumber(avgViewsUnits) : '-'}</td>
                         <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${avgViewsCostPerUnit > 0 ? '$' + avgViewsCostPerUnit.toFixed(4) : '-'}</td>
-                        <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(real_likes)}</td>
+                        <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-real-likes data-video-url="${escapeTemplateLiteral(videoUrl)}">${formatNumber(real_likes)}</td>
                         <td style="padding: 4px 3px; text-align: right; color: ${real_likes >= expected_likes ? '#10b981' : '#f59e0b'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(expected_likes)}</td>
-                        <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);"><span onclick="event.stopPropagation(); handleManualOrder('${escapeTemplateLiteral(videoUrl)}', 'likes');" style="cursor: pointer; text-decoration: underline; color: #667eea;">${manualLikesOrders}</span></td>
-                        <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${schedLikesOrders}</td>
-                        <td style="padding: 4px 3px; text-align: center; color: ${likesTimeToNext === 'READY' ? '#10b981' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${likesTimeToNext}</td>
+                        <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-manual-likes-orders data-video-url="${escapeTemplateLiteral(videoUrl)}"><span onclick="event.stopPropagation(); handleManualOrder('${escapeTemplateLiteral(videoUrl)}', 'likes');" style="cursor: pointer; text-decoration: underline; color: #667eea;">${manualLikesOrders}</span></td>
+                        <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-sched-likes-orders data-video-url="${escapeTemplateLiteral(videoUrl)}">${schedLikesOrders}</td>
+                        <td style="padding: 4px 3px; text-align: center; color: ${likesTimeToNext === 'READY' ? '#10b981' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-likes-next data-video-url="${escapeTemplateLiteral(videoUrl)}" data-target-time="${target_completion || ''}" data-target-likes="${target_likes}" data-real-likes="${real_likes}" data-avg-units="${avgLikesUnits || MIN_LIKES_ORDER}">${likesTimeToNext}</td>
                         <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${avgLikesUnits > 0 ? formatNumber(avgLikesUnits) : '-'}</td>
                         <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px;">${avgLikesCostPerUnit > 0 ? '$' + avgLikesCostPerUnit.toFixed(4) : '-'}</td>
                     </tr>
@@ -8286,19 +8286,19 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                         <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='transparent'">
                                             <td style="padding: 4px 3px; color: #667eea; font-family: monospace; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); text-align: left;" title="${escapeTemplateLiteral(videoUrl)}"><a href="#" style="color: #667eea; text-decoration: none; cursor: pointer;" onclick="event.stopPropagation(); showVideoDetailsModal('${escapeTemplateLiteral(videoUrl)}'); return false;">${videoId}</a></td>
                                             <td style="padding: 4px 3px; text-align: center; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${uploadTime}</td>
-                                            <td style="padding: 4px 3px; text-align: center; color: ${timeLeft === 'OVERDUE' ? '#ef4444' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; text-decoration: underline;" onclick="event.stopPropagation(); showEditTimeLeftModal('${escapeTemplateLiteral(videoUrl)}', ${currentHours}, ${currentMinutes});" title="Click to edit time left">${timeLeft}</td>
-                                            <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(real_views)}</td>
+                                            <td style="padding: 4px 3px; text-align: center; color: ${timeLeft === 'OVERDUE' ? '#ef4444' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; text-decoration: underline;" onclick="event.stopPropagation(); showEditTimeLeftModal('${escapeTemplateLiteral(videoUrl)}', ${currentHours}, ${currentMinutes});" title="Click to edit time left" data-time-left data-target-time="${target_completion || ''}" data-video-url="${escapeTemplateLiteral(videoUrl)}">${timeLeft}</td>
+                                            <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-real-views data-video-url="${escapeTemplateLiteral(videoUrl)}">${formatNumber(real_views)}</td>
                                             <td style="padding: 4px 3px; text-align: right; color: ${real_views >= expected_views ? '#10b981' : '#f59e0b'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(expected_views)}</td>
-                                            <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);"><span onclick="event.stopPropagation(); handleManualOrder('${escapeTemplateLiteral(videoUrl)}', 'views');" style="cursor: pointer; text-decoration: underline; color: #667eea;">${manualViewsOrders}</span></td>
-                                            <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${schedViewsOrders}</td>
-                                            <td style="padding: 4px 3px; text-align: center; color: ${timeToNext === 'READY' ? '#10b981' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${timeToNext}</td>
+                                            <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-manual-views-orders data-video-url="${escapeTemplateLiteral(videoUrl)}"><span onclick="event.stopPropagation(); handleManualOrder('${escapeTemplateLiteral(videoUrl)}', 'views');" style="cursor: pointer; text-decoration: underline; color: #667eea;">${manualViewsOrders}</span></td>
+                                            <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-sched-views-orders data-video-url="${escapeTemplateLiteral(videoUrl)}">${schedViewsOrders}</td>
+                                            <td style="padding: 4px 3px; text-align: center; color: ${timeToNext === 'READY' ? '#10b981' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-time-next data-video-url="${escapeTemplateLiteral(videoUrl)}" data-target-time="${target_completion || ''}" data-target-views="${target_views}" data-real-views="${real_views}" data-avg-units="${avgViewsUnits || MIN_VIEWS_ORDER}">${timeToNext}</td>
                                             <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${avgViewsUnits > 0 ? formatNumber(avgViewsUnits) : '-'}</td>
                                             <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${avgViewsCostPerUnit > 0 ? '$' + avgViewsCostPerUnit.toFixed(4) : '-'}</td>
-                                            <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(real_likes)}</td>
+                                            <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-real-likes data-video-url="${escapeTemplateLiteral(videoUrl)}">${formatNumber(real_likes)}</td>
                                             <td style="padding: 4px 3px; text-align: right; color: ${real_likes >= expected_likes ? '#10b981' : '#f59e0b'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(expected_likes)}</td>
-                                            <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);"><span onclick="event.stopPropagation(); handleManualOrder('${escapeTemplateLiteral(videoUrl)}', 'likes');" style="cursor: pointer; text-decoration: underline; color: #667eea;">${manualLikesOrders}</span></td>
-                                            <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${schedLikesOrders}</td>
-                                            <td style="padding: 4px 3px; text-align: center; color: ${likesTimeToNext === 'READY' ? '#10b981' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${likesTimeToNext}</td>
+                                            <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-manual-likes-orders data-video-url="${escapeTemplateLiteral(videoUrl)}"><span onclick="event.stopPropagation(); handleManualOrder('${escapeTemplateLiteral(videoUrl)}', 'likes');" style="cursor: pointer; text-decoration: underline; color: #667eea;">${manualLikesOrders}</span></td>
+                                            <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-sched-likes-orders data-video-url="${escapeTemplateLiteral(videoUrl)}">${schedLikesOrders}</td>
+                                            <td style="padding: 4px 3px; text-align: center; color: ${likesTimeToNext === 'READY' ? '#10b981' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-likes-next data-video-url="${escapeTemplateLiteral(videoUrl)}" data-target-time="${target_completion || ''}" data-target-likes="${target_likes}" data-real-likes="${real_likes}" data-avg-units="${avgLikesUnits || MIN_LIKES_ORDER}">${likesTimeToNext}</td>
                                             <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${avgLikesUnits > 0 ? formatNumber(avgLikesUnits) : '-'}</td>
                                             <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px;">${avgLikesCostPerUnit > 0 ? '$' + avgLikesCostPerUnit.toFixed(4) : '-'}</td>
                                         </tr>
@@ -8876,6 +8876,235 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 
                 window.timeToGoalIntervals.push(interval);
             });
+        }
+        
+        // Start countdown timers for table cells (TIME LEFT, TIME NEXT, LIKES NEXT)
+        function startTableCountdowns() {
+            // Clear any existing intervals
+            if (window.tableCountdownIntervals) {
+                window.tableCountdownIntervals.forEach(interval => clearInterval(interval));
+            }
+            window.tableCountdownIntervals = [];
+            
+            // Format time with seconds
+            function formatTimeWithSeconds(totalSeconds) {
+                if (totalSeconds < 0) return 'OVERDUE';
+                if (totalSeconds <= 0 || !isFinite(totalSeconds)) return 'N/A';
+                const hours = Math.floor(totalSeconds / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = Math.floor(totalSeconds % 60);
+                if (hours > 0) {
+                    return hours + 'h' + minutes + 'm' + seconds + 's';
+                } else if (minutes > 0) {
+                    return minutes + 'm' + seconds + 's';
+                } else {
+                    return seconds + 's';
+                }
+            }
+            
+            // Update TIME LEFT cells
+            document.querySelectorAll('[data-time-left][data-target-time]').forEach(cell => {
+                const targetTimeStr = cell.getAttribute('data-target-time');
+                if (!targetTimeStr) return;
+                
+                const interval = setInterval(function() {
+                    const now = new Date();
+                    const targetTime = new Date(targetTimeStr);
+                    const remainingMs = targetTime - now;
+                    const remainingSeconds = Math.floor(remainingMs / 1000);
+                    
+                    if (remainingSeconds <= 0) {
+                        cell.textContent = 'OVERDUE';
+                        cell.style.color = '#ef4444';
+                        clearInterval(interval);
+                        return;
+                    }
+                    
+                    cell.textContent = formatTimeWithSeconds(remainingSeconds);
+                }, 1000);
+                
+                // Initial update
+                const now = new Date();
+                const targetTime = new Date(targetTimeStr);
+                const remainingMs = targetTime - now;
+                const remainingSeconds = Math.floor(remainingMs / 1000);
+                if (remainingSeconds > 0) {
+                    cell.textContent = formatTimeWithSeconds(remainingSeconds);
+                } else {
+                    cell.textContent = 'OVERDUE';
+                    cell.style.color = '#ef4444';
+                }
+                
+                window.tableCountdownIntervals.push(interval);
+            });
+            
+            // Update TIME NEXT cells
+            document.querySelectorAll('[data-time-next][data-target-time]').forEach(cell => {
+                const targetTimeStr = cell.getAttribute('data-target-time');
+                const targetViews = parseFloat(cell.getAttribute('data-target-views')) || 0;
+                const realViews = parseFloat(cell.getAttribute('data-real-views')) || 0;
+                const avgUnits = parseFloat(cell.getAttribute('data-avg-units')) || 50;
+                
+                if (!targetTimeStr || targetViews <= 0) return;
+                
+                const interval = setInterval(function() {
+                    const now = new Date();
+                    const targetTime = new Date(targetTimeStr);
+                    const remainingMs = targetTime - now;
+                    
+                    if (remainingMs <= 0) {
+                        cell.textContent = 'OVERDUE';
+                        cell.style.color = '#ef4444';
+                        clearInterval(interval);
+                        return;
+                    }
+                    
+                    const viewsNeeded = Math.max(0, targetViews - realViews);
+                    if (viewsNeeded <= 0) {
+                        cell.textContent = 'DONE';
+                        cell.style.color = '#10b981';
+                        clearInterval(interval);
+                        return;
+                    }
+                    
+                    const ordersNeeded = Math.ceil(viewsNeeded / avgUnits);
+                    if (ordersNeeded > 0) {
+                        const timePerOrder = remainingMs / ordersNeeded;
+                        const remainingSeconds = Math.floor(timePerOrder / 1000);
+                        if (remainingSeconds > 0) {
+                            cell.textContent = formatTimeWithSeconds(remainingSeconds);
+                            cell.style.color = '#fff';
+                        } else {
+                            cell.textContent = 'READY';
+                            cell.style.color = '#10b981';
+                        }
+                    } else {
+                        cell.textContent = 'READY';
+                        cell.style.color = '#10b981';
+                    }
+                }, 1000);
+                
+                // Initial update
+                const now = new Date();
+                const targetTime = new Date(targetTimeStr);
+                const remainingMs = targetTime - now;
+                const viewsNeeded = Math.max(0, targetViews - realViews);
+                if (viewsNeeded <= 0) {
+                    cell.textContent = 'DONE';
+                    cell.style.color = '#10b981';
+                } else {
+                    const ordersNeeded = Math.ceil(viewsNeeded / avgUnits);
+                    if (ordersNeeded > 0) {
+                        const timePerOrder = remainingMs / ordersNeeded;
+                        const remainingSeconds = Math.floor(timePerOrder / 1000);
+                        if (remainingSeconds > 0) {
+                            cell.textContent = formatTimeWithSeconds(remainingSeconds);
+                        } else {
+                            cell.textContent = 'READY';
+                            cell.style.color = '#10b981';
+                        }
+                    } else {
+                        cell.textContent = 'READY';
+                        cell.style.color = '#10b981';
+                    }
+                }
+                
+                window.tableCountdownIntervals.push(interval);
+            });
+            
+            // Update LIKES NEXT cells
+            document.querySelectorAll('[data-likes-next][data-target-time]').forEach(cell => {
+                const targetTimeStr = cell.getAttribute('data-target-time');
+                const targetLikes = parseFloat(cell.getAttribute('data-target-likes')) || 0;
+                const realLikes = parseFloat(cell.getAttribute('data-real-likes')) || 0;
+                const avgUnits = parseFloat(cell.getAttribute('data-avg-units')) || 10;
+                
+                if (!targetTimeStr || targetLikes <= 0) return;
+                
+                const interval = setInterval(function() {
+                    const now = new Date();
+                    const targetTime = new Date(targetTimeStr);
+                    const remainingMs = targetTime - now;
+                    
+                    if (remainingMs <= 0) {
+                        cell.textContent = 'OVERDUE';
+                        cell.style.color = '#ef4444';
+                        clearInterval(interval);
+                        return;
+                    }
+                    
+                    const likesNeeded = Math.max(0, targetLikes - realLikes);
+                    if (likesNeeded <= 0) {
+                        cell.textContent = 'DONE';
+                        cell.style.color = '#10b981';
+                        clearInterval(interval);
+                        return;
+                    }
+                    
+                    const ordersNeeded = Math.ceil(likesNeeded / avgUnits);
+                    if (ordersNeeded > 0) {
+                        const timePerOrder = remainingMs / ordersNeeded;
+                        const remainingSeconds = Math.floor(timePerOrder / 1000);
+                        if (remainingSeconds > 0) {
+                            cell.textContent = formatTimeWithSeconds(remainingSeconds);
+                            cell.style.color = '#fff';
+                        } else {
+                            cell.textContent = 'READY';
+                            cell.style.color = '#10b981';
+                        }
+                    } else {
+                        cell.textContent = 'READY';
+                        cell.style.color = '#10b981';
+                    }
+                }, 1000);
+                
+                // Initial update
+                const now = new Date();
+                const targetTime = new Date(targetTimeStr);
+                const remainingMs = targetTime - now;
+                const likesNeeded = Math.max(0, targetLikes - realLikes);
+                if (likesNeeded <= 0) {
+                    cell.textContent = 'DONE';
+                    cell.style.color = '#10b981';
+                } else {
+                    const ordersNeeded = Math.ceil(likesNeeded / avgUnits);
+                    if (ordersNeeded > 0) {
+                        const timePerOrder = remainingMs / ordersNeeded;
+                        const remainingSeconds = Math.floor(timePerOrder / 1000);
+                        if (remainingSeconds > 0) {
+                            cell.textContent = formatTimeWithSeconds(remainingSeconds);
+                        } else {
+                            cell.textContent = 'READY';
+                            cell.style.color = '#10b981';
+                        }
+                    } else {
+                        cell.textContent = 'READY';
+                        cell.style.color = '#10b981';
+                    }
+                }
+                
+                window.tableCountdownIntervals.push(interval);
+            });
+        }
+        
+        // Refresh table data periodically (every 30 seconds)
+        function startTableDataRefresh() {
+            // Clear any existing interval
+            if (window.tableDataRefreshInterval) {
+                clearInterval(window.tableDataRefreshInterval);
+            }
+            
+            window.tableDataRefreshInterval = setInterval(function() {
+                // Only refresh if we're on dashboard or campaign view
+                const route = getCurrentRoute();
+                if (route.type === 'home' || route.type === 'campaign') {
+                    // Refresh progress data to update order counts and views/likes
+                    loadDashboard(false).then(() => {
+                        // Restart countdowns after refresh
+                        startTableCountdowns();
+                    });
+                }
+            }, 30000); // Refresh every 30 seconds
         }
         
         // Event delegation for all buttons

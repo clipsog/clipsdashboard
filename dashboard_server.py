@@ -7557,9 +7557,172 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         if (campaignVideos.length === 0) {
                             html += `<div style="text-align: center; padding: 30px; color: #b0b0b0;">No videos in this campaign yet. Add videos using the "Add Video" button.</div>`;
                         } else {
-                            // Show comparison table for better metrics analysis
-                            html += '<div id="campaign-videos-loading" style="text-align: center; padding: 8px; color: #b0b0b0;">Loading videos...</div>';
-                            html += '<div id="campaign-videos-table-container" style="overflow-x: auto;"></div>';
+                            // Render accounting-style table directly in HTML
+                            let tableHtml = `
+                                <div style="overflow-x: auto; margin-top: 10px;">
+                                    <table style="width: 100%; border-collapse: collapse; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); font-family: monospace; font-size: 10px;">
+                                        <thead>
+                                            <tr style="background: #252525; border-bottom: 2px solid rgba(255,255,255,0.1);">
+                                                <th style="padding: 6px 4px; text-align: left; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">VIDEO ID</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">DATE POSTED</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">TIME LEFT</th>
+                                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">CURR VIEWS</th>
+                                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">EXP VIEWS</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">MANUAL ORD</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">SCHED ORD</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">TIME NEXT</th>
+                                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">UNITS/ORD</th>
+                                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">$/UNIT</th>
+                                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">CURR LIKES</th>
+                                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">EXP LIKES</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">LIKES MAN</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">LIKES SCH</th>
+                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">LIKES NEXT</th>
+                                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">LIKES UNITS</th>
+                                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px;">LIKES $/U</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                            `;
+                            
+                            // Render table rows for each video
+                            for (const videoUrl of campaignVideos) {
+                                const videoData = progress[videoUrl];
+                                if (videoData) {
+                                    // Extract video ID
+                                    const videoIdMatch = videoUrl.match(/video\\/(\\d+)/);
+                                    const videoId = videoIdMatch ? videoIdMatch[1] : videoUrl.substring(videoUrl.length - 15);
+                                    
+                                    // Get start time (date posted) and calculate time left
+                                    const startTime = videoData.start_time ? new Date(videoData.start_time) : null;
+                                    const uploadTime = startTime ? startTime.toLocaleString('en-US', {month: '2-digit', day: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit'}) : 'N/A';
+                                    
+                                    // Calculate time left to reach goal
+                                    const target_completion = videoData.target_completion_time || videoData.target_completion_datetime;
+                                    let timeLeft = 'N/A';
+                                    if (target_completion && startTime) {
+                                        const now = new Date();
+                                        const endTime = new Date(target_completion);
+                                        const remainingMs = endTime - now;
+                                        if (remainingMs > 0) {
+                                            const remainingHours = Math.floor(remainingMs / (1000 * 60 * 60));
+                                            const remainingMinutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+                                            timeLeft = remainingHours + 'h' + (remainingMinutes > 0 ? remainingMinutes + 'm' : '');
+                                        } else {
+                                            timeLeft = 'OVERDUE';
+                                        }
+                                    }
+                                    
+                                    const real_views = videoData.real_views || 0;
+                                    const real_likes = videoData.real_likes || 0;
+                                    const target_views = videoData.target_views || 0;
+                                    const target_likes = videoData.target_likes || 0;
+                                    
+                                    // Calculate expected views/likes
+                                    let expected_views = 0;
+                                    let expected_likes = 0;
+                                    if (startTime && target_completion) {
+                                        const now = new Date();
+                                        const endTime = new Date(target_completion);
+                                        const totalDuration = endTime - startTime;
+                                        const elapsed = now - startTime;
+                                        if (totalDuration > 0 && elapsed > 0) {
+                                            const progress = Math.min(1, elapsed / totalDuration);
+                                            expected_views = Math.floor(target_views * progress);
+                                            expected_likes = Math.floor(target_likes * progress);
+                                        }
+                                    }
+                                    
+                                    // Time to next order
+                                    const nextViewsTime = videoData.next_views_purchase_time ? new Date(videoData.next_views_purchase_time) : null;
+                                    let timeToNext = 'N/A';
+                                    if (nextViewsTime) {
+                                        const now = new Date();
+                                        const diff = nextViewsTime - now;
+                                        if (diff > 0) {
+                                            const hours = Math.floor(diff / (1000 * 60 * 60));
+                                            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                                            timeToNext = hours + 'h' + (mins > 0 ? mins + 'm' : '');
+                                        } else {
+                                            timeToNext = 'READY';
+                                        }
+                                    }
+                                    
+                                    const nextLikesTime = videoData.next_likes_purchase_time ? new Date(videoData.next_likes_purchase_time) : null;
+                                    let likesTimeToNext = 'N/A';
+                                    if (nextLikesTime) {
+                                        const now = new Date();
+                                        const diff = nextLikesTime - now;
+                                        if (diff > 0) {
+                                            const hours = Math.floor(diff / (1000 * 60 * 60));
+                                            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                                            likesTimeToNext = hours + 'h' + (mins > 0 ? mins + 'm' : '');
+                                        } else {
+                                            likesTimeToNext = 'READY';
+                                        }
+                                    }
+                                    
+                                    // Order counts
+                                    const orderHistory = videoData.order_history || [];
+                                    const viewsOrders = orderHistory.filter(o => o.service === 'views');
+                                    const manualViewsOrders = viewsOrders.filter(o => o.manual).length;
+                                    const schedViewsOrders = viewsOrders.filter(o => !o.manual).length;
+                                    
+                                    const likesOrders = orderHistory.filter(o => o.service === 'likes');
+                                    const manualLikesOrders = likesOrders.filter(o => o.manual).length;
+                                    const schedLikesOrders = likesOrders.filter(o => !o.manual).length;
+                                    
+                                    // Units and cost per unit (average of scheduled orders only)
+                                    let avgViewsUnits = 0;
+                                    let avgViewsCostPerUnit = 0;
+                                    const schedViewsOrdersList = viewsOrders.filter(o => !o.manual);
+                                    if (schedViewsOrdersList.length > 0) {
+                                        const totalViewsUnits = schedViewsOrdersList.reduce((sum, o) => sum + (o.quantity || 0), 0);
+                                        const totalViewsCost = schedViewsOrdersList.reduce((sum, o) => sum + (o.cost || 0), 0);
+                                        avgViewsUnits = Math.floor(totalViewsUnits / schedViewsOrdersList.length);
+                                        avgViewsCostPerUnit = totalViewsUnits > 0 ? totalViewsCost / totalViewsUnits : 0;
+                                    }
+                                    
+                                    let avgLikesUnits = 0;
+                                    let avgLikesCostPerUnit = 0;
+                                    const schedLikesOrdersList = likesOrders.filter(o => !o.manual);
+                                    if (schedLikesOrdersList.length > 0) {
+                                        const totalLikesUnits = schedLikesOrdersList.reduce((sum, o) => sum + (o.quantity || 0), 0);
+                                        const totalLikesCost = schedLikesOrdersList.reduce((sum, o) => sum + (o.cost || 0), 0);
+                                        avgLikesUnits = Math.floor(totalLikesUnits / schedLikesOrdersList.length);
+                                        avgLikesCostPerUnit = totalLikesUnits > 0 ? totalLikesCost / totalLikesUnits : 0;
+                                    }
+                                    
+                                    tableHtml += `
+                                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer;" onclick="navigateToVideo('${escapeTemplateLiteral(videoUrl)}')" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='transparent'">
+                                            <td style="padding: 4px 3px; color: #667eea; font-family: monospace; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); text-align: left;" title="${escapeTemplateLiteral(videoUrl)}"><a href="#video/${encodeURIComponent(videoUrl)}" style="color: #667eea; text-decoration: none;" onclick="event.stopPropagation(); navigateToVideo('${escapeTemplateLiteral(videoUrl)}'); return false;">${videoId}</a></td>
+                                            <td style="padding: 4px 3px; text-align: center; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${uploadTime}</td>
+                                            <td style="padding: 4px 3px; text-align: center; color: ${timeLeft === 'OVERDUE' ? '#ef4444' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${timeLeft}</td>
+                                            <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(real_views)}</td>
+                                            <td style="padding: 4px 3px; text-align: right; color: ${real_views >= expected_views ? '#10b981' : '#f59e0b'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(expected_views)}</td>
+                                            <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);"><span onclick="event.stopPropagation(); handleManualOrder('${escapeTemplateLiteral(videoUrl)}', 'views');" style="cursor: pointer; text-decoration: underline; color: #667eea;">${manualViewsOrders}</span></td>
+                                            <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${schedViewsOrders}</td>
+                                            <td style="padding: 4px 3px; text-align: center; color: ${timeToNext === 'READY' ? '#10b981' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${timeToNext}</td>
+                                            <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${avgViewsUnits > 0 ? formatNumber(avgViewsUnits) : '-'}</td>
+                                            <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${avgViewsCostPerUnit > 0 ? '$' + avgViewsCostPerUnit.toFixed(4) : '-'}</td>
+                                            <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(real_likes)}</td>
+                                            <td style="padding: 4px 3px; text-align: right; color: ${real_likes >= expected_likes ? '#10b981' : '#f59e0b'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(expected_likes)}</td>
+                                            <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);"><span onclick="event.stopPropagation(); handleManualOrder('${escapeTemplateLiteral(videoUrl)}', 'likes');" style="cursor: pointer; text-decoration: underline; color: #667eea;">${manualLikesOrders}</span></td>
+                                            <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${schedLikesOrders}</td>
+                                            <td style="padding: 4px 3px; text-align: center; color: ${likesTimeToNext === 'READY' ? '#10b981' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${likesTimeToNext}</td>
+                                            <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${avgLikesUnits > 0 ? formatNumber(avgLikesUnits) : '-'}</td>
+                                            <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px;">${avgLikesCostPerUnit > 0 ? '$' + avgLikesCostPerUnit.toFixed(4) : '-'}</td>
+                                        </tr>
+                                    `;
+                                }
+                            }
+                            
+                            tableHtml += `
+                                        </tbody>
+                                    </table>
+                                </div>
+                            `;
+                            html += tableHtml;
                         }
                     }
                 } else if (route.type === 'detail') {
@@ -7638,18 +7801,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 content.innerHTML = html;
                 content.style.opacity = '1';
                 
-                // If we're showing a campaign, render videos asynchronously in batches
-                if (route.type === 'campaign') {
-                    const campaignId = route.campaignId;
-                    const campaign = campaignsData[campaignId];
-                    if (campaign) {
-                        const campaignVideos = campaign.videos || [];
-                        if (campaignVideos.length > 0) {
-                            // Render comparison table for campaign videos
-                            const container = document.getElementById('campaign-videos-table-container');
-                            const loading = document.getElementById('campaign-videos-loading');
-                            
-                            if (container) {
+                // Table is now rendered directly in HTML, no async rendering needed
                                 let tableHtml = `
                                     <table style="width: 100%; border-collapse: collapse; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); font-family: monospace; font-size: 10px;">
                                         <thead>

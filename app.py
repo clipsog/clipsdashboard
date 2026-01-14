@@ -151,20 +151,38 @@ if __name__ == '__main__':
     # Initialize PostgreSQL database if available
     try:
         import database
-        if database.get_database_url():
-            print("🗄️ Initializing PostgreSQL database...")
-            database.init_database_pool()
-            if database.init_schema():
-                print("🔄 Migrating existing JSON data to PostgreSQL...")
-                database.migrate_from_json()
+        database_url = database.get_database_url()
+        if database_url:
+            print(f"🗄️ Initializing PostgreSQL database...")
+            print(f"   Database URL: {database_url[:50]}...")
+            pool = database.init_database_pool()
+            if pool:
+                if database.init_schema():
+                    print("🔄 Migrating existing JSON data to PostgreSQL...")
+                    database.migrate_from_json()
+                    
+                    # VERIFY: Check that videos are preserved after migration
+                    print("🔍 Verifying data integrity after migration...")
+                    final_progress = database.load_progress()
+                    final_campaigns = database.load_campaigns()
+                    print(f"   Final state: {len(final_progress)} videos, {len(final_campaigns)} campaigns")
+                    
+                    # Check each campaign for video count
+                    for campaign_id, campaign_data in final_campaigns.items():
+                        video_count = len(campaign_data.get('videos', []))
+                        print(f"   Campaign {campaign_id}: {video_count} videos")
+                else:
+                    print("⚠️ Database schema initialization failed, using JSON fallback")
             else:
-                print("⚠️ Database schema initialization failed, using JSON fallback")
+                print("⚠️ Database pool initialization failed, using JSON fallback")
         else:
             print("📁 No DATABASE_URL found, using JSON file storage")
     except ImportError:
         print("⚠️ Database module not available, using JSON files")
     except Exception as e:
         print(f"⚠️ Database initialization error: {e}, using JSON fallback")
+        import traceback
+        traceback.print_exc()
     
     # CRITICAL: Rebuild campaigns from progress.json on startup
     # This ensures videos don't disappear after redeployment

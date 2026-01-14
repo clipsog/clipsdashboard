@@ -328,28 +328,84 @@ def save_campaigns(campaigns: Dict):
         raise
 
 def migrate_from_json():
-    """Migrate existing JSON data to PostgreSQL"""
+    """Migrate existing JSON data to PostgreSQL - PRESERVES existing database data"""
     database_url = get_database_url()
     if not database_url:
+        print("⚠️ No DATABASE_URL, skipping migration")
         return
     
     try:
         from dashboard_server import PROGRESS_FILE, CAMPAIGNS_FILE
         
-        # Migrate progress
+        # Load existing database data FIRST to preserve it
+        existing_progress = load_progress()
+        existing_campaigns = load_campaigns()
+        
+        print(f"[MIGRATION] Existing DB: {len(existing_progress)} videos, {len(existing_campaigns)} campaigns")
+        
+        # Migrate progress - MERGE with existing
+        json_progress = {}
         if PROGRESS_FILE.exists():
             with open(PROGRESS_FILE, 'r') as f:
-                progress = json.load(f)
-            if progress:
-                save_progress(progress)
-                print(f"✅ Migrated {len(progress)} videos from JSON to PostgreSQL")
+                json_progress = json.load(f)
+            print(f"[MIGRATION] JSON file: {len(json_progress)} videos")
         
-        # Migrate campaigns
+        # Merge: existing database + JSON file (database takes precedence)
+        merged_progress = existing_progress.copy()
+        for video_url, video_data in json_progress.items():
+            if video_url not in merged_progress:
+                merged_progress[video_url] = video_data
+                print(f"[MIGRATION] Adding video from JSON: {video_url[:50]}...")
+        
+        if merged_progress:
+            save_progress(merged_progress)
+            print(f"✅ Migrated {len(merged_progress)} videos (preserved {len(existing_progress)} existing)")
+        
+        # Migrate campaigns - MERGE with existing (preserve video lists)
+        json_campaigns = {}
         if CAMPAIGNS_FILE.exists():
             with open(CAMPAIGNS_FILE, 'r') as f:
-                campaigns = json.load(f)
-            if campaigns:
-                save_campaigns(campaigns)
-                print(f"✅ Migrated {len(campaigns)} campaigns from JSON to PostgreSQL")
+                json_campaigns = json.load(f)
+            print(f"[MIGRATION] JSON file: {len(json_campaigns)} campaigns")
+        
+        # Merge campaigns - preserve video lists from both sources
+        merged_campaigns = existing_campaigns.copy()
+        for campaign_id, campaign_data in json_campaigns.items():
+            if campaign_id in merged_campaigns:
+                # Merge video lists
+                existing_videos = set(merged_campaigns[campaign_id].get('videos', []))
+                json_videos = set(campaign_data.get('videos', []))
+                merged_videos = list(existing_videos | json_videos)  # Union of both sets
+                merged_campaigns[campaign_id]['videos'] = merged_videos
+                print(f"[MIGRATION] Merged campaign {campaign_id}: {len(existing_videos)} existing + {len(json_videos)} JSON = {len(merged_videos)} total videos")
+            else:
+                merged_campaigns[campaign_id] = campaign_data
+                print(f"[MIGRATION] Adding new campaign from JSON: {campaign_id}")
+        
+        if merged_campaigns:
+            save_campaigns(merged_campaigns)
+            print(f"✅ Migrated {len(merged_campaigns)} campaigns (preserved {len(existing_campaigns)} existing)")
+        
+        # CRITICAL: Rebuild campaigns from progress to ensure all videos are in campaigns
+        print("[MIGRATION] Rebuilding campaigns from progress...")
+        rebuild_count = 0
+        for video_url, video_data in merged_progress.items():
+            campaign_id = video_data.get('campaign_id')
+            if campaign_id:
+                if campaign_id not in merged_campaigns:
+                    merged_campaigns[campaign_id] = {'videos': []}
+                if 'videos' not in merged_campaigns[campaign_id]:
+                    merged_campaigns[campaign_id]['videos'] = []
+                if video_url not in merged_campaigns[campaign_id]['videos']:
+                    merged_campaigns[campaign_id]['videos'].append(video_url)
+                    rebuild_count += 1
+                    print(f"[MIGRATION] Rebuilt: Added {video_url[:50]}... to {campaign_id}")
+        
+        if rebuild_count > 0:
+            save_campaigns(merged_campaigns)
+            print(f"✅ Rebuilt {rebuild_count} video(s) into campaigns after migration")
+        
     except Exception as e:
         print(f"⚠️ Error migrating from JSON: {e}")
+        import traceback
+        traceback.print_exc()

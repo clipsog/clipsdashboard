@@ -1628,11 +1628,15 @@ class DashboardHandler(BaseHTTPRequestHandler):
             # CRITICAL: Save even if nothing changed to ensure rebuild state is persisted
             # This prevents videos from disappearing due to timing issues or file corruption
             # On Render free tier, files may not persist between deployments, so we always save
-            self.save_campaigns(campaigns)
-            if campaigns_changed or rebuild_count > 0:
-                print(f"[REBUILD] Saved campaigns (changed={campaigns_changed}, rebuilt={rebuild_count})")
-            else:
-                print(f"[REBUILD] Verified campaigns (no changes needed)")
+            try:
+                self.save_campaigns(campaigns)
+                if campaigns_changed or rebuild_count > 0:
+                    print(f"[REBUILD] Saved campaigns (changed={campaigns_changed}, rebuilt={rebuild_count})")
+                else:
+                    print(f"[REBUILD] Verified campaigns (no changes needed)")
+            except Exception as e:
+                print(f"⚠️ Failed to save campaigns after rebuild: {e}")
+                # Continue anyway - at least return the data
             
             # LOG: Report campaign video counts for debugging
             for campaign_id, campaign_data in campaigns.items():

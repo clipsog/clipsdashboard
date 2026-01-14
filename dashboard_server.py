@@ -6981,6 +6981,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 let timeToNext = 'N/A';
                 let likesTimeToNext = 'N/A';
                 
+                // Minimum order sizes
+                const MIN_VIEWS_ORDER = 50;
+                const MIN_LIKES_ORDER = 10;
+                
                 // Calculate for views (reuse target_completion from above)
                 if (target_completion && startTime) {
                     const now = new Date();
@@ -6991,31 +6995,36 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         // Calculate views needed
                         const viewsNeeded = Math.max(0, target_views - real_views);
                         
-                        // Calculate average units per scheduled order
-                        const schedViewsOrdersList = viewsOrders.filter(o => !o.manual);
-                        if (schedViewsOrdersList.length > 0 && viewsNeeded > 0) {
-                            const totalViewsUnits = schedViewsOrdersList.reduce((sum, o) => sum + (o.quantity || 0), 0);
-                            const avgViewsUnits = Math.floor(totalViewsUnits / schedViewsOrdersList.length);
+                        if (viewsNeeded <= 0) {
+                            timeToNext = 'DONE';
+                        } else {
+                            // Calculate average units per scheduled order, or use minimum if no orders
+                            const schedViewsOrdersList = viewsOrders.filter(o => !o.manual);
+                            let unitsPerOrder = MIN_VIEWS_ORDER; // Default to minimum
                             
-                            if (avgViewsUnits > 0) {
-                                const ordersNeeded = Math.ceil(viewsNeeded / avgViewsUnits);
-                                if (ordersNeeded > 0) {
-                                    const timePerOrder = remainingMs / ordersNeeded;
-                                    const hours = Math.floor(timePerOrder / (1000 * 60 * 60));
-                                    const mins = Math.floor((timePerOrder % (1000 * 60 * 60)) / (1000 * 60));
+                            if (schedViewsOrdersList.length > 0) {
+                                const totalViewsUnits = schedViewsOrdersList.reduce((sum, o) => sum + (o.quantity || 0), 0);
+                                const avgViewsUnits = Math.floor(totalViewsUnits / schedViewsOrdersList.length);
+                                if (avgViewsUnits > 0) {
+                                    unitsPerOrder = avgViewsUnits;
+                                }
+                            }
+                            
+                            // Calculate orders needed based on units per order
+                            const ordersNeeded = Math.ceil(viewsNeeded / unitsPerOrder);
+                            
+                            if (ordersNeeded > 0) {
+                                const timePerOrder = remainingMs / ordersNeeded;
+                                const hours = Math.floor(timePerOrder / (1000 * 60 * 60));
+                                const mins = Math.floor((timePerOrder % (1000 * 60 * 60)) / (1000 * 60));
+                                if (hours > 0 || mins > 0) {
                                     timeToNext = hours + 'h' + (mins > 0 ? mins + 'm' : '');
                                 } else {
                                     timeToNext = 'READY';
                                 }
+                            } else {
+                                timeToNext = 'READY';
                             }
-                        } else if (viewsNeeded <= 0) {
-                            timeToNext = 'DONE';
-                        } else if (schedViewsOrdersList.length === 0) {
-                            // No scheduled orders yet, but we need views - estimate based on remaining time
-                            // Assume we'll need at least 1 order, so show remaining time
-                            const hours = Math.floor(remainingMs / (1000 * 60 * 60));
-                            const mins = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
-                            timeToNext = hours + 'h' + (mins > 0 ? mins + 'm' : '');
                         }
                     } else {
                         timeToNext = 'OVERDUE';
@@ -7032,30 +7041,36 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         // Calculate likes needed
                         const likesNeeded = Math.max(0, target_likes - real_likes);
                         
-                        // Calculate average units per scheduled order
-                        const schedLikesOrdersList = likesOrders.filter(o => !o.manual);
-                        if (schedLikesOrdersList.length > 0 && likesNeeded > 0) {
-                            const totalLikesUnits = schedLikesOrdersList.reduce((sum, o) => sum + (o.quantity || 0), 0);
-                            const avgLikesUnits = Math.floor(totalLikesUnits / schedLikesOrdersList.length);
+                        if (likesNeeded <= 0) {
+                            likesTimeToNext = 'DONE';
+                        } else {
+                            // Calculate average units per scheduled order, or use minimum if no orders
+                            const schedLikesOrdersList = likesOrders.filter(o => !o.manual);
+                            let unitsPerOrder = MIN_LIKES_ORDER; // Default to minimum
                             
-                            if (avgLikesUnits > 0) {
-                                const ordersNeeded = Math.ceil(likesNeeded / avgLikesUnits);
-                                if (ordersNeeded > 0) {
-                                    const timePerOrder = remainingMs / ordersNeeded;
-                                    const hours = Math.floor(timePerOrder / (1000 * 60 * 60));
-                                    const mins = Math.floor((timePerOrder % (1000 * 60 * 60)) / (1000 * 60));
+                            if (schedLikesOrdersList.length > 0) {
+                                const totalLikesUnits = schedLikesOrdersList.reduce((sum, o) => sum + (o.quantity || 0), 0);
+                                const avgLikesUnits = Math.floor(totalLikesUnits / schedLikesOrdersList.length);
+                                if (avgLikesUnits > 0) {
+                                    unitsPerOrder = avgLikesUnits;
+                                }
+                            }
+                            
+                            // Calculate orders needed based on units per order
+                            const ordersNeeded = Math.ceil(likesNeeded / unitsPerOrder);
+                            
+                            if (ordersNeeded > 0) {
+                                const timePerOrder = remainingMs / ordersNeeded;
+                                const hours = Math.floor(timePerOrder / (1000 * 60 * 60));
+                                const mins = Math.floor((timePerOrder % (1000 * 60 * 60)) / (1000 * 60));
+                                if (hours > 0 || mins > 0) {
                                     likesTimeToNext = hours + 'h' + (mins > 0 ? mins + 'm' : '');
                                 } else {
                                     likesTimeToNext = 'READY';
                                 }
+                            } else {
+                                likesTimeToNext = 'READY';
                             }
-                        } else if (likesNeeded <= 0) {
-                            likesTimeToNext = 'DONE';
-                        } else if (schedLikesOrdersList.length === 0) {
-                            // No scheduled orders yet, but we need likes - estimate based on remaining time
-                            const hours = Math.floor(remainingMs / (1000 * 60 * 60));
-                            const mins = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
-                            likesTimeToNext = hours + 'h' + (mins > 0 ? mins + 'm' : '');
                         }
                     } else {
                         likesTimeToNext = 'OVERDUE';
@@ -8165,6 +8180,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                     let timeToNext = 'N/A';
                                     let likesTimeToNext = 'N/A';
                                     
+                                    // Minimum order sizes
+                                    const MIN_VIEWS_ORDER = 50;
+                                    const MIN_LIKES_ORDER = 10;
+                                    
                                     // Calculate for views
                                     if (target_completion && startTime) {
                                         const now = new Date();
@@ -8175,27 +8194,27 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                             // Calculate views needed
                                             const viewsNeeded = Math.max(0, target_views - real_views);
                                             
-                                            // Calculate average units per scheduled order
-                                            if (schedViewsOrdersList.length > 0 && viewsNeeded > 0) {
-                                                if (avgViewsUnits > 0) {
-                                                    const ordersNeeded = Math.ceil(viewsNeeded / avgViewsUnits);
-                                                    if (ordersNeeded > 0) {
-                                                        const timePerOrder = remainingMs / ordersNeeded;
-                                                        const hours = Math.floor(timePerOrder / (1000 * 60 * 60));
-                                                        const mins = Math.floor((timePerOrder % (1000 * 60 * 60)) / (1000 * 60));
+                                            if (viewsNeeded <= 0) {
+                                                timeToNext = 'DONE';
+                                            } else {
+                                                // Use average from scheduled orders, or minimum if no orders
+                                                let unitsPerOrder = avgViewsUnits > 0 ? avgViewsUnits : MIN_VIEWS_ORDER;
+                                                
+                                                // Calculate orders needed based on units per order
+                                                const ordersNeeded = Math.ceil(viewsNeeded / unitsPerOrder);
+                                                
+                                                if (ordersNeeded > 0) {
+                                                    const timePerOrder = remainingMs / ordersNeeded;
+                                                    const hours = Math.floor(timePerOrder / (1000 * 60 * 60));
+                                                    const mins = Math.floor((timePerOrder % (1000 * 60 * 60)) / (1000 * 60));
+                                                    if (hours > 0 || mins > 0) {
                                                         timeToNext = hours + 'h' + (mins > 0 ? mins + 'm' : '');
                                                     } else {
                                                         timeToNext = 'READY';
                                                     }
+                                                } else {
+                                                    timeToNext = 'READY';
                                                 }
-                                            } else if (viewsNeeded <= 0) {
-                                                timeToNext = 'DONE';
-                                            } else if (schedViewsOrdersList.length === 0) {
-                                                // No scheduled orders yet, but we need views - estimate based on remaining time
-                                                // Assume we'll need at least 1 order, so show remaining time
-                                                const hours = Math.floor(remainingMs / (1000 * 60 * 60));
-                                                const mins = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
-                                                timeToNext = hours + 'h' + (mins > 0 ? mins + 'm' : '');
                                             }
                                         } else {
                                             timeToNext = 'OVERDUE';
@@ -8212,26 +8231,27 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                             // Calculate likes needed
                                             const likesNeeded = Math.max(0, target_likes - real_likes);
                                             
-                                            // Calculate average units per scheduled order
-                                            if (schedLikesOrdersList.length > 0 && likesNeeded > 0) {
-                                                if (avgLikesUnits > 0) {
-                                                    const ordersNeeded = Math.ceil(likesNeeded / avgLikesUnits);
-                                                    if (ordersNeeded > 0) {
-                                                        const timePerOrder = remainingMs / ordersNeeded;
-                                                        const hours = Math.floor(timePerOrder / (1000 * 60 * 60));
-                                                        const mins = Math.floor((timePerOrder % (1000 * 60 * 60)) / (1000 * 60));
+                                            if (likesNeeded <= 0) {
+                                                likesTimeToNext = 'DONE';
+                                            } else {
+                                                // Use average from scheduled orders, or minimum if no orders
+                                                let unitsPerOrder = avgLikesUnits > 0 ? avgLikesUnits : MIN_LIKES_ORDER;
+                                                
+                                                // Calculate orders needed based on units per order
+                                                const ordersNeeded = Math.ceil(likesNeeded / unitsPerOrder);
+                                                
+                                                if (ordersNeeded > 0) {
+                                                    const timePerOrder = remainingMs / ordersNeeded;
+                                                    const hours = Math.floor(timePerOrder / (1000 * 60 * 60));
+                                                    const mins = Math.floor((timePerOrder % (1000 * 60 * 60)) / (1000 * 60));
+                                                    if (hours > 0 || mins > 0) {
                                                         likesTimeToNext = hours + 'h' + (mins > 0 ? mins + 'm' : '');
                                                     } else {
                                                         likesTimeToNext = 'READY';
                                                     }
+                                                } else {
+                                                    likesTimeToNext = 'READY';
                                                 }
-                                            } else if (likesNeeded <= 0) {
-                                                likesTimeToNext = 'DONE';
-                                            } else if (schedLikesOrdersList.length === 0) {
-                                                // No scheduled orders yet, but we need likes - estimate based on remaining time
-                                                const hours = Math.floor(remainingMs / (1000 * 60 * 60));
-                                                const mins = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
-                                                likesTimeToNext = hours + 'h' + (mins > 0 ? mins + 'm' : '');
                                             }
                                         } else {
                                             likesTimeToNext = 'OVERDUE';

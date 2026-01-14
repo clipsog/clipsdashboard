@@ -7993,7 +7993,32 @@ class DashboardHandler(BaseHTTPRequestHandler):
             
             try {
                 const response = await fetch('/api/progress');
-                const progress = await response.json();
+                
+                // Handle server errors gracefully
+                if (!response.ok) {
+                    console.warn(`[loadDashboard] Server error ${response.status}, will retry on next refresh`);
+                    // Don't crash, use empty progress and let periodic refresh retry
+                    const progress = {};
+                    allVideosData = progress;
+                    content.style.opacity = '1';
+                    isRefreshing = false;
+                    return;
+                }
+                
+                // Try to parse JSON, handle empty/invalid responses
+                let progress;
+                try {
+                    const text = await response.text();
+                    if (!text || text.trim() === '') {
+                        console.warn('[loadDashboard] Empty response, using empty progress');
+                        progress = {};
+                    } else {
+                        progress = JSON.parse(text);
+                    }
+                } catch (parseError) {
+                    console.error('[loadDashboard] Failed to parse JSON:', parseError);
+                    progress = {}; // Use empty progress on parse error
+                }
                 
                 // Store all videos data for filtering
                 allVideosData = progress;
@@ -8001,7 +8026,12 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 // Load campaigns ONLY on first/full load. Avoid re-rendering campaign UI every refresh
                 // (it wipes calculator inputs, checkbox selection state, etc.).
                 if (showLoading && (!campaignsData || Object.keys(campaignsData).length === 0)) {
-                    await loadCampaigns();
+                    try {
+                        await loadCampaigns();
+                    } catch (campaignError) {
+                        console.error('[loadDashboard] Failed to load campaigns:', campaignError);
+                        // Continue without campaigns if load fails
+                    }
                 }
                 
                 // Render summary stats

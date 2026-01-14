@@ -4798,7 +4798,13 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 const result = await response.json();
                 if (result.success) {
                     hideEditTimeLeftModal();
-                    loadDashboard(true);
+                    // Force immediate refresh - wait for it to complete
+                    await loadDashboard(true);
+                    // Also refresh campaigns if we're on campaign detail view
+                    const route = getCurrentRoute();
+                    if (route.type === 'campaign') {
+                        await loadCampaigns();
+                    }
                 } else {
                     document.getElementById('edit-time-error').textContent = result.error || 'Failed to update time';
                     document.getElementById('edit-time-error').style.display = 'block';
@@ -6748,32 +6754,78 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     }
                 }
                 
-                // Time to next order
-                const nextViewsTime = videoData.next_views_purchase_time ? new Date(videoData.next_views_purchase_time) : null;
+                // Time to next order - calculate based on remaining time divided by orders needed
                 let timeToNext = 'N/A';
-                if (nextViewsTime) {
+                let likesTimeToNext = 'N/A';
+                
+                // Calculate for views
+                const target_completion = videoData.target_completion_time || videoData.target_completion_datetime;
+                if (target_completion && startTime) {
                     const now = new Date();
-                    const diff = nextViewsTime - now;
-                    if (diff > 0) {
-                        const hours = Math.floor(diff / (1000 * 60 * 60));
-                        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                        timeToNext = hours + 'h' + (mins > 0 ? mins + 'm' : '');
+                    const endTime = new Date(target_completion);
+                    const remainingMs = endTime - now;
+                    
+                    if (remainingMs > 0) {
+                        // Calculate views needed
+                        const viewsNeeded = Math.max(0, target_views - real_views);
+                        
+                        // Calculate average units per scheduled order
+                        const schedViewsOrdersList = viewsOrders.filter(o => !o.manual);
+                        if (schedViewsOrdersList.length > 0 && viewsNeeded > 0) {
+                            const totalViewsUnits = schedViewsOrdersList.reduce((sum, o) => sum + (o.quantity || 0), 0);
+                            const avgViewsUnits = Math.floor(totalViewsUnits / schedViewsOrdersList.length);
+                            
+                            if (avgViewsUnits > 0) {
+                                const ordersNeeded = Math.ceil(viewsNeeded / avgViewsUnits);
+                                if (ordersNeeded > 0) {
+                                    const timePerOrder = remainingMs / ordersNeeded;
+                                    const hours = Math.floor(timePerOrder / (1000 * 60 * 60));
+                                    const mins = Math.floor((timePerOrder % (1000 * 60 * 60)) / (1000 * 60));
+                                    timeToNext = hours + 'h' + (mins > 0 ? mins + 'm' : '');
+                                } else {
+                                    timeToNext = 'READY';
+                                }
+                            }
+                        } else if (viewsNeeded <= 0) {
+                            timeToNext = 'DONE';
+                        }
                     } else {
-                        timeToNext = 'READY';
+                        timeToNext = 'OVERDUE';
                     }
                 }
                 
-                const nextLikesTime = videoData.next_likes_purchase_time ? new Date(videoData.next_likes_purchase_time) : null;
-                let likesTimeToNext = 'N/A';
-                if (nextLikesTime) {
+                // Calculate for likes
+                if (target_completion && startTime) {
                     const now = new Date();
-                    const diff = nextLikesTime - now;
-                    if (diff > 0) {
-                        const hours = Math.floor(diff / (1000 * 60 * 60));
-                        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                        likesTimeToNext = hours + 'h' + (mins > 0 ? mins + 'm' : '');
+                    const endTime = new Date(target_completion);
+                    const remainingMs = endTime - now;
+                    
+                    if (remainingMs > 0) {
+                        // Calculate likes needed
+                        const likesNeeded = Math.max(0, target_likes - real_likes);
+                        
+                        // Calculate average units per scheduled order
+                        const schedLikesOrdersList = likesOrders.filter(o => !o.manual);
+                        if (schedLikesOrdersList.length > 0 && likesNeeded > 0) {
+                            const totalLikesUnits = schedLikesOrdersList.reduce((sum, o) => sum + (o.quantity || 0), 0);
+                            const avgLikesUnits = Math.floor(totalLikesUnits / schedLikesOrdersList.length);
+                            
+                            if (avgLikesUnits > 0) {
+                                const ordersNeeded = Math.ceil(likesNeeded / avgLikesUnits);
+                                if (ordersNeeded > 0) {
+                                    const timePerOrder = remainingMs / ordersNeeded;
+                                    const hours = Math.floor(timePerOrder / (1000 * 60 * 60));
+                                    const mins = Math.floor((timePerOrder % (1000 * 60 * 60)) / (1000 * 60));
+                                    likesTimeToNext = hours + 'h' + (mins > 0 ? mins + 'm' : '');
+                                } else {
+                                    likesTimeToNext = 'READY';
+                                }
+                            }
+                        } else if (likesNeeded <= 0) {
+                            likesTimeToNext = 'DONE';
+                        }
                     } else {
-                        likesTimeToNext = 'READY';
+                        likesTimeToNext = 'OVERDUE';
                     }
                 }
                 
@@ -7855,35 +7907,6 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                         }
                                     }
                                     
-                                    // Time to next order
-                                    const nextViewsTime = videoData.next_views_purchase_time ? new Date(videoData.next_views_purchase_time) : null;
-                                    let timeToNext = 'N/A';
-                                    if (nextViewsTime) {
-                                        const now = new Date();
-                                        const diff = nextViewsTime - now;
-                                        if (diff > 0) {
-                                            const hours = Math.floor(diff / (1000 * 60 * 60));
-                                            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                                            timeToNext = hours + 'h' + (mins > 0 ? mins + 'm' : '');
-                                        } else {
-                                            timeToNext = 'READY';
-                                        }
-                                    }
-                                    
-                                    const nextLikesTime = videoData.next_likes_purchase_time ? new Date(videoData.next_likes_purchase_time) : null;
-                                    let likesTimeToNext = 'N/A';
-                                    if (nextLikesTime) {
-                                        const now = new Date();
-                                        const diff = nextLikesTime - now;
-                                        if (diff > 0) {
-                                            const hours = Math.floor(diff / (1000 * 60 * 60));
-                                            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                                            likesTimeToNext = hours + 'h' + (mins > 0 ? mins + 'm' : '');
-                                        } else {
-                                            likesTimeToNext = 'READY';
-                                        }
-                                    }
-                                    
                                     // Order counts
                                     const orderHistory = videoData.order_history || [];
                                     const viewsOrders = orderHistory.filter(o => o.service === 'views');
@@ -7913,6 +7936,72 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                         const totalLikesCost = schedLikesOrdersList.reduce((sum, o) => sum + (o.cost || 0), 0);
                                         avgLikesUnits = Math.floor(totalLikesUnits / schedLikesOrdersList.length);
                                         avgLikesCostPerUnit = totalLikesUnits > 0 ? totalLikesCost / totalLikesUnits : 0;
+                                    }
+                                    
+                                    // Time to next order - calculate based on remaining time divided by orders needed
+                                    let timeToNext = 'N/A';
+                                    let likesTimeToNext = 'N/A';
+                                    
+                                    // Calculate for views
+                                    if (target_completion && startTime) {
+                                        const now = new Date();
+                                        const endTime = new Date(target_completion);
+                                        const remainingMs = endTime - now;
+                                        
+                                        if (remainingMs > 0) {
+                                            // Calculate views needed
+                                            const viewsNeeded = Math.max(0, target_views - real_views);
+                                            
+                                            // Calculate average units per scheduled order
+                                            if (schedViewsOrdersList.length > 0 && viewsNeeded > 0) {
+                                                if (avgViewsUnits > 0) {
+                                                    const ordersNeeded = Math.ceil(viewsNeeded / avgViewsUnits);
+                                                    if (ordersNeeded > 0) {
+                                                        const timePerOrder = remainingMs / ordersNeeded;
+                                                        const hours = Math.floor(timePerOrder / (1000 * 60 * 60));
+                                                        const mins = Math.floor((timePerOrder % (1000 * 60 * 60)) / (1000 * 60));
+                                                        timeToNext = hours + 'h' + (mins > 0 ? mins + 'm' : '');
+                                                    } else {
+                                                        timeToNext = 'READY';
+                                                    }
+                                                }
+                                            } else if (viewsNeeded <= 0) {
+                                                timeToNext = 'DONE';
+                                            }
+                                        } else {
+                                            timeToNext = 'OVERDUE';
+                                        }
+                                    }
+                                    
+                                    // Calculate for likes
+                                    if (target_completion && startTime) {
+                                        const now = new Date();
+                                        const endTime = new Date(target_completion);
+                                        const remainingMs = endTime - now;
+                                        
+                                        if (remainingMs > 0) {
+                                            // Calculate likes needed
+                                            const likesNeeded = Math.max(0, target_likes - real_likes);
+                                            
+                                            // Calculate average units per scheduled order
+                                            if (schedLikesOrdersList.length > 0 && likesNeeded > 0) {
+                                                if (avgLikesUnits > 0) {
+                                                    const ordersNeeded = Math.ceil(likesNeeded / avgLikesUnits);
+                                                    if (ordersNeeded > 0) {
+                                                        const timePerOrder = remainingMs / ordersNeeded;
+                                                        const hours = Math.floor(timePerOrder / (1000 * 60 * 60));
+                                                        const mins = Math.floor((timePerOrder % (1000 * 60 * 60)) / (1000 * 60));
+                                                        likesTimeToNext = hours + 'h' + (mins > 0 ? mins + 'm' : '');
+                                                    } else {
+                                                        likesTimeToNext = 'READY';
+                                                    }
+                                                }
+                                            } else if (likesNeeded <= 0) {
+                                                likesTimeToNext = 'DONE';
+                                            }
+                                        } else {
+                                            likesTimeToNext = 'OVERDUE';
+                                        }
                                     }
                                     
                                     // Calculate current hours/minutes for time left edit

@@ -10,5 +10,8 @@ services:
         value: 3.10.0
       - key: PORT
         sync: false  # Render will set this automatically
-      - key: DATABASE_URL
-        value: postgresql://postgres.sthmpgvzdcmveihmqjpl:MJmCf99X$$$@aws-1-us-east-2.pooler.supabase.com:6543/postgres
+      # NOTE: DATABASE_URL should be set in Render Dashboard Environment Variables
+      # Go to: Render Dashboard > Your Service > Environment > Add Environment Variable
+      # Name: DATABASE_URL
+      # Value: postgresql://postgres.sthmpgvzdcmveihmqjpl:MJmCf99X$$$@aws-1-us-east-2.pooler.supabase.com:6543/postgres
+      # (The password contains $$$ which needs to be set directly, not in YAML)

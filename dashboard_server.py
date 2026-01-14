@@ -6655,7 +6655,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
         // Global helper function to escape template literals
         function escapeTemplateLiteral(str) {
             if (!str) return '';
-            return String(str).replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$/g, '\\$');
+            return String(str).replace(/\\\\/g, '\\\\\\\\').replace(/`/g, '\\\\`').replace(/\\$/g, '\\\\$');
         }
         
         function getCurrentRoute() {

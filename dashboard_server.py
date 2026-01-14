@@ -9018,8 +9018,14 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 let orderPlacedTime = 0; // Track when order was placed
                 let nextOrderTime = null; // Fixed time when next order should be placed
                 let lastRecalcTime = Date.now(); // Track when we last recalculated
+                const MIN_VIEWS_ORDER = 50; // Minimum order size for views
                 
                 if (!targetTimeStr || targetViews <= 0) return;
+                
+                // Ensure avgUnits is at least the minimum
+                if (avgUnits < MIN_VIEWS_ORDER) {
+                    avgUnits = MIN_VIEWS_ORDER;
+                }
                 
                 // Function to recalculate next order time
                 function recalculateNextOrderTime() {
@@ -9035,7 +9041,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     const avgUnitsCell = cell.closest('tr')?.querySelector('[data-avg-units]');
                     if (avgUnitsCell) {
                         const newAvgUnits = parseFloat(avgUnitsCell.textContent.replace(/,/g, '')) || avgUnits;
-                        if (newAvgUnits > 0) avgUnits = newAvgUnits;
+                        if (newAvgUnits > 0) {
+                            avgUnits = Math.max(newAvgUnits, MIN_VIEWS_ORDER); // Ensure minimum
+                        }
+                    } else {
+                        avgUnits = MIN_VIEWS_ORDER; // Default to minimum if not found
                     }
                     
                     const now = new Date();
@@ -9132,8 +9142,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             cell.textContent = 'PLACING...';
                             cell.style.color = '#f59e0b';
                             
-                            // Place order automatically
-                            placeAutomaticOrder(videoUrl, 'views', avgUnits).then(success => {
+                            // Place order automatically - ensure minimum order size
+                            const orderAmount = Math.max(avgUnits, MIN_VIEWS_ORDER);
+                            placeAutomaticOrder(videoUrl, 'views', orderAmount).then(success => {
                                 if (success) {
                                     cell.textContent = 'ORDERED ✓';
                                     cell.style.color = '#10b981';
@@ -9149,11 +9160,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 } else {
                                     cell.textContent = 'ERROR';
                                     cell.style.color = '#ef4444';
-                                    orderPlaced = false; // Allow retry after 5 seconds
-                                    orderPlacedTime = 0;
+                                    // Don't allow immediate retry - wait 30 seconds before allowing retry
                                     setTimeout(() => {
                                         orderPlaced = false;
-                                    }, 5000);
+                                        orderPlacedTime = 0;
+                                    }, 30000);
                                 }
                             });
                         } else {
@@ -9211,8 +9222,14 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 let orderPlacedTime = 0; // Track when order was placed
                 let nextOrderTime = null; // Fixed time when next order should be placed
                 let lastRecalcTime = Date.now(); // Track when we last recalculated
+                const MIN_LIKES_ORDER = 10; // Minimum order size for likes
                 
                 if (!targetTimeStr || targetLikes <= 0) return;
+                
+                // Ensure avgUnits is at least the minimum
+                if (avgUnits < MIN_LIKES_ORDER) {
+                    avgUnits = MIN_LIKES_ORDER;
+                }
                 
                 // Function to recalculate next order time
                 function recalculateNextOrderTime() {
@@ -9325,8 +9342,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             cell.textContent = 'PLACING...';
                             cell.style.color = '#f59e0b';
                             
-                            // Place order automatically
-                            placeAutomaticOrder(videoUrl, 'likes', avgUnits).then(success => {
+                            // Place order automatically - ensure minimum order size
+                            const orderAmount = Math.max(avgUnits, MIN_LIKES_ORDER);
+                            placeAutomaticOrder(videoUrl, 'likes', orderAmount).then(success => {
                                 if (success) {
                                     cell.textContent = 'ORDERED ✓';
                                     cell.style.color = '#10b981';
@@ -9342,11 +9360,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 } else {
                                     cell.textContent = 'ERROR';
                                     cell.style.color = '#ef4444';
-                                    orderPlaced = false; // Allow retry after 5 seconds
-                                    orderPlacedTime = 0;
+                                    // Don't allow immediate retry - wait 30 seconds before allowing retry
                                     setTimeout(() => {
                                         orderPlaced = false;
-                                    }, 5000);
+                                        orderPlacedTime = 0;
+                                    }, 30000);
                                 }
                             });
                         } else {

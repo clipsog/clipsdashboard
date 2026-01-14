@@ -2536,22 +2536,23 @@ class DashboardHandler(BaseHTTPRequestHandler):
         .header {
             background: #1a1a1a;
             border-radius: 0;
-            padding: 40px;
-            margin-bottom: 16px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-            border: 1px solid rgba(255,255,255,0.1);
+            padding: 8px 12px;
+            margin-bottom: 6px;
+            box-shadow: none;
+            border: 1px solid rgba(255,255,255,0.05);
         }
         
         .header h1 {
             color: #ffffff;
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            font-weight: 700;
+            font-size: 1.2em;
+            margin-bottom: 2px;
+            font-weight: 600;
         }
         
         .header p {
-            color: #b0b0b0;
-            font-size: 1.1em;
+            color: #888;
+            font-size: 0.75em;
+            margin: 0;
         }
         
         .video-card {
@@ -3237,15 +3238,16 @@ class DashboardHandler(BaseHTTPRequestHandler):
         .back-button {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 10px 20px;
+            gap: 4px;
+            padding: 4px 10px;
             background: #1a1a1a;
             color: #ffffff;
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 0;
             text-decoration: none;
-            font-weight: 600;
-            margin-bottom: 12px;
+            font-weight: 500;
+            font-size: 11px;
+            margin-bottom: 6px;
             transition: all 0.2s;
             cursor: pointer;
         }
@@ -3282,12 +3284,12 @@ class DashboardHandler(BaseHTTPRequestHandler):
         /* Summary Statistics */
         .summary-stats {
             display: flex;
-            gap: 20px;
-            margin-bottom: 16px;
-            padding: 8px 12px;
+            gap: 12px;
+            margin-bottom: 6px;
+            padding: 4px 8px;
             background: #1a1a1a;
             border-radius: 0;
-            border: 1px solid rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.05);
             flex-wrap: wrap;
             align-items: center;
         }
@@ -3295,21 +3297,21 @@ class DashboardHandler(BaseHTTPRequestHandler):
         .summary-stat-card {
             display: flex;
             align-items: baseline;
-            gap: 6px;
+            gap: 4px;
             flex: 0 1 auto;
         }
         
         .summary-stat-label {
             color: #666;
-            font-size: 0.7em;
+            font-size: 0.65em;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.2px;
             font-weight: 500;
         }
         
         .summary-stat-value {
             color: #ffffff;
-            font-size: 0.95em;
+            font-size: 0.85em;
             font-weight: 600;
         }
         
@@ -3320,17 +3322,17 @@ class DashboardHandler(BaseHTTPRequestHandler):
         /* Tab Navigation */
         .tab-navigation {
             display: flex;
-            gap: 8px;
-            margin-bottom: 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            gap: 4px;
+            margin-bottom: 6px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
         
         .tab-btn {
             background: transparent;
             border: none;
             color: #888;
-            padding: 10px 20px;
-            font-size: 14px;
+            padding: 4px 12px;
+            font-size: 11px;
             font-weight: 500;
             cursor: pointer;
             border-bottom: 2px solid transparent;
@@ -3360,60 +3362,64 @@ class DashboardHandler(BaseHTTPRequestHandler):
         .controls-bar {
             background: #1a1a1a;
             border-radius: 0;
-            padding: 8px;
-            margin-bottom: 25px;
+            padding: 4px 6px;
+            margin-bottom: 8px;
             display: flex;
-            gap: 15px;
+            gap: 6px;
             flex-wrap: wrap;
             align-items: center;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.05);
         }
         
         .search-box {
             flex: 1;
-            min-width: 200px;
-            padding: 12px 16px;
-            border: 2px solid rgba(255,255,255,0.2);
+            min-width: 150px;
+            padding: 4px 8px;
+            border: 1px solid rgba(255,255,255,0.1);
             border-radius: 0;
             background: #1a1a1a;
             color: #e0e0e0;
-            font-size: 14px;
+            font-size: 11px;
             transition: all 0.2s;
+            height: 24px;
         }
         
         .search-box:focus {
             outline: none;
             border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+            box-shadow: 0 0 0 1px rgba(102, 126, 234, 0.2);
         }
         
         .filter-select {
-            padding: 12px 16px;
-            border: 2px solid rgba(255,255,255,0.2);
+            padding: 4px 8px;
+            border: 1px solid rgba(255,255,255,0.1);
             border-radius: 0;
             background: #1a1a1a;
             color: #e0e0e0;
-            font-size: 14px;
+            font-size: 11px;
             cursor: pointer;
             transition: all 0.2s;
+            height: 24px;
         }
         
         .filter-select:focus {
             outline: none;
             border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+            box-shadow: 0 0 0 1px rgba(102, 126, 234, 0.2);
         }
         
         .export-btn {
-            padding: 12px 24px;
+            padding: 4px 10px;
             background: #2a2a2a;
             color: #fff;
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
             border-radius: 0;
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 10px;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
+            height: 24px;
+            white-space: nowrap;
         }
         
         .export-btn:hover {
@@ -3421,15 +3427,17 @@ class DashboardHandler(BaseHTTPRequestHandler):
         }
         
         .clear-filters-btn {
-            padding: 12px 20px;
+            padding: 4px 10px;
             background: #2a2a2a;
             color: #fff;
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
             border-radius: 0;
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 10px;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
+            height: 24px;
+            white-space: nowrap;
         }
         
         .clear-filters-btn:hover {
@@ -3437,19 +3445,21 @@ class DashboardHandler(BaseHTTPRequestHandler):
         }
         
         .add-video-btn {
-            padding: 10px 20px;
-            background: #2a2a2a;
+            padding: 4px 10px;
+            background: #667eea;
             color: #fff;
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(102,126,234,0.3);
             border-radius: 0;
-            font-size: 14px;
+            font-size: 10px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
+            height: 24px;
+            white-space: nowrap;
         }
         
         .add-video-btn:hover {
-            background: #333;
+            background: #5568d3;
         }
         
         /* Mobile Responsive Styles */
@@ -3577,25 +3587,25 @@ class DashboardHandler(BaseHTTPRequestHandler):
         </div>
         
         <div class="controls-bar" id="dashboard-controls">
-            <input type="text" id="search-box" class="search-box" placeholder="🔍 Search videos by username or URL..." oninput="filterVideos()">
+            <input type="text" id="search-box" class="search-box" placeholder="Search..." oninput="filterVideos()">
             <select id="status-filter" class="filter-select" onchange="filterVideos()">
-                <option value="all">All Status</option>
-                <option value="complete">✅ Complete</option>
-                <option value="good">Good Progress</option>
+                <option value="all">All</option>
+                <option value="complete">Complete</option>
+                <option value="good">Good</option>
                 <option value="moderate">Moderate</option>
-                <option value="early">Early Stage</option>
+                <option value="early">Early</option>
             </select>
             <select id="sort-by" class="filter-select" onchange="filterVideos()">
-                <option value="progress-desc">Progress: High to Low</option>
-                <option value="progress-asc">Progress: Low to High</option>
-                <option value="views-desc">Views: High to Low</option>
-                <option value="views-asc">Views: Low to High</option>
-                <option value="recent">Most Recent</option>
+                <option value="progress-desc">Progress: H→L</option>
+                <option value="progress-asc">Progress: L→H</option>
+                <option value="views-desc">Views: H→L</option>
+                <option value="views-asc">Views: L→H</option>
+                <option value="recent">Recent</option>
                 <option value="oldest">Oldest</option>
             </select>
-            <button class="export-btn" onclick="exportData()">Export Data</button>
-            <button class="add-video-btn" onclick="showAddVideoModal()">Add Video</button>
-            <button class="clear-filters-btn" onclick="clearFilters()">Clear Filters</button>
+            <button class="export-btn" onclick="exportData()">Export</button>
+            <button class="add-video-btn" onclick="showAddVideoModal()">+ Video</button>
+            <button class="clear-filters-btn" onclick="clearFilters()">Clear</button>
         </div>
         
         <!-- Campaign Management Bar -->

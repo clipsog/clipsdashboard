@@ -1,0 +1,50 @@
+{
+  "panel": "smmfollows.com",
+  "services": {
+    "views": {
+      "id": "1321",
+      "min": 50,
+      "name": "TikTok Views"
+    },
+    "likes": {
+      "id": "250",
+      "min": null,
+      "name": "TikTok Likes"
+    },
+    "comments": {
+      "id": "1384",
+      "min": 10,
+      "name": "TikTok Comments",
+      "note": "Has text area for comments (1 per line)"
+    },
+    "comment_likes": {
+      "id": "14718",
+      "min": 50,
+      "name": "TikTok Comment Likes",
+      "note": "Says \"by username\" but has place for post link (not username)"
+    }
+  },
+  "rates": {
+    "views": 0.02,
+    "likes": 0.05,
+    "comments": 0.1,
+    "comment_likes": 0.03
+  },
+  "targets": {
+    "views": 4000,
+    "likes": 125,
+    "comments": 7,
+    "comment_likes": 15
+  },
+  "adjusted_quantities": {
+    "comments": 10,
+    "comment_likes": 50
+  },
+  "costs": {
+    "views": 0.08,
+    "likes": 0.00625,
+    "comments": 0.001,
+    "comment_likes": 0.0015,
+    "total": 0.08875000000000001
+  }
+}

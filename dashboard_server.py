@@ -2629,61 +2629,41 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.wfile.write(response_data.encode())
     
     def load_progress(self):
-        """Load progress from database, with JSON fallback if database fails"""
+        """Load progress from database ONLY - Supabase is the single source of truth"""
         if DATABASE_AVAILABLE:
             try:
                 progress = database.load_progress()
                 if progress:
                     print(f"[LOAD] Loaded {len(progress)} videos from database")
-                    return progress
+                else:
+                    print(f"[LOAD] No videos found in database")
+                return progress or {}
             except Exception as e:
-                print(f"⚠️ Database load failed: {e}")
+                print(f"❌ Database load failed: {e}")
                 import traceback
                 traceback.print_exc()
+                raise  # Re-raise to prevent silent failures
         
-        # Fallback to JSON file if database fails (temporary measure)
-        # This ensures videos added during database outages aren't lost
-        if PROGRESS_FILE.exists():
-            try:
-                with open(PROGRESS_FILE, 'r') as f:
-                    progress = json.load(f)
-                    if progress:
-                        print(f"[LOAD] Loaded {len(progress)} videos from JSON fallback")
-                        return progress
-            except Exception as e:
-                print(f"⚠️ JSON fallback load failed: {e}")
-        
-        print("⚠️ Database unavailable and no JSON fallback, returning empty progress")
+        print("❌ Database module not available - cannot load data!")
         return {}
     
     def save_progress(self, progress):
-        """Save progress to database or file"""
+        """Save progress to database ONLY - Supabase is the single source of truth"""
         if DATABASE_AVAILABLE:
             try:
                 database.save_progress(progress)
+                print(f"[SAVE] Saved {len(progress)} videos to database")
                 return
             except Exception as e:
-                print(f"⚠️ Database save failed, falling back to JSON: {e}")
+                print(f"❌ Database save failed: {e}")
+                import traceback
+                traceback.print_exc()
+                raise  # Re-raise to prevent silent data loss
         
-        # Fallback to JSON file with atomic write
-        import tempfile
-        import shutil
-        
-        PROGRESS_FILE.parent.mkdir(parents=True, exist_ok=True)
-        
-        temp_fd, temp_path = tempfile.mkstemp(dir=PROGRESS_FILE.parent, suffix='.tmp')
-        try:
-            with os.fdopen(temp_fd, 'w') as f:
-                json.dump(progress, f, indent=2)
-            shutil.move(temp_path, PROGRESS_FILE)
-        except Exception as e:
-            if os.path.exists(temp_path):
-                os.remove(temp_path)
-            print(f"[ERROR] Failed to save progress: {e}")
-            raise
+        raise Exception("Database module not available - cannot save data!")
     
     def load_campaigns(self):
-        """Load campaigns from database, with JSON fallback if database fails"""
+        """Load campaigns from database ONLY - Supabase is the single source of truth"""
         if DATABASE_AVAILABLE:
             try:
                 campaigns = database.load_campaigns()
@@ -2694,49 +2674,32 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         video_count = len(campaign_data.get('videos', []))
                         if video_count > 0:
                             print(f"       {campaign_id}: {video_count} videos")
-                    return campaigns
+                else:
+                    print(f"[LOAD] No campaigns found in database")
+                return campaigns or {}
             except Exception as e:
-                print(f"⚠️ Database load failed: {e}")
+                print(f"❌ Database load failed: {e}")
                 import traceback
                 traceback.print_exc()
+                raise  # Re-raise to prevent silent failures
         
-        # Fallback to JSON file if database fails (temporary measure)
-        # This ensures videos added during database outages aren't lost
-        if CAMPAIGNS_FILE.exists():
-            try:
-                with open(CAMPAIGNS_FILE, 'r') as f:
-                    campaigns = json.load(f)
-                    if campaigns:
-                        print(f"[LOAD] Loaded {len(campaigns)} campaigns from JSON fallback")
-                        return campaigns
-            except Exception as e:
-                print(f"⚠️ JSON fallback load failed: {e}")
-        
-        print("⚠️ Database unavailable and no JSON fallback, returning empty campaigns")
+        print("❌ Database module not available - cannot load data!")
         return {}
     
     def save_campaigns(self, campaigns):
-        """Save campaigns to database or file"""
+        """Save campaigns to database ONLY - Supabase is the single source of truth"""
         if DATABASE_AVAILABLE:
             try:
                 database.save_campaigns(campaigns)
-                print(f"[SAVE] Campaigns saved to database ({len(campaigns)} campaigns)")
+                print(f"[SAVE] Saved {len(campaigns)} campaigns to database")
                 return
             except Exception as e:
-                print(f"⚠️ Database save failed, falling back to JSON: {e}")
+                print(f"❌ Database save failed: {e}")
+                import traceback
+                traceback.print_exc()
+                raise  # Re-raise to prevent silent data loss
         
-        # Fallback to JSON file with atomic write
-        import tempfile
-        import shutil
-        
-        CAMPAIGNS_FILE.parent.mkdir(parents=True, exist_ok=True)
-        
-        temp_fd, temp_path = tempfile.mkstemp(dir=CAMPAIGNS_FILE.parent, suffix='.tmp')
-        try:
-            with os.fdopen(temp_fd, 'w') as f:
-                json.dump(campaigns, f, indent=2)
-            shutil.move(temp_path, CAMPAIGNS_FILE)
-            print(f"[SAVE] Campaigns saved to file ({len(campaigns)} campaigns)")
+        raise Exception("Database module not available - cannot save data!")
         except Exception as e:
             if os.path.exists(temp_path):
                 os.remove(temp_path)

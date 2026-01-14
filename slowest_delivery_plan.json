@@ -1,0 +1,45 @@
+{
+  "cost_per_post": 0.22775,
+  "delivery_plan": {
+    "views": {
+      "orders": 80,
+      "quantity_per_order": 50,
+      "delay_seconds": 1080.0,
+      "delay_formatted": "18m 0s",
+      "cost_per_order": 0.0007000000000000001,
+      "total_cost": 0.056
+    },
+    "likes": {
+      "orders": 13,
+      "quantities_per_order": [
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        5
+      ],
+      "delay_seconds": 6646.153846153846,
+      "delay_formatted": "1h 50m 46s",
+      "cost_per_order": 0.0021,
+      "total_cost": 0.02625
+    },
+    "comments": {
+      "orders": 1,
+      "quantity": 10,
+      "cost": 0.135
+    },
+    "comment_likes": {
+      "orders": 1,
+      "quantity": 50,
+      "cost": 0.0105
+    }
+  }
+}

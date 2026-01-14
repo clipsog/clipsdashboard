@@ -227,19 +227,16 @@ def init_schema():
         return False
 
 def load_progress() -> Dict:
-    """Load all video progress from database"""
+    """Load all video progress from database ONLY - Supabase is source of truth"""
     database_url = get_database_url()
     if not database_url:
-        # Fallback to JSON file
-        from dashboard_server import PROGRESS_FILE
-        if PROGRESS_FILE.exists():
-            with open(PROGRESS_FILE, 'r') as f:
-                return json.load(f)
+        print("❌ No DATABASE_URL - cannot load progress!")
         return {}
     
     try:
         with get_db_connection() as conn:
             if not conn:
+                print("❌ Failed to get database connection")
                 return {}
             
             cursor = conn.cursor(cursor_factory=RealDictCursor)
@@ -255,12 +252,7 @@ def load_progress() -> Dict:
         print(f"❌ Error loading progress: {e}")
         import traceback
         traceback.print_exc()
-        # Fallback to JSON file
-        from dashboard_server import PROGRESS_FILE
-        if PROGRESS_FILE.exists():
-            with open(PROGRESS_FILE, 'r') as f:
-                return json.load(f)
-        return {}
+        raise  # Re-raise to prevent silent failures
 
 def save_progress(progress: Dict):
     """Save video progress to database"""
@@ -305,19 +297,16 @@ def save_progress(progress: Dict):
         raise
 
 def load_campaigns() -> Dict:
-    """Load all campaigns from database"""
+    """Load all campaigns from database ONLY - Supabase is source of truth"""
     database_url = get_database_url()
     if not database_url:
-        # Fallback to JSON file
-        from dashboard_server import CAMPAIGNS_FILE
-        if CAMPAIGNS_FILE.exists():
-            with open(CAMPAIGNS_FILE, 'r') as f:
-                return json.load(f)
+        print("❌ No DATABASE_URL - cannot load campaigns!")
         return {}
     
     try:
         with get_db_connection() as conn:
             if not conn:
+                print("❌ Failed to get database connection")
                 return {}
             
             cursor = conn.cursor(cursor_factory=RealDictCursor)
@@ -333,12 +322,7 @@ def load_campaigns() -> Dict:
         print(f"❌ Error loading campaigns: {e}")
         import traceback
         traceback.print_exc()
-        # Fallback to JSON file
-        from dashboard_server import CAMPAIGNS_FILE
-        if CAMPAIGNS_FILE.exists():
-            with open(CAMPAIGNS_FILE, 'r') as f:
-                return json.load(f)
-        return {}
+        raise  # Re-raise to prevent silent failures
 
 def save_campaigns(campaigns: Dict):
     """Save campaigns to database - MERGES with existing data to preserve videos"""

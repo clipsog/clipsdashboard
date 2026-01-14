@@ -1,0 +1,15 @@
+{
+  "rates": {
+    "views": 0.014,
+    "likes": 0.21,
+    "comments": 13.5,
+    "comment_likes": 0.21
+  },
+  "minimums": {
+    "views": 50,
+    "likes": 10,
+    "comments": 10,
+    "comment_likes": 50
+  },
+  "total_cost": 0.22775
+}

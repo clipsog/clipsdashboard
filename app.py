@@ -34,12 +34,21 @@ def run_continuous_bot():
             from dashboard_server import DashboardHandler, PROGRESS_FILE
             import json
             
-            # Load progress directly from file
-            if PROGRESS_FILE.exists():
+            # Load progress from database first, then fallback to file
+            progress = {}
+            try:
+                import database
+                if database.get_database_url():
+                    progress = database.load_progress()
+                    if progress:
+                        print(f"📊 Loaded {len(progress)} videos from database")
+            except:
+                pass
+            
+            # Fallback to JSON file only if database is empty
+            if not progress and PROGRESS_FILE.exists():
                 with open(PROGRESS_FILE, 'r') as f:
                     progress = json.load(f)
-            else:
-                progress = {}
             
             if not progress:
                 print("📭 No videos in progress, waiting...")
@@ -219,13 +228,9 @@ if __name__ == '__main__':
             with open(progress_file, 'r') as f:
                 progress = json.load(f)
         
+        # CRITICAL: Only rebuild if we have data (from database or JSON)
+        # NEVER overwrite database data with JSON files
         if campaigns or progress:
-            with open(campaigns_file, 'r') as f:
-                campaigns = json.load(f)
-            
-            with open(progress_file, 'r') as f:
-                progress = json.load(f)
-            
             rebuild_count = 0
             campaigns_changed = False
             

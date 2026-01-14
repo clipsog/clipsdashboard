@@ -2629,21 +2629,22 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.wfile.write(response_data.encode())
     
     def load_progress(self):
-        """Load progress from database or file"""
+        """Load progress from database ONLY - database is source of truth"""
         if DATABASE_AVAILABLE:
             try:
-                return database.load_progress()
+                progress = database.load_progress()
+                if progress:
+                    print(f"[LOAD] Loaded {len(progress)} videos from database")
+                return progress
             except Exception as e:
-                print(f"⚠️ Database load failed, falling back to JSON: {e}")
+                print(f"⚠️ Database load failed: {e}")
+                import traceback
+                traceback.print_exc()
         
-        # Fallback to JSON file
-        if not PROGRESS_FILE.exists():
-            return {}
-        try:
-            with open(PROGRESS_FILE, 'r') as f:
-                return json.load(f)
-        except:
-            return {}
+        # CRITICAL: If database fails, return empty dict - don't use JSON files
+        # JSON files are ephemeral on Render and will cause data loss
+        print("⚠️ Database unavailable, returning empty progress (will be rebuilt)")
+        return {}
     
     def save_progress(self, progress):
         """Save progress to database or file"""
@@ -2672,21 +2673,27 @@ class DashboardHandler(BaseHTTPRequestHandler):
             raise
     
     def load_campaigns(self):
-        """Load campaigns from database or file"""
+        """Load campaigns from database ONLY - database is source of truth"""
         if DATABASE_AVAILABLE:
             try:
-                return database.load_campaigns()
+                campaigns = database.load_campaigns()
+                if campaigns:
+                    print(f"[LOAD] Loaded {len(campaigns)} campaigns from database")
+                    # Log video counts for debugging
+                    for campaign_id, campaign_data in campaigns.items():
+                        video_count = len(campaign_data.get('videos', []))
+                        if video_count > 0:
+                            print(f"       {campaign_id}: {video_count} videos")
+                return campaigns
             except Exception as e:
-                print(f"⚠️ Database load failed, falling back to JSON: {e}")
+                print(f"⚠️ Database load failed: {e}")
+                import traceback
+                traceback.print_exc()
         
-        # Fallback to JSON file
-        if not CAMPAIGNS_FILE.exists():
-            return {}
-        try:
-            with open(CAMPAIGNS_FILE, 'r') as f:
-                return json.load(f)
-        except:
-            return {}
+        # CRITICAL: If database fails, return empty dict - don't use JSON files
+        # JSON files are ephemeral on Render and will cause data loss
+        print("⚠️ Database unavailable, returning empty campaigns (will be rebuilt)")
+        return {}
     
     def save_campaigns(self, campaigns):
         """Save campaigns to database or file"""

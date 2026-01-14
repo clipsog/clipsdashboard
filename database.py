@@ -166,22 +166,8 @@ def save_progress(progress: Dict):
     """Save video progress to database"""
     database_url = get_database_url()
     if not database_url:
-        # Fallback to JSON file
-        from dashboard_server import PROGRESS_FILE
-        import tempfile
-        import shutil
-        
-        PROGRESS_FILE.parent.mkdir(parents=True, exist_ok=True)
-        temp_fd, temp_path = tempfile.mkstemp(dir=PROGRESS_FILE.parent, suffix='.tmp')
-        try:
-            with os.fdopen(temp_fd, 'w') as f:
-                json.dump(progress, f, indent=2)
-            shutil.move(temp_path, PROGRESS_FILE)
-        except Exception as e:
-            if os.path.exists(temp_path):
-                os.remove(temp_path)
-            raise
-        return
+        print("❌ No DATABASE_URL - cannot save progress! Data will be lost!")
+        raise Exception("DATABASE_URL not configured - cannot persist data")
     
     try:
         with get_db_connection() as conn:
@@ -258,22 +244,8 @@ def save_campaigns(campaigns: Dict):
     """Save campaigns to database - MERGES with existing data to preserve videos"""
     database_url = get_database_url()
     if not database_url:
-        # Fallback to JSON file
-        from dashboard_server import CAMPAIGNS_FILE
-        import tempfile
-        import shutil
-        
-        CAMPAIGNS_FILE.parent.mkdir(parents=True, exist_ok=True)
-        temp_fd, temp_path = tempfile.mkstemp(dir=CAMPAIGNS_FILE.parent, suffix='.tmp')
-        try:
-            with os.fdopen(temp_fd, 'w') as f:
-                json.dump(campaigns, f, indent=2)
-            shutil.move(temp_path, CAMPAIGNS_FILE)
-        except Exception as e:
-            if os.path.exists(temp_path):
-                os.remove(temp_path)
-            raise
-        return
+        print("❌ No DATABASE_URL - cannot save campaigns! Data will be lost!")
+        raise Exception("DATABASE_URL not configured - cannot persist data")
     
     try:
         with get_db_connection() as conn:

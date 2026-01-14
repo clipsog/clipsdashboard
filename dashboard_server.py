@@ -6652,6 +6652,12 @@ class DashboardHandler(BaseHTTPRequestHandler):
         let isRefreshing = false;
         let allVideosData = {};
         
+        // Global helper function to escape template literals
+        function escapeTemplateLiteral(str) {
+            if (!str) return '';
+            return String(str).replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$/g, '\\$');
+        }
+        
         function getCurrentRoute() {
             const hash = window.location.hash || '';
             if (hash.startsWith('#video/')) {
@@ -7687,7 +7693,6 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                         const orders_placed = videoData.orders_placed || {};
                                         const ordered_views = orders_placed.views || 0;
                                         const target_views = videoData.target_views || 0;
-                                        const target_completion = videoData.target_completion_time || videoData.target_completion_datetime;
                                         
                                         // Calculate expected views at this time
                                         let expected_views = 0;

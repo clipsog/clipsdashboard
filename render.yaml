@@ -10,3 +10,13 @@ services:
         value: 3.10.0
       - key: PORT
         sync: false  # Render will set this automatically
+      - key: DATABASE_URL
+        fromDatabase:
+          name: smmfollows-db
+          property: connectionString
+
+databases:
+  - name: smmfollows-db
+    plan: free
+    databaseName: smmfollows
+    user: smmfollows_user

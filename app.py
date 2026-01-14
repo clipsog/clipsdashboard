@@ -148,6 +148,24 @@ def start_health_pinger():
 if __name__ == '__main__':
     print("🚀 Starting SMM Follows Dashboard and Bot...")
     
+    # Initialize PostgreSQL database if available
+    try:
+        import database
+        if database.get_database_url():
+            print("🗄️ Initializing PostgreSQL database...")
+            database.init_database_pool()
+            if database.init_schema():
+                print("🔄 Migrating existing JSON data to PostgreSQL...")
+                database.migrate_from_json()
+            else:
+                print("⚠️ Database schema initialization failed, using JSON fallback")
+        else:
+            print("📁 No DATABASE_URL found, using JSON file storage")
+    except ImportError:
+        print("⚠️ Database module not available, using JSON files")
+    except Exception as e:
+        print(f"⚠️ Database initialization error: {e}, using JSON fallback")
+    
     # CRITICAL: Rebuild campaigns from progress.json on startup
     # This ensures videos don't disappear after redeployment
     print("🔄 Rebuilding campaigns from progress.json...")

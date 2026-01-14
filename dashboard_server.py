@@ -1619,6 +1619,14 @@ class DashboardHandler(BaseHTTPRequestHandler):
             else:
                 print(f"[REBUILD] Verified campaigns (no changes needed)")
             
+            # LOG: Report campaign video counts for debugging
+            for campaign_id, campaign_data in campaigns.items():
+                video_count = len(campaign_data.get('videos', []))
+                video_list = campaign_data.get('videos', [])
+                print(f"[VERIFY] Campaign {campaign_id}: {video_count} videos")
+                if video_count > 0:
+                    print(f"         Videos: {', '.join([v[:30] + '...' for v in video_list[:3]])}{'...' if len(video_list) > 3 else ''}")
+            
             if orphaned_videos:
                 print(f"[WARNING] Found {len(orphaned_videos)} orphaned video(s), auto-fixed")
             

@@ -7416,6 +7416,12 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             html += `<div style="text-align: center; padding: 30px; color: #b0b0b0;">No videos in this campaign yet. Add videos using the "Add Video" button.</div>`;
                         } else {
                             // Render accounting-style table directly in HTML
+                            // Define escapeTemplateLiteral function for this scope
+                            function escapeTemplateLiteral(str) {
+                                if (!str) return '';
+                                return String(str).replace(/\\\\/g, '\\\\\\\\').replace(/`/g, '\\\\`').replace(/\\$/g, '\\\\$');
+                            }
+                            
                             let tableHtml = `
                                 <div style="overflow-x: auto; margin-top: 10px;">
                                     <table style="width: 100%; border-collapse: collapse; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); font-family: monospace; font-size: 10px;">

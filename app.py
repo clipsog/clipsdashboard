@@ -193,6 +193,29 @@ if __name__ == '__main__':
                     campaigns_changed = True
             
             # Rebuild videos from progress.json
+            # CRITICAL: This ensures videos never disappear
+            for video_url, video_data in progress.items():
+                campaign_id = video_data.get('campaign_id')
+                if campaign_id:
+                    # Ensure campaign exists (create if missing)
+                    if campaign_id not in campaigns:
+                        print(f"  ⚠️ Campaign {campaign_id} not found, creating placeholder")
+                        campaigns[campaign_id] = {'videos': []}
+                        campaigns_changed = True
+                    
+                    # Ensure videos list exists
+                    if 'videos' not in campaigns[campaign_id]:
+                        campaigns[campaign_id]['videos'] = []
+                        campaigns_changed = True
+                    
+                    # Add video if not already in list
+                    if video_url not in campaigns[campaign_id]['videos']:
+                        campaigns[campaign_id]['videos'].append(video_url)
+                        campaigns_changed = True
+                        rebuild_count += 1
+                        print(f"  ✓ Restored video to {campaign_id}: {video_url[:50]}...")
+            
+            # DEFENSIVE: Double-check all videos with campaign_id are in campaigns
             for video_url, video_data in progress.items():
                 campaign_id = video_data.get('campaign_id')
                 if campaign_id and campaign_id in campaigns:
@@ -202,7 +225,7 @@ if __name__ == '__main__':
                         campaigns[campaign_id]['videos'].append(video_url)
                         campaigns_changed = True
                         rebuild_count += 1
-                        print(f"  ✓ Restored video to {campaign_id}: {video_url[:50]}...")
+                        print(f"  ✓ [DEFENSIVE] Restored video to {campaign_id}: {video_url[:50]}...")
             
             # ALWAYS save campaigns after rebuild, even if nothing changed
             # This ensures the rebuilt state is persisted, especially important on Render

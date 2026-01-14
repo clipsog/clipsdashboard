@@ -190,6 +190,8 @@ def save_progress(progress: Dict):
             existing_urls = {row[0] for row in cursor.fetchall()}
             
             # Update or insert each video
+            # CRITICAL: Never delete videos - they might be in campaigns
+            # Only update existing ones or add new ones
             for video_url, video_data in progress.items():
                 cursor.execute("""
                     INSERT INTO videos (video_url, data, updated_at)
@@ -200,14 +202,9 @@ def save_progress(progress: Dict):
                         updated_at = CURRENT_TIMESTAMP
                 """, (video_url, json.dumps(video_data)))
             
-            # Remove videos that are no longer in progress
-            current_urls = set(progress.keys())
-            urls_to_remove = existing_urls - current_urls
-            if urls_to_remove:
-                cursor.execute(
-                    "DELETE FROM videos WHERE video_url = ANY(%s)",
-                    (list(urls_to_remove),)
-                )
+            # DO NOT DELETE videos - they may still be referenced in campaigns
+            # Videos should only be removed via explicit delete API call
+            # This prevents videos from disappearing due to timing issues
             
             conn.commit()
     except Exception as e:

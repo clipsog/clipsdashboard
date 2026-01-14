@@ -1544,16 +1544,6 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     'roi': round(roi, 2)
                 }
 
-            # ALWAYS save campaigns after rebuild to ensure persistence
-            # CRITICAL: Save even if nothing changed to ensure rebuild state is persisted
-            # This prevents videos from disappearing due to timing issues or file corruption
-            # On Render free tier, files may not persist between deployments, so we always save
-            self.save_campaigns(campaigns)
-            if campaigns_changed or rebuild_count > 0:
-                print(f"[REBUILD] Saved campaigns (changed={campaigns_changed}, rebuilt={rebuild_count})")
-            else:
-                print(f"[REBUILD] Verified campaigns (no changes needed)")
-            
             # VERIFICATION: Check for videos that have campaign_id but aren't in campaigns
             # This helps diagnose the "videos disappearing" issue
             # If found, automatically fix them (this is a safety net)
@@ -1570,14 +1560,35 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             campaigns[campaign_id]['videos'] = []
                         campaigns[campaign_id]['videos'].append(video_url)
                         campaigns_changed = True
+                        rebuild_count += 1
                         print(f"[AUTO-FIX] Restored orphaned video {video_url[:50]}... to campaign {campaign_id}")
+            
+            # CRITICAL: Also check campaigns for videos that should be there based on progress
+            # This is a reverse check - ensure all videos in progress with campaign_id are in campaigns
+            for video_url, video_data in progress.items():
+                campaign_id = video_data.get('campaign_id')
+                if campaign_id and campaign_id in campaigns:
+                    if 'videos' not in campaigns[campaign_id]:
+                        campaigns[campaign_id]['videos'] = []
+                        campaigns_changed = True
+                    if video_url not in campaigns[campaign_id]['videos']:
+                        campaigns[campaign_id]['videos'].append(video_url)
+                        campaigns_changed = True
+                        rebuild_count += 1
+                        print(f"[REBUILD] Added missing video {video_url[:50]}... to campaign {campaign_id}")
+            
+            # ALWAYS save campaigns after rebuild to ensure persistence
+            # CRITICAL: Save even if nothing changed to ensure rebuild state is persisted
+            # This prevents videos from disappearing due to timing issues or file corruption
+            # On Render free tier, files may not persist between deployments, so we always save
+            self.save_campaigns(campaigns)
+            if campaigns_changed or rebuild_count > 0:
+                print(f"[REBUILD] Saved campaigns (changed={campaigns_changed}, rebuilt={rebuild_count})")
+            else:
+                print(f"[REBUILD] Verified campaigns (no changes needed)")
             
             if orphaned_videos:
                 print(f"[WARNING] Found {len(orphaned_videos)} orphaned video(s), auto-fixed")
-                # Save again if we auto-fixed any
-                if campaigns_changed:
-                    self.save_campaigns(campaigns)
-                    print(f"[AUTO-FIX] Saved campaigns after restoring orphaned videos")
             
             response_data = json.dumps({'success': True, 'campaigns': campaigns})
             self.send_response(200)

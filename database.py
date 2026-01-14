@@ -20,6 +20,7 @@ def get_database_url():
     """Get database URL from environment or return None if not configured"""
     database_url = os.environ.get('DATABASE_URL')
     if not database_url:
+        print("❌ DATABASE_URL environment variable not set")
         return None
     
     # Check for placeholder or malformed URL
@@ -27,10 +28,23 @@ def get_database_url():
         print("❌ DATABASE_URL contains placeholder - please set actual password in Render dashboard")
         return None
     
-    # Debug: Log host info (without password)
+    # Debug: Log connection info (without exposing password)
     if database_url:
-        host_part = database_url.split('@')[-1] if '@' in database_url else 'unknown'
-        print(f"[DB] DATABASE_URL found (host: {host_part})")
+        try:
+            # Extract parts for logging
+            if '@' in database_url:
+                user_part = database_url.split('@')[0]
+                host_part = database_url.split('@')[-1]
+                # Show username but not password
+                if ':' in user_part:
+                    username = user_part.split(':')[0]
+                    print(f"[DB] DATABASE_URL found - User: {username}, Host: {host_part}")
+                else:
+                    print(f"[DB] DATABASE_URL found - Host: {host_part}")
+            else:
+                print(f"[DB] DATABASE_URL found but format may be incorrect")
+        except Exception as e:
+            print(f"[DB] Error parsing DATABASE_URL: {e}")
     
     return database_url
 
@@ -53,34 +67,52 @@ def init_database_pool():
     
     for attempt, url in enumerate(urls_to_try, 1):
         try:
-            # Test connection first
-            test_conn = psycopg2.connect(url, connect_timeout=5)
+            # Test connection first with short timeout
+            print(f"   Testing connection (attempt {attempt}/{len(urls_to_try)})...")
+            test_conn = psycopg2.connect(url, connect_timeout=10)
             test_conn.close()
             
             # If test succeeds, create pool
             _connection_pool = psycopg2.pool.SimpleConnectionPool(
-                1, 10, url, connect_timeout=5
+                1, 10, url, connect_timeout=10
             )
-            print(f"✅ Database connection pool initialized (attempt {attempt})")
+            print(f"✅ Database connection pool initialized successfully!")
             return _connection_pool
         except psycopg2.OperationalError as e:
-            if 'Circuit breaker' in str(e) or 'authentication' in str(e).lower():
+            error_str = str(e)
+            if 'Circuit breaker' in error_str:
                 if attempt < len(urls_to_try):
-                    print(f"   ⚠️ Connection attempt {attempt} failed (circuit breaker), trying next...")
+                    print(f"   ⚠️ Circuit breaker open on attempt {attempt}, trying direct connection...")
+                    time.sleep(2)  # Brief pause before retry
                     continue
                 else:
-                    print(f"❌ All connection attempts failed: {e}")
-                    print(f"   Circuit breaker is open - too many auth errors")
-                    print(f"   Please check DATABASE_URL password in Render dashboard")
+                    print(f"❌ Circuit breaker is open on all connection attempts")
+                    print(f"   Error: {error_str}")
+                    print(f"   ⏳ Wait 5-10 minutes for circuit breaker to reset")
+                    print(f"   Then verify DATABASE_URL password is correct in Render Dashboard")
                     return None
-            else:
-                print(f"❌ Connection error: {e}")
+            elif 'authentication' in error_str.lower() or 'password' in error_str.lower():
+                print(f"❌ Authentication failed: {error_str}")
+                print(f"   Please verify DATABASE_URL password is correct in Render Dashboard")
                 if attempt < len(urls_to_try):
+                    print(f"   Trying direct connection as fallback...")
+                    time.sleep(2)
+                    continue
+                return None
+            else:
+                print(f"❌ Connection error: {error_str}")
+                if attempt < len(urls_to_try):
+                    print(f"   Trying next connection method...")
+                    time.sleep(2)
                     continue
                 return None
         except Exception as e:
             print(f"❌ Failed to initialize database pool: {e}")
+            import traceback
+            traceback.print_exc()
             if attempt < len(urls_to_try):
+                print(f"   Trying next connection method...")
+                time.sleep(2)
                 continue
             return None
     

@@ -9084,11 +9084,6 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         return; // Keep showing PLACING... or ORDERED status
                     }
                     
-                    // Recalculate every 5 seconds or if nextOrderTime is null
-                    if (!nextOrderTime || (Date.now() - lastRecalcTime) > 5000) {
-                        recalculateNextOrderTime();
-                    }
-                    
                     const now = Date.now();
                     const targetTime = new Date(targetTimeStr).getTime();
                     
@@ -9115,8 +9110,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         return;
                     }
                     
-                    if (!nextOrderTime) {
+                    // Only recalculate if nextOrderTime is null OR if we've passed it (should have placed order)
+                    if (!nextOrderTime || (nextOrderTime && now >= nextOrderTime)) {
                         recalculateNextOrderTime();
+                        // If still no nextOrderTime after recalculation, show READY
                         if (!nextOrderTime) {
                             cell.textContent = 'READY';
                             cell.style.color = '#10b981';
@@ -9284,11 +9281,6 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         return; // Keep showing PLACING... or ORDERED status
                     }
                     
-                    // Recalculate every 5 seconds or if nextOrderTime is null
-                    if (!nextOrderTime || (Date.now() - lastRecalcTime) > 5000) {
-                        recalculateNextOrderTime();
-                    }
-                    
                     const now = Date.now();
                     const targetTime = new Date(targetTimeStr).getTime();
                     
@@ -9315,8 +9307,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         return;
                     }
                     
-                    if (!nextOrderTime) {
+                    // Only recalculate if nextOrderTime is null OR if we've passed it (should have placed order)
+                    if (!nextOrderTime || (nextOrderTime && now >= nextOrderTime)) {
                         recalculateNextOrderTime();
+                        // If still no nextOrderTime after recalculation, show READY
                         if (!nextOrderTime) {
                             cell.textContent = 'READY';
                             cell.style.color = '#10b981';

@@ -22,15 +22,15 @@ def get_database_url():
     if not database_url:
         return None
     
-    # Handle Render YAML escaping: $$ becomes $ in environment variable
-    # But we need to handle cases where password contains $ signs
-    # Render automatically handles $$ -> $ conversion, so we should be fine
-    # However, if password has multiple $ signs, they might be escaped differently
+    # Check for placeholder or malformed URL
+    if '[YOUR-PASSWORD]' in database_url or 'password' in database_url.lower():
+        print("❌ DATABASE_URL contains placeholder - please set actual password in Render dashboard")
+        return None
     
-    # Debug: Log first 50 chars to see what we're getting (without password)
+    # Debug: Log host info (without password)
     if database_url:
-        safe_url = database_url.split('@')[0].split(':')[-1] if '@' in database_url else database_url[:50]
-        print(f"[DB] DATABASE_URL found (host: {database_url.split('@')[-1] if '@' in database_url else 'unknown'})")
+        host_part = database_url.split('@')[-1] if '@' in database_url else 'unknown'
+        print(f"[DB] DATABASE_URL found (host: {host_part})")
     
     return database_url
 

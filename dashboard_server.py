@@ -420,7 +420,13 @@ class DashboardHandler(BaseHTTPRequestHandler):
     
     def send_progress_json(self):
         """Send progress as JSON with real-time analytics"""
-        progress = self.load_progress()
+        try:
+            progress = self.load_progress()
+        except Exception as e:
+            print(f"❌ Error loading progress in send_progress_json: {e}")
+            import traceback
+            traceback.print_exc()
+            progress = {}  # Return empty progress on error
         
         # Always fetch real-time analytics for all videos
         for video_url in list(progress.keys()):
@@ -460,13 +466,12 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 import traceback
                 traceback.print_exc()
         
-        # Save updated progress
+        # Save updated progress to database
         try:
-            PROGRESS_FILE.parent.mkdir(parents=True, exist_ok=True)
-            with open(PROGRESS_FILE, 'w') as f:
-                json.dump(progress, f, indent=2)
-        except:
-            pass
+            self.save_progress(progress)
+        except Exception as e:
+            print(f"⚠️ Failed to save progress after analytics update: {e}")
+            # Continue anyway - at least return the updated data
         
         self.send_response(200)
         self.send_header('Content-type', 'application/json')
@@ -1424,8 +1429,18 @@ class DashboardHandler(BaseHTTPRequestHandler):
         """Get all campaigns with financial data"""
         try:
             # CRITICAL: Load campaigns FIRST to preserve existing video lists
-            campaigns = self.load_campaigns()
-            progress = self.load_progress()
+            try:
+                campaigns = self.load_campaigns()
+            except Exception as e:
+                print(f"❌ Error loading campaigns in handle_get_campaigns: {e}")
+                campaigns = {}
+            
+            try:
+                progress = self.load_progress()
+            except Exception as e:
+                print(f"❌ Error loading progress in handle_get_campaigns: {e}")
+                progress = {}
+            
             campaigns_changed = False
             
             # PRESERVE existing videos in campaigns - never clear them
@@ -2745,7 +2760,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 print(f"❌ Database load failed: {e}")
                 import traceback
                 traceback.print_exc()
-                raise  # Re-raise to prevent silent failures
+                # Return empty dict instead of raising - let API handlers decide how to respond
+                return {}
         
         print("❌ Database module not available - cannot load data!")
         return {}
@@ -2784,7 +2800,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 print(f"❌ Database load failed: {e}")
                 import traceback
                 traceback.print_exc()
-                raise  # Re-raise to prevent silent failures
+                # Return empty dict instead of raising - let API handlers decide how to respond
+                return {}
         
         print("❌ Database module not available - cannot load data!")
         return {}

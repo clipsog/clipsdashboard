@@ -2279,12 +2279,26 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     if 'order_history' not in progress[video_url]:
                         progress[video_url]['order_history'] = []
                     
+                    # Determine order type - check if this is an automatic order
+                    order_type = 'manual'  # Default to manual
+                    # Check if this order was triggered automatically (we'll pass a flag via request)
+                    import json as json_module
+                    try:
+                        content_length = int(self.headers.get('Content-Length', 0))
+                        if content_length > 0:
+                            post_data = self.rfile.read(content_length)
+                            request_data = json_module.loads(post_data.decode('utf-8'))
+                            if request_data.get('automatic', False):
+                                order_type = 'scheduled'
+                    except:
+                        pass  # Default to manual if we can't determine
+                    
                     progress[video_url]['order_history'].append({
                         'service': metric,
                         'quantity': amount,
                         'order_id': str(order_id),
                         'timestamp': datetime.now().isoformat(),
-                        'type': 'manual'
+                        'type': order_type
                     })
                     
                     # Update total cost
@@ -8882,6 +8896,37 @@ class DashboardHandler(BaseHTTPRequestHandler):
             });
         }
         
+        // Function to place automatic orders when TIME NEXT reaches 0
+        async function placeAutomaticOrder(videoUrl, metric, amount) {
+            try {
+                console.log(`[Auto Order] Placing ${amount} ${metric} for ${videoUrl}`);
+                const response = await fetch('/api/manual-order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        video_url: videoUrl,
+                        metric: metric,
+                        amount: amount,
+                        automatic: true  // Flag to mark as automatic/scheduled order
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    console.log(`[Auto Order] Success! Order ID: ${data.order_id}, Amount: ${data.amount}`);
+                    return true;
+                } else {
+                    console.error(`[Auto Order] Failed: ${data.error || 'Unknown error'}`);
+                    return false;
+                }
+            } catch (error) {
+                console.error('[Auto Order] Exception:', error);
+                return false;
+            }
+        }
+        
         // Start countdown timers for table cells (TIME LEFT, TIME NEXT, LIKES NEXT)
         function startTableCountdowns() {
             // Clear any existing intervals
@@ -8948,6 +8993,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 const targetViews = parseFloat(cell.getAttribute('data-target-views')) || 0;
                 const avgUnits = parseFloat(cell.getAttribute('data-avg-units')) || 50;
                 const videoUrl = cell.getAttribute('data-video-url');
+                let orderPlaced = false; // Track if order was already placed for this countdown
                 
                 if (!targetTimeStr || targetViews <= 0) return;
                 
@@ -8986,9 +9032,33 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         if (remainingSeconds > 0) {
                             cell.textContent = formatTimeWithSeconds(remainingSeconds);
                             cell.style.color = '#fff';
+                            orderPlaced = false; // Reset flag when time is positive
                         } else {
-                            cell.textContent = 'READY';
-                            cell.style.color = '#10b981';
+                            // Time reached 0 - place order automatically
+                            if (!orderPlaced) {
+                                orderPlaced = true;
+                                cell.textContent = 'PLACING...';
+                                cell.style.color = '#f59e0b';
+                                
+                                // Place order automatically
+                                placeAutomaticOrder(videoUrl, 'views', avgUnits).then(success => {
+                                    if (success) {
+                                        cell.textContent = 'ORDERED';
+                                        cell.style.color = '#10b981';
+                                        // Refresh dashboard after a short delay to show new order
+                                        setTimeout(() => {
+                                            loadDashboard(false);
+                                        }, 2000);
+                                    } else {
+                                        cell.textContent = 'ERROR';
+                                        cell.style.color = '#ef4444';
+                                        orderPlaced = false; // Allow retry
+                                    }
+                                });
+                            } else {
+                                cell.textContent = 'READY';
+                                cell.style.color = '#10b981';
+                            }
                         }
                     } else {
                         cell.textContent = 'READY';
@@ -9030,6 +9100,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 const targetLikes = parseFloat(cell.getAttribute('data-target-likes')) || 0;
                 const avgUnits = parseFloat(cell.getAttribute('data-avg-units')) || 10;
                 const videoUrl = cell.getAttribute('data-video-url');
+                let orderPlaced = false; // Track if order was already placed for this countdown
                 
                 if (!targetTimeStr || targetLikes <= 0) return;
                 
@@ -9068,9 +9139,33 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         if (remainingSeconds > 0) {
                             cell.textContent = formatTimeWithSeconds(remainingSeconds);
                             cell.style.color = '#fff';
+                            orderPlaced = false; // Reset flag when time is positive
                         } else {
-                            cell.textContent = 'READY';
-                            cell.style.color = '#10b981';
+                            // Time reached 0 - place order automatically
+                            if (!orderPlaced) {
+                                orderPlaced = true;
+                                cell.textContent = 'PLACING...';
+                                cell.style.color = '#f59e0b';
+                                
+                                // Place order automatically
+                                placeAutomaticOrder(videoUrl, 'likes', avgUnits).then(success => {
+                                    if (success) {
+                                        cell.textContent = 'ORDERED';
+                                        cell.style.color = '#10b981';
+                                        // Refresh dashboard after a short delay to show new order
+                                        setTimeout(() => {
+                                            loadDashboard(false);
+                                        }, 2000);
+                                    } else {
+                                        cell.textContent = 'ERROR';
+                                        cell.style.color = '#ef4444';
+                                        orderPlaced = false; // Allow retry
+                                    }
+                                });
+                            } else {
+                                cell.textContent = 'READY';
+                                cell.style.color = '#10b981';
+                            }
                         }
                     } else {
                         cell.textContent = 'READY';

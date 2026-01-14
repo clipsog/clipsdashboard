@@ -101,64 +101,64 @@ def get_db_connection():
     max_retries = 3
     retry_delay = 1
     
-    for attempt in range(max_retries):
-        try:
-            if _connection_pool:
-                conn = _connection_pool.getconn()
-            else:
-                # Fallback to direct connection if pool unavailable
-                conn = psycopg2.connect(database_url, connect_timeout=5)
-            
-            # Test the connection
-            cursor = conn.cursor()
-            cursor.execute("SELECT 1")
-            cursor.close()
-            
-            yield conn
-            conn.commit()
-            break  # Success, exit retry loop
-            
-        except psycopg2.OperationalError as e:
-            if conn:
-                try:
-                    conn.rollback()
-                    if _connection_pool:
-                        _connection_pool.putconn(conn)
-                    else:
-                        conn.close()
-                except:
-                    pass
-                conn = None
-            
-            if 'Circuit breaker' in str(e):
-                if attempt < max_retries - 1:
-                    print(f"   ⚠️ Circuit breaker open, retrying in {retry_delay}s... (attempt {attempt + 1}/{max_retries})")
-                    time.sleep(retry_delay)
-                    retry_delay *= 2  # Exponential backoff
-                    # Reinitialize pool on circuit breaker
-                    global _connection_pool
-                    _connection_pool = None
-                    init_database_pool()
-                    continue
+    try:
+        for attempt in range(max_retries):
+            try:
+                if _connection_pool:
+                    conn = _connection_pool.getconn()
                 else:
-                    print(f"❌ Database circuit breaker still open after {max_retries} attempts")
+                    # Fallback to direct connection if pool unavailable
+                    conn = psycopg2.connect(database_url, connect_timeout=5)
+                
+                # Test the connection
+                cursor = conn.cursor()
+                cursor.execute("SELECT 1")
+                cursor.close()
+                
+                yield conn
+                conn.commit()
+                break  # Success, exit retry loop
+                
+            except psycopg2.OperationalError as e:
+                if conn:
+                    try:
+                        conn.rollback()
+                        if _connection_pool:
+                            _connection_pool.putconn(conn)
+                        else:
+                            conn.close()
+                    except:
+                        pass
+                    conn = None
+                
+                if 'Circuit breaker' in str(e):
+                    if attempt < max_retries - 1:
+                        print(f"   ⚠️ Circuit breaker open, retrying in {retry_delay}s... (attempt {attempt + 1}/{max_retries})")
+                        time.sleep(retry_delay)
+                        retry_delay *= 2  # Exponential backoff
+                        # Reinitialize pool on circuit breaker
+                        global _connection_pool
+                        _connection_pool = None
+                        init_database_pool()
+                        continue
+                    else:
+                        print(f"❌ Database circuit breaker still open after {max_retries} attempts")
+                        raise
+                else:
+                    print(f"❌ Database error: {e}")
                     raise
-            else:
+                    
+            except Exception as e:
+                if conn:
+                    try:
+                        conn.rollback()
+                    except:
+                        pass
                 print(f"❌ Database error: {e}")
                 raise
-                
-        except Exception as e:
-            if conn:
-                try:
-                    conn.rollback()
-                except:
-                    pass
-            print(f"❌ Database error: {e}")
-            raise
-    else:
-        # All retries exhausted
-        raise Exception("Failed to get database connection after retries")
-    
+        else:
+            # All retries exhausted
+            raise Exception("Failed to get database connection after retries")
     finally:
         if conn and _connection_pool:
             try:

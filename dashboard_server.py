@@ -9119,10 +9119,17 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 }, 1000);
                 
                 // Initial update
+                let initialRealViews = parseFloat(cell.getAttribute('data-real-views')) || 0;
+                const initialRealViewsCell = document.querySelector('[data-real-views][data-video-url="' + videoUrl + '"]');
+                if (initialRealViewsCell) {
+                    const cellText = initialRealViewsCell.textContent.replace(/,/g, '');
+                    initialRealViews = parseFloat(cellText) || initialRealViews;
+                }
+                
                 const now = new Date();
                 const targetTime = new Date(targetTimeStr);
                 const remainingMs = targetTime - now;
-                const viewsNeeded = Math.max(0, targetViews - realViews);
+                const viewsNeeded = Math.max(0, targetViews - initialRealViews);
                 if (viewsNeeded <= 0) {
                     cell.textContent = 'DONE';
                     cell.style.color = '#10b981';
@@ -9257,10 +9264,17 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 }, 1000);
                 
                 // Initial update
+                let initialRealLikes = parseFloat(cell.getAttribute('data-real-likes')) || 0;
+                const initialRealLikesCell = document.querySelector('[data-real-likes][data-video-url="' + videoUrl + '"]');
+                if (initialRealLikesCell) {
+                    const cellText = initialRealLikesCell.textContent.replace(/,/g, '');
+                    initialRealLikes = parseFloat(cellText) || initialRealLikes;
+                }
+                
                 const now = new Date();
                 const targetTime = new Date(targetTimeStr);
                 const remainingMs = targetTime - now;
-                const likesNeeded = Math.max(0, targetLikes - realLikes);
+                const likesNeeded = Math.max(0, targetLikes - initialRealLikes);
                 if (likesNeeded <= 0) {
                     cell.textContent = 'DONE';
                     cell.style.color = '#10b981';

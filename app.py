@@ -200,33 +200,25 @@ if __name__ == '__main__':
         import json
         from pathlib import Path
         
-        # Try to load from database first, then fallback to JSON
+        # CRITICAL: Load ONLY from database - JSON files are ephemeral on Render
         campaigns = {}
         progress = {}
         
         try:
             import database
-            if database.get_database_url():
-                print("   Loading from database...")
+            database_url = database.get_database_url()
+            if database_url:
+                print("   Loading from Supabase database...")
                 campaigns = database.load_campaigns()
                 progress = database.load_progress()
                 print(f"   Database: {len(campaigns)} campaigns, {len(progress)} videos")
-        except:
-            pass
-        
-        # Fallback to JSON files if database is empty or unavailable
-        campaigns_file = Path(__file__).parent / 'data' / 'campaigns.json'
-        progress_file = Path(__file__).parent / 'data' / 'progress.json'
-        
-        if not campaigns and campaigns_file.exists():
-            print("   Loading campaigns from JSON file...")
-            with open(campaigns_file, 'r') as f:
-                campaigns = json.load(f)
-        
-        if not progress and progress_file.exists():
-            print("   Loading progress from JSON file...")
-            with open(progress_file, 'r') as f:
-                progress = json.load(f)
+            else:
+                print("   ❌ No DATABASE_URL configured - cannot load data!")
+                print("   Please set DATABASE_URL environment variable in Render dashboard")
+        except Exception as e:
+            print(f"   ❌ Error loading from database: {e}")
+            import traceback
+            traceback.print_exc()
         
         # CRITICAL: Only rebuild if we have data (from database or JSON)
         # NEVER overwrite database data with JSON files
@@ -275,35 +267,21 @@ if __name__ == '__main__':
                         rebuild_count += 1
                         print(f"  ✓ [DEFENSIVE] Restored video to {campaign_id}: {video_url[:50]}...")
             
-            # Save rebuilt campaigns to database (if available) or JSON file
+            # Save rebuilt campaigns to database ONLY
             try:
                 import database
-                if database.get_database_url():
-                    print("   Saving rebuilt campaigns to database...")
+                database_url = database.get_database_url()
+                if database_url:
+                    print("   Saving rebuilt campaigns to Supabase database...")
                     database.save_campaigns(campaigns)
                     print(f"✅ Rebuilt {rebuild_count} video(s) to campaigns and saved to database")
                 else:
-                    raise Exception("No database URL")
-            except:
-                # Fallback to JSON file
-                print("   Saving rebuilt campaigns to JSON file...")
-                import tempfile
-                import shutil
-                campaigns_file.parent.mkdir(parents=True, exist_ok=True)
-                temp_fd, temp_path = tempfile.mkstemp(dir=campaigns_file.parent, suffix='.tmp')
-                try:
-                    with os.fdopen(temp_fd, 'w') as f:
-                        json.dump(campaigns, f, indent=2)
-                    shutil.move(temp_path, campaigns_file)
-                    if rebuild_count > 0:
-                        print(f"✅ Rebuilt {rebuild_count} video(s) to campaigns and saved to JSON")
-                    else:
-                        total_videos = sum(len(c.get('videos', [])) for c in campaigns.values())
-                        print(f"✅ Verified campaigns ({len(campaigns)} campaigns, {total_videos} videos)")
-                except Exception as e:
-                    if Path(temp_path).exists():
-                        os.remove(temp_path)
-                    print(f"❌ Failed to save campaigns: {e}")
+                    raise Exception("No DATABASE_URL configured")
+            except Exception as e:
+                print(f"❌ CRITICAL: Failed to save campaigns to database: {e}")
+                print(f"   Data will be lost! Please check DATABASE_URL configuration")
+                import traceback
+                traceback.print_exc()
             
             # VERIFY: Log final state
             for campaign_id, campaign_data in campaigns.items():

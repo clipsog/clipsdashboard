@@ -9040,6 +9040,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         if (newAvgUnits > 0) avgUnits = newAvgUnits;
                     }
                     
+                    // Always recalculate based on current time
                     const now = new Date();
                     const targetTime = new Date(targetTimeStr);
                     const remainingMs = targetTime - now;
@@ -9061,9 +9062,12 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     
                     const ordersNeeded = Math.ceil(viewsNeeded / avgUnits);
                     if (ordersNeeded > 0) {
-                        const timePerOrder = remainingMs / ordersNeeded;
-                        const remainingSeconds = Math.floor(timePerOrder / 1000);
+                        // Calculate time per order in milliseconds (this decreases as time passes)
+                        const timePerOrderMs = remainingMs / ordersNeeded;
+                        // Convert to total seconds - this will decrease every second
+                        const remainingSeconds = Math.max(0, Math.floor(timePerOrderMs / 1000));
                         if (remainingSeconds > 0) {
+                            // Update display every second - seconds will count down naturally
                             cell.textContent = formatTimeWithSeconds(remainingSeconds);
                             cell.style.color = '#fff';
                             orderPlaced = false; // Reset flag when time is positive
@@ -9174,6 +9178,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         if (newAvgUnits > 0) avgUnits = newAvgUnits;
                     }
                     
+                    // Always recalculate based on current time
                     const now = new Date();
                     const targetTime = new Date(targetTimeStr);
                     const remainingMs = targetTime - now;
@@ -9195,9 +9200,12 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     
                     const ordersNeeded = Math.ceil(likesNeeded / avgUnits);
                     if (ordersNeeded > 0) {
-                        const timePerOrder = remainingMs / ordersNeeded;
-                        const remainingSeconds = Math.floor(timePerOrder / 1000);
+                        // Calculate time per order in milliseconds (this decreases as time passes)
+                        const timePerOrderMs = remainingMs / ordersNeeded;
+                        // Convert to total seconds - this will decrease every second
+                        const remainingSeconds = Math.max(0, Math.floor(timePerOrderMs / 1000));
                         if (remainingSeconds > 0) {
+                            // Update display every second - seconds will count down naturally
                             cell.textContent = formatTimeWithSeconds(remainingSeconds);
                             cell.style.color = '#fff';
                             orderPlaced = false; // Reset flag when time is positive

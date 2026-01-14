@@ -2628,6 +2628,109 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(response_data.encode())
     
+    def handle_wipe_database(self):
+        """Handle POST request to wipe all data from database"""
+        try:
+            if self.command != 'POST':
+                response_data = json.dumps({'success': False, 'error': 'POST required'})
+                self.send_response(405)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Content-Length', str(len(response_data)))
+                self.end_headers()
+                self.wfile.write(response_data.encode())
+                return
+            
+            # Parse confirmation from body
+            content_length = int(self.headers.get('Content-Length', 0))
+            if content_length > 0:
+                post_data = self.rfile.read(content_length)
+                params = json.loads(post_data.decode())
+                confirm = params.get('confirm', '').upper()
+            else:
+                confirm = ''
+            
+            if confirm != 'YES':
+                response_data = json.dumps({'success': False, 'error': 'Confirmation required. Send {"confirm": "YES"}'})
+                self.send_response(400)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Content-Length', str(len(response_data)))
+                self.end_headers()
+                self.wfile.write(response_data.encode())
+                return
+            
+            if not DATABASE_AVAILABLE:
+                response_data = json.dumps({'success': False, 'error': 'Database module not available'})
+                self.send_response(500)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Content-Length', str(len(response_data)))
+                self.end_headers()
+                self.wfile.write(response_data.encode())
+                return
+            
+            print("🗑️  Wiping all data from database...")
+            
+            try:
+                with database.get_db_connection() as conn:
+                    if not conn:
+                        raise Exception("Failed to connect to database")
+                    
+                    cursor = conn.cursor()
+                    
+                    # Delete all videos
+                    cursor.execute("DELETE FROM videos")
+                    videos_deleted = cursor.rowcount
+                    print(f"   ✅ Deleted {videos_deleted} videos")
+                    
+                    # Delete all campaigns
+                    cursor.execute("DELETE FROM campaigns")
+                    campaigns_deleted = cursor.rowcount
+                    print(f"   ✅ Deleted {campaigns_deleted} campaigns")
+                    
+                    conn.commit()
+                    
+                    response_data = json.dumps({
+                        'success': True,
+                        'message': 'All data wiped successfully',
+                        'videos_deleted': videos_deleted,
+                        'campaigns_deleted': campaigns_deleted
+                    })
+                    self.send_response(200)
+                    self.send_header('Content-type', 'application/json')
+                    self.send_header('Access-Control-Allow-Origin', '*')
+                    self.send_header('Content-Length', str(len(response_data)))
+                    self.end_headers()
+                    self.wfile.write(response_data.encode())
+                    print(f"✅ Database wiped: {videos_deleted} videos, {campaigns_deleted} campaigns")
+                    return
+                    
+            except Exception as e:
+                print(f"❌ Error wiping database: {e}")
+                import traceback
+                traceback.print_exc()
+                response_data = json.dumps({'success': False, 'error': str(e)})
+                self.send_response(500)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Content-Length', str(len(response_data)))
+                self.end_headers()
+                self.wfile.write(response_data.encode())
+                return
+                
+        except Exception as e:
+            print(f"EXCEPTION in handle_wipe_database: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            response_data = json.dumps({'success': False, 'error': str(e)})
+            self.send_response(500)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Content-Length', str(len(response_data)))
+            self.end_headers()
+            self.wfile.write(response_data.encode())
+    
     def load_progress(self):
         """Load progress from database ONLY - Supabase is the single source of truth"""
         if DATABASE_AVAILABLE:

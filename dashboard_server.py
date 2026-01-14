@@ -1423,27 +1423,58 @@ class DashboardHandler(BaseHTTPRequestHandler):
     def handle_get_campaigns(self):
         """Get all campaigns with financial data"""
         try:
+            # CRITICAL: Load campaigns FIRST to preserve existing video lists
             campaigns = self.load_campaigns()
             progress = self.load_progress()
             campaigns_changed = False
             
+            # PRESERVE existing videos in campaigns - never clear them
+            # Store original video lists before rebuilding
+            original_campaign_videos = {}
+            for campaign_id, campaign_data in campaigns.items():
+                original_campaign_videos[campaign_id] = list(campaign_data.get('videos', []))
+            
             # Rebuild campaign videos from progress.json (ensure persistence after restarts)
             # This ensures videos with campaign_id in progress.json are added to campaigns
-            # This is critical for persistence - if server restarts, videos are restored
-            # This runs EVERY TIME campaigns are loaded to ensure videos never disappear
+            # CRITICAL: We ADD videos, never remove existing ones
             rebuild_count = 0
             for video_url, video_data in progress.items():
                 campaign_id = video_data.get('campaign_id')
-                if campaign_id and campaign_id in campaigns:
+                if campaign_id:
+                    # Ensure campaign exists (create if missing)
+                    if campaign_id not in campaigns:
+                        print(f"[REBUILD] Creating missing campaign {campaign_id}")
+                        campaigns[campaign_id] = {'videos': []}
+                        campaigns_changed = True
+                    
                     # Initialize videos list if it doesn't exist
                     if 'videos' not in campaigns[campaign_id]:
                         campaigns[campaign_id]['videos'] = []
+                    
+                    # PRESERVE existing videos from original load
+                    if campaign_id in original_campaign_videos:
+                        for existing_video in original_campaign_videos[campaign_id]:
+                            if existing_video not in campaigns[campaign_id]['videos']:
+                                campaigns[campaign_id]['videos'].append(existing_video)
+                    
                     # Add video if not already in list (prevents duplicates)
                     if video_url not in campaigns[campaign_id]['videos']:
                         campaigns[campaign_id]['videos'].append(video_url)
                         campaigns_changed = True
                         rebuild_count += 1
                         print(f"[REBUILD] Added video {video_url[:50]}... to campaign {campaign_id}")
+            
+            # CRITICAL: Restore any videos that were in campaigns but not in progress
+            # This prevents videos from disappearing if progress.json is temporarily incomplete
+            for campaign_id, original_videos in original_campaign_videos.items():
+                if campaign_id in campaigns:
+                    if 'videos' not in campaigns[campaign_id]:
+                        campaigns[campaign_id]['videos'] = []
+                    for video_url in original_videos:
+                        if video_url not in campaigns[campaign_id]['videos']:
+                            campaigns[campaign_id]['videos'].append(video_url)
+                            campaigns_changed = True
+                            print(f"[PRESERVE] Restored video {video_url[:50]}... to campaign {campaign_id} (was in campaign but not in progress)")
             
             if rebuild_count > 0:
                 print(f"[REBUILD] Restored {rebuild_count} video(s) to campaigns")
@@ -1454,7 +1485,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     campaign_data['videos'] = []
                     campaigns_changed = True
             
-            # DEFENSIVE: Double-check that videos with campaign_id are in campaigns
+            # DEFENSIVE: Triple-check that videos with campaign_id are in campaigns
             # This is a safety net in case something went wrong
             for video_url, video_data in progress.items():
                 campaign_id = video_data.get('campaign_id')
@@ -1465,6 +1496,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     if video_url not in campaigns[campaign_id]['videos']:
                         campaigns[campaign_id]['videos'].append(video_url)
                         campaigns_changed = True
+                        rebuild_count += 1
                         print(f"[DEFENSIVE REBUILD] Restored missing video {video_url[:50]}... to campaign {campaign_id}")
             
             # Calculate financial data for each campaign

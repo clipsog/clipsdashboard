@@ -255,7 +255,7 @@ def load_campaigns() -> Dict:
         return {}
 
 def save_campaigns(campaigns: Dict):
-    """Save campaigns to database"""
+    """Save campaigns to database - MERGES with existing data to preserve videos"""
     database_url = get_database_url()
     if not database_url:
         # Fallback to JSON file
@@ -280,14 +280,33 @@ def save_campaigns(campaigns: Dict):
             if not conn:
                 return
             
-            cursor = conn.cursor()
+            cursor = conn.cursor(cursor_factory=RealDictCursor)
             
-            # Get all existing campaign IDs
-            cursor.execute("SELECT campaign_id FROM campaigns")
-            existing_ids = {row[0] for row in cursor.fetchall()}
+            # CRITICAL: Load existing campaigns FIRST to preserve video lists
+            cursor.execute("SELECT campaign_id, data FROM campaigns")
+            existing_campaigns = {}
+            for row in cursor.fetchall():
+                existing_campaigns[row['campaign_id']] = dict(row['data'])
             
-            # Update or insert each campaign
+            # MERGE: Preserve existing videos when updating campaigns
             for campaign_id, campaign_data in campaigns.items():
+                # Get existing campaign data if it exists
+                existing_data = existing_campaigns.get(campaign_id, {})
+                existing_videos = existing_data.get('videos', [])
+                new_videos = campaign_data.get('videos', [])
+                
+                # MERGE video lists - combine existing and new, remove duplicates
+                merged_videos = list(set(existing_videos + new_videos))
+                
+                # Update campaign_data with merged videos
+                merged_campaign_data = campaign_data.copy()
+                merged_campaign_data['videos'] = merged_videos
+                
+                # Also preserve other important fields from existing data
+                for key in ['created_at', 'name']:
+                    if key in existing_data and key not in merged_campaign_data:
+                        merged_campaign_data[key] = existing_data[key]
+                
                 cursor.execute("""
                     INSERT INTO campaigns (campaign_id, data, updated_at)
                     VALUES (%s, %s, CURRENT_TIMESTAMP)
@@ -295,18 +314,13 @@ def save_campaigns(campaigns: Dict):
                     DO UPDATE SET 
                         data = EXCLUDED.data,
                         updated_at = CURRENT_TIMESTAMP
-                """, (campaign_id, json.dumps(campaign_data)))
+                """, (campaign_id, json.dumps(merged_campaign_data)))
             
-            # Remove campaigns that no longer exist
-            current_ids = set(campaigns.keys())
-            ids_to_remove = existing_ids - current_ids
-            if ids_to_remove:
-                cursor.execute(
-                    "DELETE FROM campaigns WHERE campaign_id = ANY(%s)",
-                    (list(ids_to_remove),)
-                )
+            # DO NOT DELETE campaigns - they may be referenced by videos
+            # Only update/insert, never remove
             
             conn.commit()
+            print(f"[DB SAVE] Saved {len(campaigns)} campaigns with merged video lists")
     except Exception as e:
         print(f"❌ Error saving campaigns: {e}")
         import traceback

@@ -2281,17 +2281,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     
                     # Determine order type - check if this is an automatic order
                     order_type = 'manual'  # Default to manual
-                    # Check if this order was triggered automatically (we'll pass a flag via request)
-                    import json as json_module
-                    try:
-                        content_length = int(self.headers.get('Content-Length', 0))
-                        if content_length > 0:
-                            post_data = self.rfile.read(content_length)
-                            request_data = json_module.loads(post_data.decode('utf-8'))
-                            if request_data.get('automatic', False):
-                                order_type = 'scheduled'
-                    except:
-                        pass  # Default to manual if we can't determine
+                    # Check if this order was triggered automatically
+                    automatic_flag = params.get('automatic', [None])[0]
+                    if automatic_flag and automatic_flag.lower() == 'true':
+                        order_type = 'scheduled'
                     
                     progress[video_url]['order_history'].append({
                         'service': metric,
@@ -8900,17 +8893,18 @@ class DashboardHandler(BaseHTTPRequestHandler):
         async function placeAutomaticOrder(videoUrl, metric, amount) {
             try {
                 console.log(`[Auto Order] Placing ${amount} ${metric} for ${videoUrl}`);
+                const params = new URLSearchParams();
+                params.append('video_url', videoUrl);
+                params.append('metric', metric);
+                params.append('amount', amount);
+                params.append('automatic', 'true');  // Flag to mark as automatic/scheduled order
+                
                 const response = await fetch('/api/manual-order', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'application/x-www-form-urlencoded',
                     },
-                    body: JSON.stringify({
-                        video_url: videoUrl,
-                        metric: metric,
-                        amount: amount,
-                        automatic: true  // Flag to mark as automatic/scheduled order
-                    })
+                    body: params.toString()
                 });
                 
                 const data = await response.json();

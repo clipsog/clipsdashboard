@@ -329,7 +329,15 @@ def save_campaigns(campaigns: Dict):
     database_url = get_database_url()
     if not database_url:
         print("❌ No DATABASE_URL - cannot save campaigns! Data will be lost!")
+        print("   Please set DATABASE_URL in Render Dashboard > Environment Variables")
         raise Exception("DATABASE_URL not configured - cannot persist data")
+    
+    # Check if URL contains placeholder
+    if '[YOUR-PASSWORD]' in database_url or 'password' in database_url.lower():
+        print("❌ DATABASE_URL contains placeholder - please set actual password!")
+        print("   Go to: Render Dashboard > Your Service > Environment")
+        print("   Set DATABASE_URL = postgresql://postgres.sthmpgvzdcmveihmqjpl:MJmCf99X$$$@aws-1-us-east-2.pooler.supabase.com:6543/postgres")
+        raise Exception("DATABASE_URL contains placeholder - cannot persist data")
     
     try:
         with get_db_connection() as conn:

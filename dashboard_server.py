@@ -1740,7 +1740,24 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 'created_at': datetime.now().isoformat()
             }
             
-            self.save_campaigns(campaigns)
+            try:
+                self.save_campaigns(campaigns)
+            except Exception as save_error:
+                error_msg = str(save_error)
+                # Check for circuit breaker or auth errors
+                if 'Circuit breaker' in error_msg or 'authentication' in error_msg.lower():
+                    error_msg = "Database connection failed: Circuit breaker open (too many auth errors). Please check DATABASE_URL password in Render Dashboard. Wait 5-10 minutes for circuit breaker to reset, then verify password is correct."
+                elif 'DATABASE_URL' in error_msg:
+                    error_msg = "DATABASE_URL not configured. Please set it in Render Dashboard > Environment Variables"
+                
+                response_data = json.dumps({'success': False, 'error': error_msg})
+                self.send_response(500)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Content-Length', str(len(response_data)))
+                self.end_headers()
+                self.wfile.write(response_data.encode())
+                return
             
             response_data = json.dumps({
                 'success': True,
@@ -1757,7 +1774,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
             print(f"EXCEPTION in handle_create_campaign: {str(e)}")
             import traceback
             traceback.print_exc()
-            response_data = json.dumps({'success': False, 'error': str(e)})
+            error_msg = str(e)
+            if 'Circuit breaker' in error_msg or 'authentication' in error_msg.lower():
+                error_msg = "Database connection failed: Circuit breaker open. Please check DATABASE_URL password in Render Dashboard."
+            response_data = json.dumps({'success': False, 'error': error_msg})
             self.send_response(500)
             self.send_header('Content-type', 'application/json')
             self.send_header('Access-Control-Allow-Origin', '*')

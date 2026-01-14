@@ -49,7 +49,7 @@ def run_continuous_bot():
             # Process each video - check ALL active campaigns for due orders
             # This ensures we catch up on missed orders after server restarts
             now = datetime.now()
-            videos_need_check = []
+            videos_need_check = set()  # Use set for O(1) lookup and automatic deduplication
             
             for video_url in list(progress.keys()):
                 try:
@@ -73,25 +73,25 @@ def run_continuous_bot():
                     # Always check videos with active campaigns (has start_time and target)
                     # The check_and_place_due_orders method will determine if orders are actually due
                     if has_start_time and has_target:
-                        videos_need_check.append(video_url)
+                        videos_need_check.add(video_url)
                     # Also check videos with expired timers (for immediate response)
-                    else:
-                        next_views_time = video_progress.get('next_views_purchase_time')
-                        next_likes_time = video_progress.get('next_likes_purchase_time')
-                        next_comments_time = video_progress.get('next_comments_purchase_time')
-                        next_comment_likes_time = video_progress.get('next_comment_likes_purchase_time')
-                        
-                        # Check if any timer has expired
-                        if any([next_views_time, next_likes_time, next_comments_time, next_comment_likes_time]):
-                            for timer_str in [next_views_time, next_likes_time, next_comments_time, next_comment_likes_time]:
-                                if timer_str:
-                                    try:
-                                        purchase_time = datetime.fromisoformat(timer_str.replace('Z', '+00:00'))
-                                        if purchase_time <= now:
-                                            videos_need_check.append(video_url)
-                                            break
-                                    except:
-                                        pass
+                    # This runs independently of the campaign check above
+                    next_views_time = video_progress.get('next_views_purchase_time')
+                    next_likes_time = video_progress.get('next_likes_purchase_time')
+                    next_comments_time = video_progress.get('next_comments_purchase_time')
+                    next_comment_likes_time = video_progress.get('next_comment_likes_purchase_time')
+                    
+                    # Check if any timer has expired
+                    if next_views_time or next_likes_time or next_comments_time or next_comment_likes_time:
+                        for timer_str in [next_views_time, next_likes_time, next_comments_time, next_comment_likes_time]:
+                            if timer_str:
+                                try:
+                                    purchase_time = datetime.fromisoformat(timer_str.replace('Z', '+00:00'))
+                                    if purchase_time <= now:
+                                        videos_need_check.add(video_url)  # Set automatically handles duplicates
+                                        break
+                                except (ValueError, TypeError):
+                                    pass
                         
                 except Exception as e:
                     print(f"❌ Error checking {video_url}: {e}")
@@ -147,6 +147,63 @@ def start_health_pinger():
 
 if __name__ == '__main__':
     print("🚀 Starting SMM Follows Dashboard and Bot...")
+    
+    # CRITICAL: Rebuild campaigns from progress.json on startup
+    # This ensures videos don't disappear after redeployment
+    print("🔄 Rebuilding campaigns from progress.json...")
+    try:
+        import json
+        from pathlib import Path
+        
+        campaigns_file = Path(__file__).parent / 'data' / 'campaigns.json'
+        progress_file = Path(__file__).parent / 'data' / 'progress.json'
+        
+        if campaigns_file.exists() and progress_file.exists():
+            with open(campaigns_file, 'r') as f:
+                campaigns = json.load(f)
+            
+            with open(progress_file, 'r') as f:
+                progress = json.load(f)
+            
+            rebuild_count = 0
+            campaigns_changed = False
+            
+            # Ensure all campaigns have a videos list
+            for campaign_id, campaign_data in campaigns.items():
+                if 'videos' not in campaign_data:
+                    campaign_data['videos'] = []
+                    campaigns_changed = True
+            
+            # Rebuild videos from progress.json
+            for video_url, video_data in progress.items():
+                campaign_id = video_data.get('campaign_id')
+                if campaign_id and campaign_id in campaigns:
+                    if video_url not in campaigns[campaign_id].get('videos', []):
+                        if 'videos' not in campaigns[campaign_id]:
+                            campaigns[campaign_id]['videos'] = []
+                        campaigns[campaign_id]['videos'].append(video_url)
+                        campaigns_changed = True
+                        rebuild_count += 1
+                        print(f"  ✓ Restored video to {campaign_id}: {video_url[:50]}...")
+            
+            if campaigns_changed:
+                # Use atomic write
+                import tempfile
+                import shutil
+                temp_fd, temp_path = tempfile.mkstemp(dir=campaigns_file.parent, suffix='.tmp')
+                try:
+                    with os.fdopen(temp_fd, 'w') as f:
+                        json.dump(campaigns, f, indent=2)
+                    shutil.move(temp_path, campaigns_file)
+                    print(f"✅ Rebuilt {rebuild_count} video(s) to campaigns")
+                except Exception as e:
+                    if Path(temp_path).exists():
+                        os.remove(temp_path)
+                    print(f"❌ Failed to save campaigns: {e}")
+            else:
+                print("✅ Campaigns already in sync with progress.json")
+    except Exception as e:
+        print(f"⚠️ Error rebuilding campaigns: {e}")
     
     # Start continuous bot in background thread
     bot_thread = threading.Thread(target=run_continuous_bot, daemon=True)

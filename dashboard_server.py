@@ -5113,7 +5113,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             html += `
                                 <div style="padding: 8px; margin-bottom: 5px; background: #2a2a2a; border-left: 3px solid #667eea;">
                                     <p style="margin: 3px 0; font-size: 12px;"><strong>${order.service}</strong> - ${formatNumber(order.quantity || 0)} units - $${(order.cost || 0).toFixed(4)}</p>
-                                    <p style="margin: 3px 0; font-size: 11px; color: #b0b0b0;">${date} ${order.manual ? '(Manual)' : '(Scheduled)'}</p>
+                                    <p style="margin: 3px 0; font-size: 11px; color: #b0b0b0;">${date} ${(order.type === 'manual' || (!order.type && order.manual)) ? '(Manual)' : '(Scheduled)'}</p>
                                 </div>
                             `;
                         });
@@ -6978,12 +6978,12 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 // Order counts - MUST be calculated BEFORE TIME NEXT calculation
                 const orderHistory = videoData.order_history || [];
                 const viewsOrders = orderHistory.filter(o => o.service === 'views');
-                const manualViewsOrders = viewsOrders.filter(o => o.manual).length;
-                const schedViewsOrders = viewsOrders.filter(o => !o.manual).length;
+                const manualViewsOrders = viewsOrders.filter(o => o.type === 'manual' || (!o.type && o.manual)).length;
+                const schedViewsOrders = viewsOrders.filter(o => o.type === 'scheduled' || (!o.type && !o.manual)).length;
                 
                 const likesOrders = orderHistory.filter(o => o.service === 'likes');
-                const manualLikesOrders = likesOrders.filter(o => o.manual).length;
-                const schedLikesOrders = likesOrders.filter(o => !o.manual).length;
+                const manualLikesOrders = likesOrders.filter(o => o.type === 'manual' || (!o.type && o.manual)).length;
+                const schedLikesOrders = likesOrders.filter(o => o.type === 'scheduled' || (!o.type && !o.manual)).length;
                 
                 // Time to next order - calculate based on remaining time divided by orders needed
                 let timeToNext = 'N/A';

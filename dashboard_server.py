@@ -6941,7 +6941,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     if (remainingMs > 0) {
                         const remainingHours = Math.floor(remainingMs / (1000 * 60 * 60));
                         const remainingMinutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
-                        timeLeft = remainingHours + 'h' + (remainingMinutes > 0 ? remainingMinutes + 'm' : '');
+                        const remainingSeconds = Math.floor((remainingMs % (1000 * 60)) / 1000);
+                        timeLeft = remainingHours + 'h' + (remainingMinutes > 0 ? remainingMinutes + 'm' : '') + remainingSeconds + 's';
                     } else {
                         timeLeft = 'OVERDUE';
                     }
@@ -7017,8 +7018,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 const timePerOrder = remainingMs / ordersNeeded;
                                 const hours = Math.floor(timePerOrder / (1000 * 60 * 60));
                                 const mins = Math.floor((timePerOrder % (1000 * 60 * 60)) / (1000 * 60));
-                                if (hours > 0 || mins > 0) {
-                                    timeToNext = hours + 'h' + (mins > 0 ? mins + 'm' : '');
+                                const secs = Math.floor((timePerOrder % (1000 * 60)) / 1000);
+                                if (hours > 0 || mins > 0 || secs > 0) {
+                                    timeToNext = hours + 'h' + (mins > 0 ? mins + 'm' : '') + secs + 's';
                                 } else {
                                     timeToNext = 'READY';
                                 }
@@ -7063,8 +7065,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 const timePerOrder = remainingMs / ordersNeeded;
                                 const hours = Math.floor(timePerOrder / (1000 * 60 * 60));
                                 const mins = Math.floor((timePerOrder % (1000 * 60 * 60)) / (1000 * 60));
-                                if (hours > 0 || mins > 0) {
-                                    likesTimeToNext = hours + 'h' + (mins > 0 ? mins + 'm' : '');
+                                const secs = Math.floor((timePerOrder % (1000 * 60)) / 1000);
+                                if (hours > 0 || mins > 0 || secs > 0) {
+                                    likesTimeToNext = hours + 'h' + (mins > 0 ? mins + 'm' : '') + secs + 's';
                                 } else {
                                     likesTimeToNext = 'READY';
                                 }
@@ -8021,6 +8024,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     if (campaignsContent) {
                         campaignsContent.classList.remove('active');
                     }
+                    // Hide campaigns overview summary on dashboard tab
+                    const campaignsSummary = document.getElementById('campaigns-summary');
+                    if (campaignsSummary) {
+                        campaignsSummary.style.display = 'none';
+                    }
                     // Ensure dashboard content is visible
                     const dashboardContent = document.getElementById('dashboard-content');
                     if (dashboardContent) {
@@ -8119,7 +8127,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                         if (remainingMs > 0) {
                                             const remainingHours = Math.floor(remainingMs / (1000 * 60 * 60));
                                             const remainingMinutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
-                                            timeLeft = remainingHours + 'h' + (remainingMinutes > 0 ? remainingMinutes + 'm' : '');
+                                            const remainingSeconds = Math.floor((remainingMs % (1000 * 60)) / 1000);
+                                            timeLeft = remainingHours + 'h' + (remainingMinutes > 0 ? remainingMinutes + 'm' : '') + remainingSeconds + 's';
                                         } else {
                                             timeLeft = 'OVERDUE';
                                         }
@@ -8207,8 +8216,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                                     const timePerOrder = remainingMs / ordersNeeded;
                                                     const hours = Math.floor(timePerOrder / (1000 * 60 * 60));
                                                     const mins = Math.floor((timePerOrder % (1000 * 60 * 60)) / (1000 * 60));
-                                                    if (hours > 0 || mins > 0) {
-                                                        timeToNext = hours + 'h' + (mins > 0 ? mins + 'm' : '');
+                                                    const secs = Math.floor((timePerOrder % (1000 * 60)) / 1000);
+                                                    if (hours > 0 || mins > 0 || secs > 0) {
+                                                        timeToNext = hours + 'h' + (mins > 0 ? mins + 'm' : '') + secs + 's';
                                                     } else {
                                                         timeToNext = 'READY';
                                                     }
@@ -8244,8 +8254,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                                     const timePerOrder = remainingMs / ordersNeeded;
                                                     const hours = Math.floor(timePerOrder / (1000 * 60 * 60));
                                                     const mins = Math.floor((timePerOrder % (1000 * 60 * 60)) / (1000 * 60));
-                                                    if (hours > 0 || mins > 0) {
-                                                        likesTimeToNext = hours + 'h' + (mins > 0 ? mins + 'm' : '');
+                                                    const secs = Math.floor((timePerOrder % (1000 * 60)) / 1000);
+                                                    if (hours > 0 || mins > 0 || secs > 0) {
+                                                        likesTimeToNext = hours + 'h' + (mins > 0 ? mins + 'm' : '') + secs + 's';
                                                     } else {
                                                         likesTimeToNext = 'READY';
                                                     }
@@ -8424,6 +8435,18 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         }
                     }, 150);
                 });
+                
+                // Show/hide campaigns overview based on route
+                const campaignsSummary = document.getElementById('campaigns-summary');
+                if (campaignsSummary) {
+                    if (route.type === 'campaign') {
+                        // Hide campaigns overview when viewing campaign detail
+                        campaignsSummary.style.display = 'none';
+                    } else {
+                        // Show campaigns overview on home page
+                        campaignsSummary.style.display = 'block';
+                    }
+                }
                 
                 // Apply filters if on homepage
                 if (route.type === 'home') {

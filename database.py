@@ -1,0 +1,339 @@
+"""
+PostgreSQL database module for persistent data storage
+Replaces JSON file storage with PostgreSQL for reliable persistence on Render
+"""
+
+import os
+import json
+import psycopg2
+from psycopg2.extras import RealDictCursor
+from psycopg2 import pool
+from contextlib import contextmanager
+from datetime import datetime
+from typing import Dict, Optional, List
+
+# Connection pool (thread-safe)
+_connection_pool = None
+
+def get_database_url():
+    """Get database URL from environment or return None if not configured"""
+    return os.environ.get('DATABASE_URL')
+
+def init_database_pool():
+    """Initialize database connection pool"""
+    global _connection_pool
+    database_url = get_database_url()
+    if not database_url:
+        return None
+    
+    try:
+        _connection_pool = psycopg2.pool.SimpleConnectionPool(
+            1, 20, database_url
+        )
+        print("✅ Database connection pool initialized")
+        return _connection_pool
+    except Exception as e:
+        print(f"❌ Failed to initialize database pool: {e}")
+        return None
+
+@contextmanager
+def get_db_connection():
+    """Get database connection from pool"""
+    database_url = get_database_url()
+    if not database_url:
+        # Fallback to JSON files if no database URL
+        yield None
+        return
+    
+    if not _connection_pool:
+        init_database_pool()
+    
+    conn = None
+    try:
+        if _connection_pool:
+            conn = _connection_pool.getconn()
+        else:
+            conn = psycopg2.connect(database_url)
+        yield conn
+        conn.commit()
+    except Exception as e:
+        if conn:
+            conn.rollback()
+        print(f"❌ Database error: {e}")
+        raise
+    finally:
+        if conn and _connection_pool:
+            _connection_pool.putconn(conn)
+        elif conn:
+            conn.close()
+
+def init_schema():
+    """Initialize database schema"""
+    database_url = get_database_url()
+    if not database_url:
+        print("⚠️ No DATABASE_URL, skipping schema initialization")
+        return False
+    
+    try:
+        with get_db_connection() as conn:
+            if not conn:
+                return False
+            
+            cursor = conn.cursor()
+            
+            # Videos table - stores all video progress data
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS videos (
+                    video_url TEXT PRIMARY KEY,
+                    data JSONB NOT NULL DEFAULT '{}'::jsonb,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            
+            # Campaigns table - stores campaign data
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS campaigns (
+                    campaign_id TEXT PRIMARY KEY,
+                    data JSONB NOT NULL DEFAULT '{}'::jsonb,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            
+            # Create indexes for better performance
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS idx_videos_campaign_id 
+                ON videos ((data->>'campaign_id'))
+            """)
+            
+            cursor.execute("""
+                CREATE INDEX IF NOT EXISTS idx_videos_start_time 
+                ON videos ((data->>'start_time'))
+            """)
+            
+            conn.commit()
+            print("✅ Database schema initialized")
+            return True
+    except Exception as e:
+        print(f"❌ Failed to initialize schema: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
+
+def load_progress() -> Dict:
+    """Load all video progress from database"""
+    database_url = get_database_url()
+    if not database_url:
+        # Fallback to JSON file
+        from dashboard_server import PROGRESS_FILE
+        if PROGRESS_FILE.exists():
+            with open(PROGRESS_FILE, 'r') as f:
+                return json.load(f)
+        return {}
+    
+    try:
+        with get_db_connection() as conn:
+            if not conn:
+                return {}
+            
+            cursor = conn.cursor(cursor_factory=RealDictCursor)
+            cursor.execute("SELECT video_url, data FROM videos")
+            rows = cursor.fetchall()
+            
+            progress = {}
+            for row in rows:
+                progress[row['video_url']] = dict(row['data'])
+            
+            return progress
+    except Exception as e:
+        print(f"❌ Error loading progress: {e}")
+        import traceback
+        traceback.print_exc()
+        # Fallback to JSON file
+        from dashboard_server import PROGRESS_FILE
+        if PROGRESS_FILE.exists():
+            with open(PROGRESS_FILE, 'r') as f:
+                return json.load(f)
+        return {}
+
+def save_progress(progress: Dict):
+    """Save video progress to database"""
+    database_url = get_database_url()
+    if not database_url:
+        # Fallback to JSON file
+        from dashboard_server import PROGRESS_FILE
+        import tempfile
+        import shutil
+        
+        PROGRESS_FILE.parent.mkdir(parents=True, exist_ok=True)
+        temp_fd, temp_path = tempfile.mkstemp(dir=PROGRESS_FILE.parent, suffix='.tmp')
+        try:
+            with os.fdopen(temp_fd, 'w') as f:
+                json.dump(progress, f, indent=2)
+            shutil.move(temp_path, PROGRESS_FILE)
+        except Exception as e:
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+            raise
+        return
+    
+    try:
+        with get_db_connection() as conn:
+            if not conn:
+                return
+            
+            cursor = conn.cursor()
+            
+            # Get all existing video URLs
+            cursor.execute("SELECT video_url FROM videos")
+            existing_urls = {row[0] for row in cursor.fetchall()}
+            
+            # Update or insert each video
+            for video_url, video_data in progress.items():
+                cursor.execute("""
+                    INSERT INTO videos (video_url, data, updated_at)
+                    VALUES (%s, %s, CURRENT_TIMESTAMP)
+                    ON CONFLICT (video_url)
+                    DO UPDATE SET 
+                        data = EXCLUDED.data,
+                        updated_at = CURRENT_TIMESTAMP
+                """, (video_url, json.dumps(video_data)))
+            
+            # Remove videos that are no longer in progress
+            current_urls = set(progress.keys())
+            urls_to_remove = existing_urls - current_urls
+            if urls_to_remove:
+                cursor.execute(
+                    "DELETE FROM videos WHERE video_url = ANY(%s)",
+                    (list(urls_to_remove),)
+                )
+            
+            conn.commit()
+    except Exception as e:
+        print(f"❌ Error saving progress: {e}")
+        import traceback
+        traceback.print_exc()
+        raise
+
+def load_campaigns() -> Dict:
+    """Load all campaigns from database"""
+    database_url = get_database_url()
+    if not database_url:
+        # Fallback to JSON file
+        from dashboard_server import CAMPAIGNS_FILE
+        if CAMPAIGNS_FILE.exists():
+            with open(CAMPAIGNS_FILE, 'r') as f:
+                return json.load(f)
+        return {}
+    
+    try:
+        with get_db_connection() as conn:
+            if not conn:
+                return {}
+            
+            cursor = conn.cursor(cursor_factory=RealDictCursor)
+            cursor.execute("SELECT campaign_id, data FROM campaigns")
+            rows = cursor.fetchall()
+            
+            campaigns = {}
+            for row in rows:
+                campaigns[row['campaign_id']] = dict(row['data'])
+            
+            return campaigns
+    except Exception as e:
+        print(f"❌ Error loading campaigns: {e}")
+        import traceback
+        traceback.print_exc()
+        # Fallback to JSON file
+        from dashboard_server import CAMPAIGNS_FILE
+        if CAMPAIGNS_FILE.exists():
+            with open(CAMPAIGNS_FILE, 'r') as f:
+                return json.load(f)
+        return {}
+
+def save_campaigns(campaigns: Dict):
+    """Save campaigns to database"""
+    database_url = get_database_url()
+    if not database_url:
+        # Fallback to JSON file
+        from dashboard_server import CAMPAIGNS_FILE
+        import tempfile
+        import shutil
+        
+        CAMPAIGNS_FILE.parent.mkdir(parents=True, exist_ok=True)
+        temp_fd, temp_path = tempfile.mkstemp(dir=CAMPAIGNS_FILE.parent, suffix='.tmp')
+        try:
+            with os.fdopen(temp_fd, 'w') as f:
+                json.dump(campaigns, f, indent=2)
+            shutil.move(temp_path, CAMPAIGNS_FILE)
+        except Exception as e:
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+            raise
+        return
+    
+    try:
+        with get_db_connection() as conn:
+            if not conn:
+                return
+            
+            cursor = conn.cursor()
+            
+            # Get all existing campaign IDs
+            cursor.execute("SELECT campaign_id FROM campaigns")
+            existing_ids = {row[0] for row in cursor.fetchall()}
+            
+            # Update or insert each campaign
+            for campaign_id, campaign_data in campaigns.items():
+                cursor.execute("""
+                    INSERT INTO campaigns (campaign_id, data, updated_at)
+                    VALUES (%s, %s, CURRENT_TIMESTAMP)
+                    ON CONFLICT (campaign_id)
+                    DO UPDATE SET 
+                        data = EXCLUDED.data,
+                        updated_at = CURRENT_TIMESTAMP
+                """, (campaign_id, json.dumps(campaign_data)))
+            
+            # Remove campaigns that no longer exist
+            current_ids = set(campaigns.keys())
+            ids_to_remove = existing_ids - current_ids
+            if ids_to_remove:
+                cursor.execute(
+                    "DELETE FROM campaigns WHERE campaign_id = ANY(%s)",
+                    (list(ids_to_remove),)
+                )
+            
+            conn.commit()
+    except Exception as e:
+        print(f"❌ Error saving campaigns: {e}")
+        import traceback
+        traceback.print_exc()
+        raise
+
+def migrate_from_json():
+    """Migrate existing JSON data to PostgreSQL"""
+    database_url = get_database_url()
+    if not database_url:
+        return
+    
+    try:
+        from dashboard_server import PROGRESS_FILE, CAMPAIGNS_FILE
+        
+        # Migrate progress
+        if PROGRESS_FILE.exists():
+            with open(PROGRESS_FILE, 'r') as f:
+                progress = json.load(f)
+            if progress:
+                save_progress(progress)
+                print(f"✅ Migrated {len(progress)} videos from JSON to PostgreSQL")
+        
+        # Migrate campaigns
+        if CAMPAIGNS_FILE.exists():
+            with open(CAMPAIGNS_FILE, 'r') as f:
+                campaigns = json.load(f)
+            if campaigns:
+                save_campaigns(campaigns)
+                print(f"✅ Migrated {len(campaigns)} campaigns from JSON to PostgreSQL")
+    except Exception as e:
+        print(f"⚠️ Error migrating from JSON: {e}")

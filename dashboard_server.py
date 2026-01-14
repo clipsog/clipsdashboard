@@ -19,6 +19,14 @@ import requests
 from bs4 import BeautifulSoup
 from colorama import Fore, Style, init
 
+# Import database module for PostgreSQL support
+try:
+    import database
+    DATABASE_AVAILABLE = True
+except ImportError:
+    DATABASE_AVAILABLE = False
+    print("⚠️ Database module not available, using JSON files")
+
 init(autoreset=True)
 
 # Use environment variable for PORT (Render provides this), fallback to 8080
@@ -2570,7 +2578,14 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.wfile.write(response_data.encode())
     
     def load_progress(self):
-        """Load progress from file"""
+        """Load progress from database or file"""
+        if DATABASE_AVAILABLE:
+            try:
+                return database.load_progress()
+            except Exception as e:
+                print(f"⚠️ Database load failed, falling back to JSON: {e}")
+        
+        # Fallback to JSON file
         if not PROGRESS_FILE.exists():
             return {}
         try:
@@ -2580,28 +2595,40 @@ class DashboardHandler(BaseHTTPRequestHandler):
             return {}
     
     def save_progress(self, progress):
-        """Save progress to file with atomic write to prevent corruption"""
+        """Save progress to database or file"""
+        if DATABASE_AVAILABLE:
+            try:
+                database.save_progress(progress)
+                return
+            except Exception as e:
+                print(f"⚠️ Database save failed, falling back to JSON: {e}")
+        
+        # Fallback to JSON file with atomic write
         import tempfile
         import shutil
         
         PROGRESS_FILE.parent.mkdir(parents=True, exist_ok=True)
         
-        # Write to temporary file first (atomic operation)
         temp_fd, temp_path = tempfile.mkstemp(dir=PROGRESS_FILE.parent, suffix='.tmp')
         try:
             with os.fdopen(temp_fd, 'w') as f:
                 json.dump(progress, f, indent=2)
-            # Atomic move (rename) to actual file
             shutil.move(temp_path, PROGRESS_FILE)
         except Exception as e:
-            # Clean up temp file if something went wrong
             if os.path.exists(temp_path):
                 os.remove(temp_path)
             print(f"[ERROR] Failed to save progress: {e}")
             raise
     
     def load_campaigns(self):
-        """Load campaigns from file"""
+        """Load campaigns from database or file"""
+        if DATABASE_AVAILABLE:
+            try:
+                return database.load_campaigns()
+            except Exception as e:
+                print(f"⚠️ Database load failed, falling back to JSON: {e}")
+        
+        # Fallback to JSON file
         if not CAMPAIGNS_FILE.exists():
             return {}
         try:
@@ -2611,22 +2638,28 @@ class DashboardHandler(BaseHTTPRequestHandler):
             return {}
     
     def save_campaigns(self, campaigns):
-        """Save campaigns to file with atomic write to prevent corruption"""
+        """Save campaigns to database or file"""
+        if DATABASE_AVAILABLE:
+            try:
+                database.save_campaigns(campaigns)
+                print(f"[SAVE] Campaigns saved to database ({len(campaigns)} campaigns)")
+                return
+            except Exception as e:
+                print(f"⚠️ Database save failed, falling back to JSON: {e}")
+        
+        # Fallback to JSON file with atomic write
         import tempfile
         import shutil
         
         CAMPAIGNS_FILE.parent.mkdir(parents=True, exist_ok=True)
         
-        # Write to temporary file first (atomic operation)
         temp_fd, temp_path = tempfile.mkstemp(dir=CAMPAIGNS_FILE.parent, suffix='.tmp')
         try:
             with os.fdopen(temp_fd, 'w') as f:
                 json.dump(campaigns, f, indent=2)
-            # Atomic move (rename) to actual file
             shutil.move(temp_path, CAMPAIGNS_FILE)
-            print(f"[SAVE] Campaigns saved successfully ({len(campaigns)} campaigns)")
+            print(f"[SAVE] Campaigns saved to file ({len(campaigns)} campaigns)")
         except Exception as e:
-            # Clean up temp file if something went wrong
             if os.path.exists(temp_path):
                 os.remove(temp_path)
             print(f"[ERROR] Failed to save campaigns: {e}")
@@ -6758,8 +6791,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 let timeToNext = 'N/A';
                 let likesTimeToNext = 'N/A';
                 
-                // Calculate for views
-                const target_completion = videoData.target_completion_time || videoData.target_completion_datetime;
+                // Calculate for views (reuse target_completion from above)
                 if (target_completion && startTime) {
                     const now = new Date();
                     const endTime = new Date(target_completion);

@@ -8908,9 +8908,36 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 });
                 
                 const data = await response.json();
-                if (data.success) {
+                if (data.success && data.order_id) {
                     console.log(`[Auto Order] Success! Order ID: ${data.order_id}, Amount: ${data.amount}`);
-                    return true;
+                    
+                    // Verify order was actually saved by checking order history
+                    try {
+                        const progressResponse = await fetch('/api/progress');
+                        const progressData = await progressResponse.json();
+                        
+                        if (progressData && progressData[videoUrl] && progressData[videoUrl].order_history) {
+                            const recentOrder = progressData[videoUrl].order_history
+                                .filter(o => o.service === metric)
+                                .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0];
+                            
+                            if (recentOrder && recentOrder.order_id === String(data.order_id)) {
+                                console.log(`[Auto Order] Verified! Order ${data.order_id} found in order history`);
+                                return true;
+                            } else {
+                                console.warn(`[Auto Order] Warning: Order ${data.order_id} not found in order history yet`);
+                                // Still return true as API said success, might be timing issue
+                                return true;
+                            }
+                        } else {
+                            console.warn(`[Auto Order] Warning: Could not verify order in progress data`);
+                            return true; // API said success, assume it worked
+                        }
+                    } catch (verifyError) {
+                        console.error('[Auto Order] Verification error:', verifyError);
+                        // API said success, assume it worked
+                        return true;
+                    }
                 } else {
                     console.error(`[Auto Order] Failed: ${data.error || 'Unknown error'}`);
                     return false;
@@ -8985,19 +9012,32 @@ class DashboardHandler(BaseHTTPRequestHandler):
             document.querySelectorAll('[data-time-next][data-target-time]').forEach(cell => {
                 const targetTimeStr = cell.getAttribute('data-target-time');
                 const targetViews = parseFloat(cell.getAttribute('data-target-views')) || 0;
-                const avgUnits = parseFloat(cell.getAttribute('data-avg-units')) || 50;
+                let avgUnits = parseFloat(cell.getAttribute('data-avg-units')) || 50;
                 const videoUrl = cell.getAttribute('data-video-url');
                 let orderPlaced = false; // Track if order was already placed for this countdown
+                let orderPlacedTime = 0; // Track when order was placed
                 
                 if (!targetTimeStr || targetViews <= 0) return;
                 
                 const interval = setInterval(function() {
+                    // Skip updates if we're waiting for order confirmation (within 3 seconds of placing)
+                    if (orderPlaced && (Date.now() - orderPlacedTime) < 3000) {
+                        return; // Keep showing PLACING... or ORDERED status
+                    }
+                    
                     // Get current real views from the DOM (updated by periodic refresh)
                     let realViews = parseFloat(cell.getAttribute('data-real-views')) || 0;
                     const realViewsCell = document.querySelector('[data-real-views][data-video-url="' + videoUrl + '"]');
                     if (realViewsCell) {
                         const cellText = realViewsCell.textContent.replace(/,/g, '');
                         realViews = parseFloat(cellText) || realViews;
+                    }
+                    
+                    // Get updated avgUnits from DOM if available (recalculated after refresh)
+                    const avgUnitsCell = cell.closest('tr')?.querySelector('[data-avg-units]');
+                    if (avgUnitsCell) {
+                        const newAvgUnits = parseFloat(avgUnitsCell.textContent.replace(/,/g, '')) || avgUnits;
+                        if (newAvgUnits > 0) avgUnits = newAvgUnits;
                     }
                     
                     const now = new Date();
@@ -9027,31 +9067,45 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             cell.textContent = formatTimeWithSeconds(remainingSeconds);
                             cell.style.color = '#fff';
                             orderPlaced = false; // Reset flag when time is positive
+                            orderPlacedTime = 0;
                         } else {
                             // Time reached 0 - place order automatically
                             if (!orderPlaced) {
                                 orderPlaced = true;
+                                orderPlacedTime = Date.now();
                                 cell.textContent = 'PLACING...';
                                 cell.style.color = '#f59e0b';
                                 
                                 // Place order automatically
                                 placeAutomaticOrder(videoUrl, 'views', avgUnits).then(success => {
                                     if (success) {
-                                        cell.textContent = 'ORDERED';
+                                        cell.textContent = 'ORDERED ✓';
                                         cell.style.color = '#10b981';
-                                        // Refresh dashboard after a short delay to show new order
+                                        // Refresh dashboard after a short delay to show new order and recalculate TIME NEXT
                                         setTimeout(() => {
-                                            loadDashboard(false);
+                                            loadDashboard(false).then(() => {
+                                                // Restart countdowns after refresh to recalculate TIME NEXT
+                                                setTimeout(() => {
+                                                    startTableCountdowns();
+                                                }, 500);
+                                            });
                                         }, 2000);
                                     } else {
                                         cell.textContent = 'ERROR';
                                         cell.style.color = '#ef4444';
-                                        orderPlaced = false; // Allow retry
+                                        orderPlaced = false; // Allow retry after 5 seconds
+                                        orderPlacedTime = 0;
+                                        setTimeout(() => {
+                                            orderPlaced = false;
+                                        }, 5000);
                                     }
                                 });
                             } else {
-                                cell.textContent = 'READY';
-                                cell.style.color = '#10b981';
+                                // Order already placed, wait for refresh
+                                if ((Date.now() - orderPlacedTime) > 3000) {
+                                    cell.textContent = 'READY';
+                                    cell.style.color = '#10b981';
+                                }
                             }
                         }
                     } else {
@@ -9092,19 +9146,32 @@ class DashboardHandler(BaseHTTPRequestHandler):
             document.querySelectorAll('[data-likes-next][data-target-time]').forEach(cell => {
                 const targetTimeStr = cell.getAttribute('data-target-time');
                 const targetLikes = parseFloat(cell.getAttribute('data-target-likes')) || 0;
-                const avgUnits = parseFloat(cell.getAttribute('data-avg-units')) || 10;
+                let avgUnits = parseFloat(cell.getAttribute('data-avg-units')) || 10;
                 const videoUrl = cell.getAttribute('data-video-url');
                 let orderPlaced = false; // Track if order was already placed for this countdown
+                let orderPlacedTime = 0; // Track when order was placed
                 
                 if (!targetTimeStr || targetLikes <= 0) return;
                 
                 const interval = setInterval(function() {
+                    // Skip updates if we're waiting for order confirmation (within 3 seconds of placing)
+                    if (orderPlaced && (Date.now() - orderPlacedTime) < 3000) {
+                        return; // Keep showing PLACING... or ORDERED status
+                    }
+                    
                     // Get current real likes from the DOM (updated by periodic refresh)
                     let realLikes = parseFloat(cell.getAttribute('data-real-likes')) || 0;
                     const realLikesCell = document.querySelector('[data-real-likes][data-video-url="' + videoUrl + '"]');
                     if (realLikesCell) {
                         const cellText = realLikesCell.textContent.replace(/,/g, '');
                         realLikes = parseFloat(cellText) || realLikes;
+                    }
+                    
+                    // Get updated avgUnits from DOM if available (recalculated after refresh)
+                    const avgUnitsCell = cell.closest('tr')?.querySelector('[data-avg-likes-units]');
+                    if (avgUnitsCell) {
+                        const newAvgUnits = parseFloat(avgUnitsCell.textContent.replace(/,/g, '')) || avgUnits;
+                        if (newAvgUnits > 0) avgUnits = newAvgUnits;
                     }
                     
                     const now = new Date();
@@ -9134,31 +9201,45 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             cell.textContent = formatTimeWithSeconds(remainingSeconds);
                             cell.style.color = '#fff';
                             orderPlaced = false; // Reset flag when time is positive
+                            orderPlacedTime = 0;
                         } else {
                             // Time reached 0 - place order automatically
                             if (!orderPlaced) {
                                 orderPlaced = true;
+                                orderPlacedTime = Date.now();
                                 cell.textContent = 'PLACING...';
                                 cell.style.color = '#f59e0b';
                                 
                                 // Place order automatically
                                 placeAutomaticOrder(videoUrl, 'likes', avgUnits).then(success => {
                                     if (success) {
-                                        cell.textContent = 'ORDERED';
+                                        cell.textContent = 'ORDERED ✓';
                                         cell.style.color = '#10b981';
-                                        // Refresh dashboard after a short delay to show new order
+                                        // Refresh dashboard after a short delay to show new order and recalculate TIME NEXT
                                         setTimeout(() => {
-                                            loadDashboard(false);
+                                            loadDashboard(false).then(() => {
+                                                // Restart countdowns after refresh to recalculate TIME NEXT
+                                                setTimeout(() => {
+                                                    startTableCountdowns();
+                                                }, 500);
+                                            });
                                         }, 2000);
                                     } else {
                                         cell.textContent = 'ERROR';
                                         cell.style.color = '#ef4444';
-                                        orderPlaced = false; // Allow retry
+                                        orderPlaced = false; // Allow retry after 5 seconds
+                                        orderPlacedTime = 0;
+                                        setTimeout(() => {
+                                            orderPlaced = false;
+                                        }, 5000);
                                     }
                                 });
                             } else {
-                                cell.textContent = 'READY';
-                                cell.style.color = '#10b981';
+                                // Order already placed, wait for refresh
+                                if ((Date.now() - orderPlacedTime) > 3000) {
+                                    cell.textContent = 'READY';
+                                    cell.style.color = '#10b981';
+                                }
                             }
                         }
                     } else {

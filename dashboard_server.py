@@ -8471,6 +8471,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 setTimeout(startNextPurchaseCountdowns, 350);
                 // Start countdown timers for "Time to Goal" displays
                 setTimeout(startTimeToGoalCountdowns, 400);
+                // Start countdown timers for table cells (TIME LEFT, TIME NEXT, LIKES NEXT)
+                setTimeout(startTableCountdowns, 700);
+                // Start periodic table data refresh
+                setTimeout(startTableDataRefresh, 1000);
             } catch (error) {
                 console.error('Error loading dashboard:', error);
                 // Only show error on manual refresh, not auto-refresh

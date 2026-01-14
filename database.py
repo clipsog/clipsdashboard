@@ -18,10 +18,19 @@ _connection_pool = None
 def get_database_url():
     """Get database URL from environment or return None if not configured"""
     database_url = os.environ.get('DATABASE_URL')
-    # Handle Supabase connection string format
-    if database_url and '$$$$' in database_url:
-        # Replace escaped $$ with single $ for password
-        database_url = database_url.replace('$$$$', '$')
+    if not database_url:
+        return None
+    
+    # Handle Render YAML escaping: $$ becomes $ in environment variable
+    # But we need to handle cases where password contains $ signs
+    # Render automatically handles $$ -> $ conversion, so we should be fine
+    # However, if password has multiple $ signs, they might be escaped differently
+    
+    # Debug: Log first 50 chars to see what we're getting (without password)
+    if database_url:
+        safe_url = database_url.split('@')[0].split(':')[-1] if '@' in database_url else database_url[:50]
+        print(f"[DB] DATABASE_URL found (host: {database_url.split('@')[-1] if '@' in database_url else 'unknown'})")
+    
     return database_url
 
 def init_database_pool():

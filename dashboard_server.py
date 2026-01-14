@@ -2803,11 +2803,6 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 raise  # Re-raise to prevent silent data loss
         
         raise Exception("Database module not available - cannot save data!")
-        except Exception as e:
-            if os.path.exists(temp_path):
-                os.remove(temp_path)
-            print(f"[ERROR] Failed to save campaigns: {e}")
-            raise
     
     def get_dashboard_html(self):
         """Generate HTML dashboard"""

@@ -8946,12 +8946,20 @@ class DashboardHandler(BaseHTTPRequestHandler):
             document.querySelectorAll('[data-time-next][data-target-time]').forEach(cell => {
                 const targetTimeStr = cell.getAttribute('data-target-time');
                 const targetViews = parseFloat(cell.getAttribute('data-target-views')) || 0;
-                const realViews = parseFloat(cell.getAttribute('data-real-views')) || 0;
                 const avgUnits = parseFloat(cell.getAttribute('data-avg-units')) || 50;
+                const videoUrl = cell.getAttribute('data-video-url');
                 
                 if (!targetTimeStr || targetViews <= 0) return;
                 
                 const interval = setInterval(function() {
+                    // Get current real views from the DOM (updated by periodic refresh)
+                    let realViews = parseFloat(cell.getAttribute('data-real-views')) || 0;
+                    const realViewsCell = document.querySelector('[data-real-views][data-video-url="' + videoUrl + '"]');
+                    if (realViewsCell) {
+                        const cellText = realViewsCell.textContent.replace(/,/g, '');
+                        realViews = parseFloat(cellText) || realViews;
+                    }
+                    
                     const now = new Date();
                     const targetTime = new Date(targetTimeStr);
                     const remainingMs = targetTime - now;
@@ -9020,12 +9028,20 @@ class DashboardHandler(BaseHTTPRequestHandler):
             document.querySelectorAll('[data-likes-next][data-target-time]').forEach(cell => {
                 const targetTimeStr = cell.getAttribute('data-target-time');
                 const targetLikes = parseFloat(cell.getAttribute('data-target-likes')) || 0;
-                const realLikes = parseFloat(cell.getAttribute('data-real-likes')) || 0;
                 const avgUnits = parseFloat(cell.getAttribute('data-avg-units')) || 10;
+                const videoUrl = cell.getAttribute('data-video-url');
                 
                 if (!targetTimeStr || targetLikes <= 0) return;
                 
                 const interval = setInterval(function() {
+                    // Get current real likes from the DOM (updated by periodic refresh)
+                    let realLikes = parseFloat(cell.getAttribute('data-real-likes')) || 0;
+                    const realLikesCell = document.querySelector('[data-real-likes][data-video-url="' + videoUrl + '"]');
+                    if (realLikesCell) {
+                        const cellText = realLikesCell.textContent.replace(/,/g, '');
+                        realLikes = parseFloat(cellText) || realLikes;
+                    }
+                    
                     const now = new Date();
                     const targetTime = new Date(targetTimeStr);
                     const remainingMs = targetTime - now;

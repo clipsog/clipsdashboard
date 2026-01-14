@@ -17,7 +17,12 @@ _connection_pool = None
 
 def get_database_url():
     """Get database URL from environment or return None if not configured"""
-    return os.environ.get('DATABASE_URL')
+    database_url = os.environ.get('DATABASE_URL')
+    # Handle Supabase connection string format
+    if database_url and '$$$$' in database_url:
+        # Replace escaped $$ with single $ for password
+        database_url = database_url.replace('$$$$', '$')
+    return database_url
 
 def init_database_pool():
     """Initialize database connection pool"""

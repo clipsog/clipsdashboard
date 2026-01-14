@@ -8889,8 +8889,25 @@ class DashboardHandler(BaseHTTPRequestHandler):
             });
         }
         
+        // Global lock to prevent duplicate simultaneous orders
+        if (!window.placingOrders) {
+            window.placingOrders = new Set();
+        }
+        
         // Function to place automatic orders when TIME NEXT reaches 0
         async function placeAutomaticOrder(videoUrl, metric, amount) {
+            // Create unique key for this video+metric combination
+            const orderKey = `${videoUrl}|${metric}`;
+            
+            // Check if order is already being placed
+            if (window.placingOrders.has(orderKey)) {
+                console.log(`[Auto Order] Order already in progress for ${orderKey}, skipping...`);
+                return false;
+            }
+            
+            // Add to lock
+            window.placingOrders.add(orderKey);
+            
             try {
                 console.log(`[Auto Order] Placing ${amount} ${metric} for ${videoUrl}`);
                 const params = new URLSearchParams();
@@ -8907,43 +8924,91 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     body: params.toString()
                 });
                 
-                const data = await response.json();
+                // Handle server errors (502, 503) without trying to parse JSON
+                if (!response.ok) {
+                    const statusText = response.statusText || 'Unknown error';
+                    console.error(`[Auto Order] Server error ${response.status}: ${statusText}`);
+                    // Remove from lock after a delay to allow retry
+                    setTimeout(() => {
+                        window.placingOrders.delete(orderKey);
+                    }, 10000); // Wait 10 seconds before allowing retry
+                    return false;
+                }
+                
+                // Try to parse JSON, but handle empty/invalid responses
+                let data;
+                try {
+                    const text = await response.text();
+                    if (!text || text.trim() === '') {
+                        console.error('[Auto Order] Empty response from server');
+                        setTimeout(() => {
+                            window.placingOrders.delete(orderKey);
+                        }, 10000);
+                        return false;
+                    }
+                    data = JSON.parse(text);
+                } catch (parseError) {
+                    console.error('[Auto Order] Failed to parse JSON response:', parseError);
+                    setTimeout(() => {
+                        window.placingOrders.delete(orderKey);
+                    }, 10000);
+                    return false;
+                }
+                
                 if (data.success && data.order_id) {
                     console.log(`[Auto Order] Success! Order ID: ${data.order_id}, Amount: ${data.amount}`);
                     
-                    // Verify order was actually saved by checking order history
-                    try {
-                        const progressResponse = await fetch('/api/progress');
-                        const progressData = await progressResponse.json();
-                        
-                        if (progressData && progressData[videoUrl] && progressData[videoUrl].order_history) {
-                            const recentOrder = progressData[videoUrl].order_history
-                                .filter(o => o.service === metric)
-                                .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0];
-                            
-                            if (recentOrder && recentOrder.order_id === String(data.order_id)) {
-                                console.log(`[Auto Order] Verified! Order ${data.order_id} found in order history`);
-                                return true;
-                            } else {
-                                console.warn(`[Auto Order] Warning: Order ${data.order_id} not found in order history yet`);
-                                // Still return true as API said success, might be timing issue
-                                return true;
+                    // Verify order was actually saved by checking order history (with retry)
+                    let verified = false;
+                    for (let attempt = 0; attempt < 3; attempt++) {
+                        try {
+                            await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1))); // Wait before each attempt
+                            const progressResponse = await fetch('/api/progress');
+                            if (!progressResponse.ok) {
+                                continue; // Try again
                             }
-                        } else {
-                            console.warn(`[Auto Order] Warning: Could not verify order in progress data`);
-                            return true; // API said success, assume it worked
+                            const progressData = await progressResponse.json();
+                            
+                            if (progressData && progressData[videoUrl] && progressData[videoUrl].order_history) {
+                                const recentOrder = progressData[videoUrl].order_history
+                                    .filter(o => o.service === metric)
+                                    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0];
+                                
+                                if (recentOrder && recentOrder.order_id === String(data.order_id)) {
+                                    console.log(`[Auto Order] Verified! Order ${data.order_id} found in order history`);
+                                    verified = true;
+                                    break;
+                                }
+                            }
+                        } catch (verifyError) {
+                            console.warn(`[Auto Order] Verification attempt ${attempt + 1} failed:`, verifyError);
                         }
-                    } catch (verifyError) {
-                        console.error('[Auto Order] Verification error:', verifyError);
-                        // API said success, assume it worked
-                        return true;
                     }
+                    
+                    if (!verified) {
+                        console.warn(`[Auto Order] Could not verify order ${data.order_id} after 3 attempts, but API reported success`);
+                    }
+                    
+                    // Remove from lock after successful order
+                    setTimeout(() => {
+                        window.placingOrders.delete(orderKey);
+                    }, 5000); // Keep lock for 5 seconds to prevent immediate duplicate
+                    
+                    return true;
                 } else {
                     console.error(`[Auto Order] Failed: ${data.error || 'Unknown error'}`);
+                    // Remove from lock after error
+                    setTimeout(() => {
+                        window.placingOrders.delete(orderKey);
+                    }, 30000); // Wait 30 seconds before allowing retry on error
                     return false;
                 }
             } catch (error) {
                 console.error('[Auto Order] Exception:', error);
+                // Remove from lock after exception
+                setTimeout(() => {
+                    window.placingOrders.delete(orderKey);
+                }, 30000); // Wait 30 seconds before allowing retry
                 return false;
             }
         }
@@ -9145,6 +9210,13 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 if (success) {
                                     cell.textContent = 'ORDERED ✓';
                                     cell.style.color = '#10b981';
+                                    // Reset orderPlaced flag after a delay to allow next order
+                                    setTimeout(() => {
+                                        orderPlaced = false;
+                                        orderPlacedTime = 0;
+                                        // Recalculate next order time
+                                        recalculateNextOrderTime();
+                                    }, 5000);
                                     // Refresh dashboard after a short delay to show new order and recalculate TIME NEXT
                                     setTimeout(() => {
                                         loadDashboard(false).then(() => {
@@ -9153,7 +9225,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                                 startTableCountdowns();
                                             }, 500);
                                         });
-                                    }, 2000);
+                                    }, 3000);
                                 } else {
                                     cell.textContent = 'ERROR';
                                     cell.style.color = '#ef4444';
@@ -9161,12 +9233,14 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                     setTimeout(() => {
                                         orderPlaced = false;
                                         orderPlacedTime = 0;
+                                        // Recalculate next order time
+                                        recalculateNextOrderTime();
                                     }, 30000);
                                 }
                             });
                         } else {
                             // Order already placed, wait for refresh
-                            if ((Date.now() - orderPlacedTime) > 3000) {
+                            if ((Date.now() - orderPlacedTime) > 5000) {
                                 cell.textContent = 'READY';
                                 cell.style.color = '#10b981';
                             }
@@ -9342,6 +9416,13 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 if (success) {
                                     cell.textContent = 'ORDERED ✓';
                                     cell.style.color = '#10b981';
+                                    // Reset orderPlaced flag after a delay to allow next order
+                                    setTimeout(() => {
+                                        orderPlaced = false;
+                                        orderPlacedTime = 0;
+                                        // Recalculate next order time
+                                        recalculateNextOrderTime();
+                                    }, 5000);
                                     // Refresh dashboard after a short delay to show new order and recalculate TIME NEXT
                                     setTimeout(() => {
                                         loadDashboard(false).then(() => {
@@ -9350,7 +9431,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                                 startTableCountdowns();
                                             }, 500);
                                         });
-                                    }, 2000);
+                                    }, 3000);
                                 } else {
                                     cell.textContent = 'ERROR';
                                     cell.style.color = '#ef4444';
@@ -9358,12 +9439,14 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                     setTimeout(() => {
                                         orderPlaced = false;
                                         orderPlacedTime = 0;
+                                        // Recalculate next order time
+                                        recalculateNextOrderTime();
                                     }, 30000);
                                 }
                             });
                         } else {
                             // Order already placed, wait for refresh
-                            if ((Date.now() - orderPlacedTime) > 3000) {
+                            if ((Date.now() - orderPlacedTime) > 5000) {
                                 cell.textContent = 'READY';
                                 cell.style.color = '#10b981';
                             }

@@ -2341,14 +2341,15 @@ class DashboardHandler(BaseHTTPRequestHandler):
             
             # Remove videos from other campaigns first (only if they're being reassigned)
             # This prevents videos from being in multiple campaigns
+            # BUT: Only remove if the video is actually being assigned to the new campaign
             for cid, camp_data in campaigns.items():
                 if cid != campaign_id:
                     original_videos = camp_data.get('videos', [])
-                    filtered_videos = [v for v in original_videos if v not in video_urls]
-                    if len(filtered_videos) != len(original_videos):
-                        camp_data['videos'] = filtered_videos
-                        removed_count = len(original_videos) - len(filtered_videos)
-                        print(f"[ASSIGN] Removed {removed_count} video(s) from campaign {cid}")
+                    # Only remove videos that are in BOTH the old campaign AND being assigned to new campaign
+                    videos_to_remove = [v for v in original_videos if v in video_urls and v in progress]
+                    if videos_to_remove:
+                        camp_data['videos'] = [v for v in original_videos if v not in videos_to_remove]
+                        print(f"[ASSIGN] Removed {len(videos_to_remove)} video(s) from campaign {cid} (reassigning to {campaign_id})")
             
             # Add videos to selected campaign
             # Ensure all videos in video_urls that exist in progress are added

@@ -2536,22 +2536,22 @@ class DashboardHandler(BaseHTTPRequestHandler):
         .header {
             background: #1a1a1a;
             border-radius: 0;
-            padding: 8px 12px;
-            margin-bottom: 6px;
+            padding: 4px 8px;
+            margin-bottom: 3px;
             box-shadow: none;
             border: 1px solid rgba(255,255,255,0.05);
         }
         
         .header h1 {
             color: #ffffff;
-            font-size: 1.2em;
-            margin-bottom: 2px;
+            font-size: 1em;
+            margin-bottom: 1px;
             font-weight: 600;
         }
         
         .header p {
             color: #888;
-            font-size: 0.75em;
+            font-size: 0.7em;
             margin: 0;
         }
         
@@ -3238,16 +3238,16 @@ class DashboardHandler(BaseHTTPRequestHandler):
         .back-button {
             display: inline-flex;
             align-items: center;
-            gap: 4px;
-            padding: 4px 10px;
+            gap: 3px;
+            padding: 2px 8px;
             background: #1a1a1a;
             color: #ffffff;
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 0;
             text-decoration: none;
             font-weight: 500;
-            font-size: 11px;
-            margin-bottom: 6px;
+            font-size: 10px;
+            margin-bottom: 3px;
             transition: all 0.2s;
             cursor: pointer;
         }
@@ -3362,10 +3362,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
         .controls-bar {
             background: #1a1a1a;
             border-radius: 0;
-            padding: 4px 6px;
-            margin-bottom: 8px;
+            padding: 2px 4px;
+            margin-bottom: 4px;
             display: flex;
-            gap: 6px;
+            gap: 3px;
             flex-wrap: wrap;
             align-items: center;
             border: 1px solid rgba(255,255,255,0.05);
@@ -3373,15 +3373,16 @@ class DashboardHandler(BaseHTTPRequestHandler):
         
         .search-box {
             flex: 1;
-            min-width: 150px;
-            padding: 4px 8px;
+            min-width: 120px;
+            padding: 2px 6px;
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 0;
             background: #1a1a1a;
             color: #e0e0e0;
-            font-size: 11px;
+            font-size: 10px;
             transition: all 0.2s;
-            height: 24px;
+            height: 20px;
+            line-height: 20px;
         }
         
         .search-box:focus {
@@ -3391,15 +3392,16 @@ class DashboardHandler(BaseHTTPRequestHandler):
         }
         
         .filter-select {
-            padding: 4px 8px;
+            padding: 2px 6px;
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 0;
             background: #1a1a1a;
             color: #e0e0e0;
-            font-size: 11px;
+            font-size: 10px;
             cursor: pointer;
             transition: all 0.2s;
-            height: 24px;
+            height: 20px;
+            line-height: 20px;
         }
         
         .filter-select:focus {
@@ -3409,17 +3411,18 @@ class DashboardHandler(BaseHTTPRequestHandler):
         }
         
         .export-btn {
-            padding: 4px 10px;
+            padding: 2px 8px;
             background: #2a2a2a;
             color: #fff;
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 0;
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
-            height: 24px;
+            height: 20px;
             white-space: nowrap;
+            line-height: 16px;
         }
         
         .export-btn:hover {
@@ -3427,17 +3430,18 @@ class DashboardHandler(BaseHTTPRequestHandler):
         }
         
         .clear-filters-btn {
-            padding: 4px 10px;
+            padding: 2px 8px;
             background: #2a2a2a;
             color: #fff;
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 0;
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
-            height: 24px;
+            height: 20px;
             white-space: nowrap;
+            line-height: 16px;
         }
         
         .clear-filters-btn:hover {
@@ -3445,17 +3449,18 @@ class DashboardHandler(BaseHTTPRequestHandler):
         }
         
         .add-video-btn {
-            padding: 4px 10px;
+            padding: 2px 8px;
             background: #667eea;
             color: #fff;
             border: 1px solid rgba(102,126,234,0.3);
             border-radius: 0;
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
-            height: 24px;
+            height: 20px;
             white-space: nowrap;
+            line-height: 16px;
         }
         
         .add-video-btn:hover {

@@ -6319,23 +6319,6 @@ class DashboardHandler(BaseHTTPRequestHandler):
         }
         
         function renderHomepage(videos) {
-            // Format time remaining helper
-            function formatTimeRemaining(hours) {
-                if (hours < 0) return 'Past due';
-                if (hours <= 0 || !isFinite(hours)) return 'N/A';
-                const days = Math.floor(hours / 24);
-                const remainingHours = Math.floor(hours % 24);
-                const minutes = Math.floor((hours % 1) * 60);
-                
-                if (days > 0) {
-                    return days + 'd ' + remainingHours + 'h';
-                } else if (remainingHours > 0) {
-                    return remainingHours + 'h ' + minutes + 'm';
-                } else {
-                    return minutes + 'm';
-                }
-            }
-            
             if (Object.keys(videos).length === 0) {
                 return `
                     <div class="empty-state">
@@ -6345,314 +6328,169 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 `;
             }
             
-            let html = '<div class="videos-grid">';
+            // Render as accounting-style table instead of cards
+            let html = `
+                <div style="overflow-x: auto; margin-top: 10px;">
+                    <table style="width: 100%; border-collapse: collapse; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); font-family: monospace; font-size: 10px;">
+                        <thead>
+                            <tr style="background: #252525; border-bottom: 2px solid rgba(255,255,255,0.1);">
+                                <th style="padding: 6px 4px; text-align: left; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">VIDEO ID</th>
+                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">DATE POSTED</th>
+                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">TIME LEFT</th>
+                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">CURR VIEWS</th>
+                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">EXP VIEWS</th>
+                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">MANUAL ORD</th>
+                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">SCHED ORD</th>
+                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">TIME NEXT</th>
+                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">UNITS/ORD</th>
+                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">$/UNIT</th>
+                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">CURR LIKES</th>
+                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">EXP LIKES</th>
+                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">LIKES MAN</th>
+                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">LIKES SCH</th>
+                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">LIKES NEXT</th>
+                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">LIKES UNITS</th>
+                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px;">LIKES $/U</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
             
             for (const [videoUrl, videoData] of Object.entries(videos)) {
                 const { username, videoId } = extractVideoInfo(videoUrl);
-                // Escape template literal special characters
                 function escapeTemplateLiteral(str) {
                     if (!str) return '';
                     return String(str).replace(/\\\\/g, '\\\\\\\\').replace(/`/g, '\\\\`').replace(/\\$/g, '\\\\$');
                 }
-                const displayName = username ? `@${escapeTemplateLiteral(username)}` : 'Unknown';
                 
-                const ordersPlaced = videoData.orders_placed || {};
-                const realViews = videoData.real_views !== undefined ? videoData.real_views : (videoData.initial_views || 0);
-                const realLikes = videoData.real_likes !== undefined ? videoData.real_likes : (videoData.initial_likes || 0);
-                const realComments = videoData.real_comments !== undefined ? videoData.real_comments : (videoData.initial_comments || 0);
+                // Get start time (date posted) and calculate time left
+                const startTime = videoData.start_time ? new Date(videoData.start_time) : null;
+                const uploadTime = startTime ? startTime.toLocaleString('en-US', {month: '2-digit', day: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit'}) : 'N/A';
                 
-                const targetViews = videoData.target_views || 4000;
-                const targetLikes = videoData.target_likes || 125;
-                const targetComments = videoData.target_comments || 7;
-                
-                const viewsProgress = (realViews / targetViews) * 100;
-                const likesProgress = (realLikes / targetLikes) * 100;
-                const commentsProgress = (realComments / targetComments) * 100;
-                
-                const overallProgress = viewsProgress;
-                const embedUrl = getTikTokEmbedUrl(videoUrl);
-                const safeVideoUrl = JSON.stringify(videoUrl);
-                // Escape URLs for HTML attributes - use split/join to avoid regex issues
-                function escapeHtml(str) {
-                    if (!str) return '';
-                    return str.split('&').join('&amp;').split('"').join('&quot;').split("'").join('&#39;').split('<').join('&lt;').split('>').join('&gt;');
+                // Calculate time left to reach goal
+                const target_completion = videoData.target_completion_time || videoData.target_completion_datetime;
+                let timeLeft = 'N/A';
+                if (target_completion && startTime) {
+                    const now = new Date();
+                    const endTime = new Date(target_completion);
+                    const remainingMs = endTime - now;
+                    if (remainingMs > 0) {
+                        const remainingHours = Math.floor(remainingMs / (1000 * 60 * 60));
+                        const remainingMinutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+                        timeLeft = remainingHours + 'h' + (remainingMinutes > 0 ? remainingMinutes + 'm' : '');
+                    } else {
+                        timeLeft = 'OVERDUE';
+                    }
                 }
-                const safeEmbedUrl = escapeHtml(embedUrl);
-                const safeVideoUrlAttr = escapeHtml(videoUrl);
                 
-                // Create a safe ID for the button to avoid issues
-                const buttonId = 'btn-' + Math.random().toString(36).substring(2, 9);
+                const real_views = videoData.real_views !== undefined ? videoData.real_views : (videoData.initial_views || 0);
+                const real_likes = videoData.real_likes !== undefined ? videoData.real_likes : (videoData.initial_likes || 0);
+                const target_views = videoData.target_views || 4000;
+                const target_likes = videoData.target_likes || 125;
                 
-                const campaignId = videoData.campaign_id || '';
+                // Calculate expected views/likes
+                let expected_views = 0;
+                let expected_likes = 0;
+                if (startTime && target_completion) {
+                    const now = new Date();
+                    const endTime = new Date(target_completion);
+                    const totalDuration = endTime - startTime;
+                    const elapsed = now - startTime;
+                    if (totalDuration > 0 && elapsed > 0) {
+                        const progress = Math.min(1, elapsed / totalDuration);
+                        expected_views = Math.floor(target_views * progress);
+                        expected_likes = Math.floor(target_likes * progress);
+                    }
+                }
+                
+                // Time to next order
+                const nextViewsTime = videoData.next_views_purchase_time ? new Date(videoData.next_views_purchase_time) : null;
+                let timeToNext = 'N/A';
+                if (nextViewsTime) {
+                    const now = new Date();
+                    const diff = nextViewsTime - now;
+                    if (diff > 0) {
+                        const hours = Math.floor(diff / (1000 * 60 * 60));
+                        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                        timeToNext = hours + 'h' + (mins > 0 ? mins + 'm' : '');
+                    } else {
+                        timeToNext = 'READY';
+                    }
+                }
+                
+                const nextLikesTime = videoData.next_likes_purchase_time ? new Date(videoData.next_likes_purchase_time) : null;
+                let likesTimeToNext = 'N/A';
+                if (nextLikesTime) {
+                    const now = new Date();
+                    const diff = nextLikesTime - now;
+                    if (diff > 0) {
+                        const hours = Math.floor(diff / (1000 * 60 * 60));
+                        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                        likesTimeToNext = hours + 'h' + (mins > 0 ? mins + 'm' : '');
+                    } else {
+                        likesTimeToNext = 'READY';
+                    }
+                }
+                
+                // Order counts
+                const orderHistory = videoData.order_history || [];
+                const viewsOrders = orderHistory.filter(o => o.service === 'views');
+                const manualViewsOrders = viewsOrders.filter(o => o.manual).length;
+                const schedViewsOrders = viewsOrders.filter(o => !o.manual).length;
+                
+                const likesOrders = orderHistory.filter(o => o.service === 'likes');
+                const manualLikesOrders = likesOrders.filter(o => o.manual).length;
+                const schedLikesOrders = likesOrders.filter(o => !o.manual).length;
+                
+                // Units and cost per unit (average of scheduled orders only)
+                let avgViewsUnits = 0;
+                let avgViewsCostPerUnit = 0;
+                const schedViewsOrdersList = viewsOrders.filter(o => !o.manual);
+                if (schedViewsOrdersList.length > 0) {
+                    const totalViewsUnits = schedViewsOrdersList.reduce((sum, o) => sum + (o.quantity || 0), 0);
+                    const totalViewsCost = schedViewsOrdersList.reduce((sum, o) => sum + (o.cost || 0), 0);
+                    avgViewsUnits = Math.floor(totalViewsUnits / schedViewsOrdersList.length);
+                    avgViewsCostPerUnit = totalViewsUnits > 0 ? totalViewsCost / totalViewsUnits : 0;
+                }
+                
+                let avgLikesUnits = 0;
+                let avgLikesCostPerUnit = 0;
+                const schedLikesOrdersList = likesOrders.filter(o => !o.manual);
+                if (schedLikesOrdersList.length > 0) {
+                    const totalLikesUnits = schedLikesOrdersList.reduce((sum, o) => sum + (o.quantity || 0), 0);
+                    const totalLikesCost = schedLikesOrdersList.reduce((sum, o) => sum + (o.cost || 0), 0);
+                    avgLikesUnits = Math.floor(totalLikesUnits / schedLikesOrdersList.length);
+                    avgLikesCostPerUnit = totalLikesUnits > 0 ? totalLikesCost / totalLikesUnits : 0;
+                }
+                
                 html += `
-                    <div class="video-card-mini" data-video-url="${safeVideoUrlAttr}" data-campaign-id="${campaignId || ''}">
-                        <div class="video-card-mini-header" style="display: flex; align-items: center; gap: 10px;">
-                            <input type="checkbox" class="video-select-checkbox" data-video-url="${safeVideoUrlAttr}" style="width: 18px; height: 18px; cursor: pointer; accent-color: #667eea;" onchange="updateCampaignBar()">
-                            <div class="video-card-mini-title" style="flex: 1;">${displayName}</div>
-                            <div class="status-badge ${getStatusClass(overallProgress)}">
-                                ${getStatusText(overallProgress)}
-                            </div>
-                        </div>
-                        ${campaignId ? `<div style="font-size: 0.75em; color: #667eea; margin-top: 5px; opacity: 0.8;">Campaign: <span id="campaign-name-${safeVideoUrlAttr.replace(/[^a-zA-Z0-9]/g, '_')}">Loading...</span></div>` : ''}
-                        ${embedUrl ? `
-                        <div class="video-embed-mini" data-action="stop-propagation">
-                            <iframe src="${safeEmbedUrl}" allowfullscreen></iframe>
-                        </div>
-                        ` : ''}
-                        <div class="video-card-mini-stats">
-                            <div class="mini-stat">
-                                <div class="mini-stat-label">Views</div>
-                                <div class="mini-stat-value">${formatNumber(realViews)}</div>
-                                <div class="mini-stat-progress">
-                                    <div class="mini-stat-progress-bar" style="width: ${Math.min(viewsProgress, 100)}%"></div>
-                                </div>
-                            </div>
-                            <div class="mini-stat">
-                                <div class="mini-stat-label">Likes</div>
-                                <div class="mini-stat-value">${formatNumber(realLikes)}</div>
-                                <div class="mini-stat-progress">
-                                    <div class="mini-stat-progress-bar" style="width: ${Math.min(likesProgress, 100)}%"></div>
-                                </div>
-                            </div>
-                            <div class="mini-stat">
-                                <div class="mini-stat-label">Comments</div>
-                                <div class="mini-stat-value">${formatNumber(realComments)}</div>
-                                <div class="mini-stat-progress">
-                                    <div class="mini-stat-progress-bar" style="width: ${Math.min(commentsProgress, 100)}%"></div>
-                                </div>
-                            </div>
-                        </div>
-                        ${(function() {
-                            const currentActivity = videoData.current_activity || {};
-                            const activityStatus = currentActivity.status || 'idle';
-                            const lastUpdated = currentActivity.last_updated ? new Date(currentActivity.last_updated) : null;
-                            const now = new Date();
-                            
-                            // Calculate next action time if waiting
-                            let nextActionTime = null;
-                            let countdownSeconds = 0;
-                            if (activityStatus === 'waiting' && currentActivity.next_action_time) {
-                                nextActionTime = new Date(currentActivity.next_action_time);
-                                countdownSeconds = Math.max(0, Math.floor((nextActionTime - now) / 1000));
-                            }
-                            
-                            // Calculate views per hour from orders
-                            const viewsOrdered = ordersPlaced.views || 0;
-                            const targetCompletionTime = videoData.target_completion_time || videoData.target_completion_datetime;
-                            let viewsPerHour = 0;
-                            if (targetCompletionTime && viewsOrdered > 0) {
-                                const startTime = videoData.start_time ? new Date(videoData.start_time) : new Date();
-                                const endTime = new Date(targetCompletionTime);
-                                const hoursRemaining = Math.max(1, (endTime - new Date()) / (1000 * 60 * 60));
-                                viewsPerHour = viewsOrdered / hoursRemaining;
-                            } else {
-                                viewsPerHour = 167; // Default rate
-                            }
-                            
-                            // Calculate target completion time variables
-                            const targetCompletionTimeLocal = videoData.target_completion_time || videoData.target_completion_datetime;
-                            let hoursToTargetLocal = 0;
-                            let isTargetOverdueLocal = false;
-                            if (targetCompletionTimeLocal) {
-                                const targetTime = new Date(targetCompletionTimeLocal);
-                                hoursToTargetLocal = Math.max(0, (targetTime - now) / (1000 * 60 * 60));
-                                isTargetOverdueLocal = hoursToTargetLocal <= 0;
-                            }
-                            
-                            // Calculate combined progress rate (orders + organic growth)
-                            let combinedViewsPerHour = viewsPerHour;
-                            const growthHistory = videoData.growth_history || [];
-                            if (growthHistory.length >= 2) {
-                                const recent = growthHistory.slice(-5);
-                                const oldest = recent[0];
-                                const newest = recent[recent.length - 1];
-                                const timeDiff = (new Date(newest.timestamp) - new Date(oldest.timestamp)) / (1000 * 60 * 60);
-                                const viewsDiff = newest.views - oldest.views;
-                                if (timeDiff > 0) {
-                                    const organicRate = viewsDiff / timeDiff;
-                                    combinedViewsPerHour = viewsPerHour + organicRate;
-                                }
-                            }
-                            
-                            // Calculate time remaining to reach goals - respect target completion time
-                            const viewsNeeded = Math.max(0, targetViews - realViews);
-                            let hoursToGoal = 0;
-                            
-                            // Use target completion time if set, otherwise calculate from rate
-                            if (targetCompletionTimeLocal && hoursToTargetLocal > 0) {
-                                // Use target completion time as the maximum
-                                hoursToGoal = Math.min(hoursToTargetLocal, combinedViewsPerHour > 0 ? viewsNeeded / combinedViewsPerHour : hoursToTargetLocal);
-                            } else {
-                                // Fallback to rate-based calculation
-                                hoursToGoal = combinedViewsPerHour > 0 ? viewsNeeded / combinedViewsPerHour : 0;
-                            }
-                            
-                            // If target is overdue, show that
-                            if (isTargetOverdueLocal && viewsNeeded > 0) {
-                                hoursToGoal = -1; // Will show "Past due"
-                            }
-                            
-                            let statusHtml = '';
-                            
-                            if (activityStatus === 'waiting') {
-                                const hours = Math.floor(countdownSeconds / 3600);
-                                const minutes = Math.floor((countdownSeconds % 3600) / 60);
-                                const seconds = countdownSeconds % 60;
-                                
-                                let timeDisplay = '';
-                                if (hours > 0) {
-                                    timeDisplay = hours + 'h ' + minutes + 'm ' + seconds + 's';
-                                } else if (minutes > 0) {
-                                    timeDisplay = minutes + 'm ' + seconds + 's';
-                                } else {
-                                    timeDisplay = seconds + 's';
-                                }
-                                
-                                statusHtml = '<div class="video-card-mini-activity" style="padding: 8px; margin: 12px 0; background: #1a1a1a; border-radius: 0; border-left: 3px solid #667eea;">' +
-                                    '<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">' +
-                                    '<span style="font-size: 18px;"></span>' +
-                                    '<div style="flex: 1;">' +
-                                    '<div style="font-weight: 600; font-size: 13px; color: #fff;">Waiting to Order</div>' +
-                                    '<div style="opacity: 0.8; font-size: 11px; color: #ccc;">' + (currentActivity.waiting_for || 'Next order') + '</div>' +
-                                    '</div>' +
-                                    '<div style="text-align: right;">' +
-                                    '<div style="font-size: 16px; font-weight: 700; font-family: monospace; color: #fff;" data-countdown-display data-video-url="' + safeVideoUrlAttr + '">' + timeDisplay + '</div>' +
-                                    '<div style="opacity: 0.7; font-size: 10px; color: #ccc;">until next</div>' +
-                                    '</div>' +
-                                    '</div>' +
-                                    '<div data-countdown data-next-action-time="' + (currentActivity.next_action_time || '') + '" data-video-url="' + safeVideoUrlAttr + '" style="display:none;"></div>';
-                                
-                                // Add time to goal if available
-                                if (viewsNeeded > 0) {
-                                    let timeToGoal = '';
-                                    if (hoursToGoal < 0 || isTargetOverdueLocal) {
-                                        timeToGoal = 'Past due';
-                                    } else if (hoursToGoal > 0) {
-                                        const totalSeconds = Math.floor(hoursToGoal * 3600);
-                                        const days = Math.floor(totalSeconds / (24 * 3600));
-                                        const remainingAfterDays = totalSeconds % (24 * 3600);
-                                        const hours = Math.floor(remainingAfterDays / 3600);
-                                        const remainingAfterHours = remainingAfterDays % 3600;
-                                        const minutes = Math.floor(remainingAfterHours / 60);
-                                        const seconds = remainingAfterHours % 60;
-                                        
-                                        if (days > 0) {
-                                            timeToGoal = days + 'd ' + hours + 'h ' + minutes + 'm';
-                                        } else if (hours > 0) {
-                                            timeToGoal = hours + 'h ' + minutes + 'm ' + seconds + 's';
-                                        } else if (minutes > 0) {
-                                            timeToGoal = minutes + 'm ' + seconds + 's';
-                                        } else {
-                                            timeToGoal = seconds + 's';
-                                        }
-                                    } else {
-                                        timeToGoal = 'N/A';
-                                    }
-                                    
-                                    const targetTimeDisplay = targetCompletionTimeLocal && hoursToTargetLocal > 0 ? ' (Target: ' + formatTimeRemaining(hoursToTargetLocal) + ')' : '';
-                                    statusHtml += '<div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.2); display: flex; justify-content: space-between; font-size: 11px;">' +
-                                        '<div style="opacity: 0.8;">Time to Goal: <strong style="color: ' + (hoursToGoal < 0 ? '#ef4444' : '#fff') + ';">' + timeToGoal + '</strong>' + targetTimeDisplay + '</div>' +
-                                        '<div style="opacity: 0.8;">Rate: <strong>' + Math.round(combinedViewsPerHour) + '/hr</strong></div>' +
-                                        '</div>';
-                                }
-                                
-                                statusHtml += '</div>';
-                            } else if (activityStatus === 'ordering') {
-                                statusHtml = '<div class="video-card-mini-activity" style="padding: 6px; margin: 10px 0; background: #1a1a1a; border-radius: 0; border-left: 3px solid #667eea;">' +
-                                    '<div style="display: flex; align-items: center; gap: 8px;">' +
-                                    '<span style="font-size: 16px; font-weight: 700;">...</span>' +
-                                    '<div style="flex: 1;">' +
-                                    '<div style="font-weight: 600; font-size: 12px; color: #fff;">Ordering Now</div>' +
-                                    '<div style="opacity: 0.8; font-size: 11px; color: #ccc;">' + (currentActivity.action || 'Placing order') + '</div>' +
-                                    '</div>' +
-                                    '</div>';
-                                
-                                // Add time to goal if available
-                                if (viewsNeeded > 0) {
-                                    let timeToGoal = '';
-                                    if (hoursToGoal < 0 || isTargetOverdueLocal) {
-                                        timeToGoal = 'Past due';
-                                    } else if (hoursToGoal > 0) {
-                                        const totalSeconds = Math.floor(hoursToGoal * 3600);
-                                        const days = Math.floor(totalSeconds / (24 * 3600));
-                                        const remainingAfterDays = totalSeconds % (24 * 3600);
-                                        const hours = Math.floor(remainingAfterDays / 3600);
-                                        const remainingAfterHours = remainingAfterDays % 3600;
-                                        const minutes = Math.floor(remainingAfterHours / 60);
-                                        const seconds = remainingAfterHours % 60;
-                                        
-                                        if (days > 0) {
-                                            timeToGoal = days + 'd ' + hours + 'h ' + minutes + 'm';
-                                        } else if (hours > 0) {
-                                            timeToGoal = hours + 'h ' + minutes + 'm ' + seconds + 's';
-                                        } else if (minutes > 0) {
-                                            timeToGoal = minutes + 'm ' + seconds + 's';
-                                        } else {
-                                            timeToGoal = seconds + 's';
-                                        }
-                                    } else {
-                                        timeToGoal = 'N/A';
-                                    }
-                                    
-                                    const targetTimeDisplay = targetCompletionTimeLocal && hoursToTargetLocal > 0 ? ' (Target: ' + formatTimeRemaining(hoursToTargetLocal) + ')' : '';
-                                    statusHtml += '<div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.2); display: flex; justify-content: space-between; font-size: 11px;">' +
-                                        '<div style="opacity: 0.8;">Time to Goal: <strong style="color: ' + (hoursToGoal < 0 ? '#ef4444' : '#fff') + ';">' + timeToGoal + '</strong>' + targetTimeDisplay + '</div>' +
-                                        '<div style="opacity: 0.8;">Rate: <strong>' + Math.round(combinedViewsPerHour) + '/hr</strong></div>' +
-                                        '</div>';
-                                }
-                                
-                                statusHtml += '</div>';
-                            } else {
-                                // Idle or delivering - show time to goal
-                                if (viewsNeeded > 0) {
-                                    let timeToGoal = '';
-                                    if (hoursToGoal < 0 || isTargetOverdueLocal) {
-                                        timeToGoal = 'Past due';
-                                    } else if (hoursToGoal > 0) {
-                                        const totalSeconds = Math.floor(hoursToGoal * 3600);
-                                        const days = Math.floor(totalSeconds / (24 * 3600));
-                                        const remainingAfterDays = totalSeconds % (24 * 3600);
-                                        const hours = Math.floor(remainingAfterDays / 3600);
-                                        const remainingAfterHours = remainingAfterDays % 3600;
-                                        const minutes = Math.floor(remainingAfterHours / 60);
-                                        const seconds = remainingAfterHours % 60;
-                                        
-                                        if (days > 0) {
-                                            timeToGoal = days + 'd ' + hours + 'h ' + minutes + 'm';
-                                        } else if (hours > 0) {
-                                            timeToGoal = hours + 'h ' + minutes + 'm ' + seconds + 's';
-                                        } else if (minutes > 0) {
-                                            timeToGoal = minutes + 'm ' + seconds + 's';
-                                        } else {
-                                            timeToGoal = seconds + 's';
-                                        }
-                                    } else {
-                                        timeToGoal = 'N/A';
-                                    }
-                                    
-                                    const targetTimeDisplay = targetCompletionTimeLocal && hoursToTargetLocal > 0 ? ' (Target: ' + formatTimeRemaining(hoursToTargetLocal) + ')' : '';
-                                    
-                                    statusHtml = '<div class="video-card-mini-activity" style="padding: 8px; margin: 12px 0; background: #1a1a1a; border-radius: 0; border-left: 3px solid #667eea;">' +
-                                        '<div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px;">' +
-                                        '<div style="opacity: 0.8;">Time to Goal: <strong style="color: ' + (hoursToGoal < 0 ? '#ef4444' : '#fff') + ';">' + timeToGoal + '</strong>' + targetTimeDisplay + '</div>' +
-                                        '<div style="opacity: 0.8;">Rate: <strong style="color: #fff;">' + Math.round(combinedViewsPerHour) + '/hr</strong></div>' +
-                                        '</div>' +
-                                        '</div>';
-                                }
-                            }
-                            
-                            return statusHtml;
-                        }())}
-                        <div class="video-card-mini-actions" style="padding: 10px; border-top: 1px solid rgba(255,255,255,0.1);">
-                            <button class="show-analytics-btn" data-video-url="${safeVideoUrlAttr}" style="width: 100%; padding: 8px; background: #1a1a1a; border: none; border-radius: 0; color: white; font-weight: 600; cursor: pointer; font-size: 14px; transition: transform 0.2s, box-shadow 0.2s;">
-                                Show Analytics
-                            </button>
-                        </div>
-                    </div>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer;" onclick="navigateToVideo('${escapeTemplateLiteral(videoUrl)}')" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='transparent'">
+                        <td style="padding: 4px 3px; color: #667eea; font-family: monospace; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); text-align: left;" title="${escapeTemplateLiteral(videoUrl)}"><a href="#video/${encodeURIComponent(videoUrl)}" style="color: #667eea; text-decoration: none;" onclick="event.stopPropagation(); navigateToVideo('${escapeTemplateLiteral(videoUrl)}'); return false;">${videoId}</a></td>
+                        <td style="padding: 4px 3px; text-align: center; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${uploadTime}</td>
+                        <td style="padding: 4px 3px; text-align: center; color: ${timeLeft === 'OVERDUE' ? '#ef4444' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${timeLeft}</td>
+                        <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(real_views)}</td>
+                        <td style="padding: 4px 3px; text-align: right; color: ${real_views >= expected_views ? '#10b981' : '#f59e0b'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(expected_views)}</td>
+                        <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);"><span onclick="event.stopPropagation(); handleManualOrder('${escapeTemplateLiteral(videoUrl)}', 'views');" style="cursor: pointer; text-decoration: underline; color: #667eea;">${manualViewsOrders}</span></td>
+                        <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${schedViewsOrders}</td>
+                        <td style="padding: 4px 3px; text-align: center; color: ${timeToNext === 'READY' ? '#10b981' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${timeToNext}</td>
+                        <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${avgViewsUnits > 0 ? formatNumber(avgViewsUnits) : '-'}</td>
+                        <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${avgViewsCostPerUnit > 0 ? '$' + avgViewsCostPerUnit.toFixed(4) : '-'}</td>
+                        <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(real_likes)}</td>
+                        <td style="padding: 4px 3px; text-align: right; color: ${real_likes >= expected_likes ? '#10b981' : '#f59e0b'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(expected_likes)}</td>
+                        <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);"><span onclick="event.stopPropagation(); handleManualOrder('${escapeTemplateLiteral(videoUrl)}', 'likes');" style="cursor: pointer; text-decoration: underline; color: #667eea;">${manualLikesOrders}</span></td>
+                        <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${schedLikesOrders}</td>
+                        <td style="padding: 4px 3px; text-align: center; color: ${likesTimeToNext === 'READY' ? '#10b981' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${likesTimeToNext}</td>
+                        <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${avgLikesUnits > 0 ? formatNumber(avgLikesUnits) : '-'}</td>
+                        <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px;">${avgLikesCostPerUnit > 0 ? '$' + avgLikesCostPerUnit.toFixed(4) : '-'}</td>
+                    </tr>
                 `;
             }
             
-            html += '</div>';
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
             return html;
         }
         

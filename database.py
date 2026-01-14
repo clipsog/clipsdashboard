@@ -89,6 +89,8 @@ def init_database_pool():
 @contextmanager
 def get_db_connection():
     """Get database connection from pool with retry logic"""
+    global _connection_pool
+    
     database_url = get_database_url()
     if not database_url:
         yield None
@@ -137,7 +139,6 @@ def get_db_connection():
                         time.sleep(retry_delay)
                         retry_delay *= 2  # Exponential backoff
                         # Reinitialize pool on circuit breaker
-                        global _connection_pool
                         _connection_pool = None
                         init_database_pool()
                         continue

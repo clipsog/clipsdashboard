@@ -7398,7 +7398,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         const campaignVideos = campaign.videos || [];
                         const financial = campaign.financial || {};
                         
-                        html += '<div class="back-button" data-action="navigate-home" onclick="switchTab(\'campaigns\'); navigateToHome();">← Back to All Campaigns</div>';
+                        html += '<div class="back-button" data-action="navigate-home" data-switch-to="campaigns">← Back to All Campaigns</div>';
                         html += `<div style="background: #1a1a1a; border-radius: 0; padding: 10px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.1);">`;
                         html += `<h1 style="color: #fff; font-size: 2em; margin-bottom: 10px;">${campaign.name || 'Unnamed Campaign'}</h1>`;
                         html += `<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px;">`;
@@ -8179,11 +8179,19 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         e.preventDefault();
                         e.stopPropagation();
                         try {
-                            // Check if we're in a campaign view
-                            const route = getCurrentRoute();
-                            if (route.type === 'campaign') {
-                                // Switch to campaigns tab first
-                                switchTab('campaigns');
+                            // Check if we need to switch tabs first
+                            const switchTo = btn.getAttribute('data-switch-to');
+                            if (switchTo && typeof switchTab === 'function') {
+                                switchTab(switchTo);
+                            } else {
+                                // Check if we're in a campaign view
+                                const route = getCurrentRoute();
+                                if (route.type === 'campaign') {
+                                    // Switch to campaigns tab first
+                                    if (typeof switchTab === 'function') {
+                                        switchTab('campaigns');
+                                    }
+                                }
                             }
                             if (typeof navigateToHome === 'function') {
                                 navigateToHome();

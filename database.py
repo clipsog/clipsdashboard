@@ -5,6 +5,7 @@ Replaces JSON file storage with PostgreSQL for reliable persistence on Render
 
 import os
 import json
+import time
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from psycopg2 import pool
@@ -34,28 +35,62 @@ def get_database_url():
     return database_url
 
 def init_database_pool():
-    """Initialize database connection pool"""
+    """Initialize database connection pool with retry logic"""
     global _connection_pool
     database_url = get_database_url()
     if not database_url:
         return None
     
-    try:
-        _connection_pool = psycopg2.pool.SimpleConnectionPool(
-            1, 20, database_url
-        )
-        print("✅ Database connection pool initialized")
-        return _connection_pool
-    except Exception as e:
-        print(f"❌ Failed to initialize database pool: {e}")
-        return None
+    # Try direct connection port (5432) if pooler (6543) fails
+    # Supabase pooler can have circuit breaker issues
+    urls_to_try = [database_url]
+    
+    # If using pooler port (6543), also try direct port (5432)
+    if ':6543' in database_url:
+        direct_url = database_url.replace(':6543', ':5432')
+        urls_to_try.append(direct_url)
+        print(f"   Will try pooler (6543) first, then direct (5432) if needed")
+    
+    for attempt, url in enumerate(urls_to_try, 1):
+        try:
+            # Test connection first
+            test_conn = psycopg2.connect(url, connect_timeout=5)
+            test_conn.close()
+            
+            # If test succeeds, create pool
+            _connection_pool = psycopg2.pool.SimpleConnectionPool(
+                1, 10, url, connect_timeout=5
+            )
+            print(f"✅ Database connection pool initialized (attempt {attempt})")
+            return _connection_pool
+        except psycopg2.OperationalError as e:
+            if 'Circuit breaker' in str(e) or 'authentication' in str(e).lower():
+                if attempt < len(urls_to_try):
+                    print(f"   ⚠️ Connection attempt {attempt} failed (circuit breaker), trying next...")
+                    continue
+                else:
+                    print(f"❌ All connection attempts failed: {e}")
+                    print(f"   Circuit breaker is open - too many auth errors")
+                    print(f"   Please check DATABASE_URL password in Render dashboard")
+                    return None
+            else:
+                print(f"❌ Connection error: {e}")
+                if attempt < len(urls_to_try):
+                    continue
+                return None
+        except Exception as e:
+            print(f"❌ Failed to initialize database pool: {e}")
+            if attempt < len(urls_to_try):
+                continue
+            return None
+    
+    return None
 
 @contextmanager
 def get_db_connection():
-    """Get database connection from pool"""
+    """Get database connection from pool with retry logic"""
     database_url = get_database_url()
     if not database_url:
-        # Fallback to JSON files if no database URL
         yield None
         return
     
@@ -63,23 +98,78 @@ def get_db_connection():
         init_database_pool()
     
     conn = None
-    try:
-        if _connection_pool:
-            conn = _connection_pool.getconn()
-        else:
-            conn = psycopg2.connect(database_url)
-        yield conn
-        conn.commit()
-    except Exception as e:
-        if conn:
-            conn.rollback()
-        print(f"❌ Database error: {e}")
-        raise
+    max_retries = 3
+    retry_delay = 1
+    
+    for attempt in range(max_retries):
+        try:
+            if _connection_pool:
+                conn = _connection_pool.getconn()
+            else:
+                # Fallback to direct connection if pool unavailable
+                conn = psycopg2.connect(database_url, connect_timeout=5)
+            
+            # Test the connection
+            cursor = conn.cursor()
+            cursor.execute("SELECT 1")
+            cursor.close()
+            
+            yield conn
+            conn.commit()
+            break  # Success, exit retry loop
+            
+        except psycopg2.OperationalError as e:
+            if conn:
+                try:
+                    conn.rollback()
+                    if _connection_pool:
+                        _connection_pool.putconn(conn)
+                    else:
+                        conn.close()
+                except:
+                    pass
+                conn = None
+            
+            if 'Circuit breaker' in str(e):
+                if attempt < max_retries - 1:
+                    print(f"   ⚠️ Circuit breaker open, retrying in {retry_delay}s... (attempt {attempt + 1}/{max_retries})")
+                    time.sleep(retry_delay)
+                    retry_delay *= 2  # Exponential backoff
+                    # Reinitialize pool on circuit breaker
+                    global _connection_pool
+                    _connection_pool = None
+                    init_database_pool()
+                    continue
+                else:
+                    print(f"❌ Database circuit breaker still open after {max_retries} attempts")
+                    raise
+            else:
+                print(f"❌ Database error: {e}")
+                raise
+                
+        except Exception as e:
+            if conn:
+                try:
+                    conn.rollback()
+                except:
+                    pass
+            print(f"❌ Database error: {e}")
+            raise
+    else:
+        # All retries exhausted
+        raise Exception("Failed to get database connection after retries")
+    
     finally:
         if conn and _connection_pool:
-            _connection_pool.putconn(conn)
+            try:
+                _connection_pool.putconn(conn)
+            except:
+                pass
         elif conn:
-            conn.close()
+            try:
+                conn.close()
+            except:
+                pass
 
 def init_schema():
     """Initialize database schema"""

@@ -1529,11 +1529,14 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 }
 
             # ALWAYS save campaigns after rebuild to ensure persistence
-            # Even if campaigns_changed is False, we save to ensure rebuild is persisted
+            # CRITICAL: Save even if nothing changed to ensure rebuild state is persisted
             # This prevents videos from disappearing due to timing issues or file corruption
+            # On Render free tier, files may not persist between deployments, so we always save
+            self.save_campaigns(campaigns)
             if campaigns_changed or rebuild_count > 0:
-                self.save_campaigns(campaigns)
                 print(f"[REBUILD] Saved campaigns (changed={campaigns_changed}, rebuilt={rebuild_count})")
+            else:
+                print(f"[REBUILD] Verified campaigns (no changes needed)")
             
             # VERIFICATION: Check for videos that have campaign_id but aren't in campaigns
             # This helps diagnose the "videos disappearing" issue

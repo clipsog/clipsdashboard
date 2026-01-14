@@ -186,22 +186,24 @@ if __name__ == '__main__':
                         rebuild_count += 1
                         print(f"  ✓ Restored video to {campaign_id}: {video_url[:50]}...")
             
-            if campaigns_changed:
-                # Use atomic write
-                import tempfile
-                import shutil
-                temp_fd, temp_path = tempfile.mkstemp(dir=campaigns_file.parent, suffix='.tmp')
-                try:
-                    with os.fdopen(temp_fd, 'w') as f:
-                        json.dump(campaigns, f, indent=2)
-                    shutil.move(temp_path, campaigns_file)
-                    print(f"✅ Rebuilt {rebuild_count} video(s) to campaigns")
-                except Exception as e:
-                    if Path(temp_path).exists():
-                        os.remove(temp_path)
-                    print(f"❌ Failed to save campaigns: {e}")
-            else:
-                print("✅ Campaigns already in sync with progress.json")
+            # ALWAYS save campaigns after rebuild, even if nothing changed
+            # This ensures the rebuilt state is persisted, especially important on Render
+            # where files may reset on deployment
+            import tempfile
+            import shutil
+            temp_fd, temp_path = tempfile.mkstemp(dir=campaigns_file.parent, suffix='.tmp')
+            try:
+                with os.fdopen(temp_fd, 'w') as f:
+                    json.dump(campaigns, f, indent=2)
+                shutil.move(temp_path, campaigns_file)
+                if rebuild_count > 0:
+                    print(f"✅ Rebuilt {rebuild_count} video(s) to campaigns and saved")
+                else:
+                    print(f"✅ Verified campaigns ({len(campaigns)} campaigns, {sum(len(c.get('videos', [])) for c in campaigns.values())} videos)")
+            except Exception as e:
+                if Path(temp_path).exists():
+                    os.remove(temp_path)
+                print(f"❌ Failed to save campaigns: {e}")
     except Exception as e:
         print(f"⚠️ Error rebuilding campaigns: {e}")
     

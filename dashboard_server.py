@@ -95,6 +95,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.handle_catch_up()
         elif path == '/api/manual-order':
             self.handle_manual_order()
+        elif path == '/api/update-video-time':
+            self.handle_update_video_time()
+        elif path == '/api/video-details':
+            self.handle_video_details()
         elif path == '/health' or path == '/api/health':
             self.handle_health()
         else:
@@ -135,6 +139,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.handle_catch_up()
         elif path == '/api/manual-order':
             self.handle_manual_order()
+        elif path == '/api/update-video-time':
+            self.handle_update_video_time()
+        elif path == '/api/video-details':
+            self.handle_video_details()
         elif path == '/health' or path == '/api/health':
             self.handle_health()
         else:
@@ -2450,6 +2458,228 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(response_data.encode())
     
+    def handle_update_video_time(self):
+        """Update video target completion time"""
+        try:
+            parsed_path = urllib.parse.urlparse(self.path)
+            query_string = parsed_path.query
+            params = urllib.parse.parse_qs(query_string)
+            
+            video_url = params.get('video_url', [None])[0]
+            target_completion_time_str = params.get('target_completion_time', [None])[0]
+            
+            if not video_url or not target_completion_time_str:
+                response_data = json.dumps({'success': False, 'error': 'Missing video_url or target_completion_time'})
+                self.send_response(400)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Content-Length', str(len(response_data)))
+                self.end_headers()
+                self.wfile.write(response_data.encode())
+                return
+            
+            video_url = urllib.parse.unquote(video_url)
+            
+            progress = self.load_progress()
+            if video_url not in progress:
+                response_data = json.dumps({'success': False, 'error': 'Video not found'})
+                self.send_response(404)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Content-Length', str(len(response_data)))
+                self.end_headers()
+                self.wfile.write(response_data.encode())
+                return
+            
+            # Update target completion time
+            progress[video_url]['target_completion_time'] = target_completion_time_str
+            progress[video_url]['target_completion_datetime'] = target_completion_time_str
+            
+            self.save_progress(progress)
+            
+            response_data = json.dumps({'success': True, 'message': 'Video time updated successfully'})
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Content-Length', str(len(response_data)))
+            self.end_headers()
+            self.wfile.write(response_data.encode())
+        except Exception as e:
+            print(f"EXCEPTION in handle_update_video_time: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            response_data = json.dumps({'success': False, 'error': str(e)})
+            self.send_response(500)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Content-Length', str(len(response_data)))
+            self.end_headers()
+            self.wfile.write(response_data.encode())
+    
+    def handle_video_details(self):
+        """Get video details"""
+        try:
+            parsed_path = urllib.parse.urlparse(self.path)
+            query_string = parsed_path.query
+            params = urllib.parse.parse_qs(query_string)
+            
+            video_url = params.get('video_url', [None])[0]
+            
+            if not video_url:
+                response_data = json.dumps({'success': False, 'error': 'Missing video_url'})
+                self.send_response(400)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Content-Length', str(len(response_data)))
+                self.end_headers()
+                self.wfile.write(response_data.encode())
+                return
+            
+            video_url = urllib.parse.unquote(video_url)
+            
+            progress = self.load_progress()
+            if video_url not in progress:
+                response_data = json.dumps({'success': False, 'error': 'Video not found'})
+                self.send_response(404)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Content-Length', str(len(response_data)))
+                self.end_headers()
+                self.wfile.write(response_data.encode())
+                return
+            
+            video_data = progress[video_url]
+            
+            response_data = json.dumps({'success': True, 'video': video_data})
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Content-Length', str(len(response_data)))
+            self.end_headers()
+            self.wfile.write(response_data.encode())
+        except Exception as e:
+            print(f"EXCEPTION in handle_video_details: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            response_data = json.dumps({'success': False, 'error': str(e)})
+            self.send_response(500)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Content-Length', str(len(response_data)))
+            self.end_headers()
+            self.wfile.write(response_data.encode())
+    
+    def handle_update_video_time(self):
+        """Update video target completion time"""
+        try:
+            parsed_path = urllib.parse.urlparse(self.path)
+            query_string = parsed_path.query
+            params = urllib.parse.parse_qs(query_string)
+            
+            video_url = params.get('video_url', [None])[0]
+            target_completion_time_str = params.get('target_completion_time', [None])[0]
+            
+            if not video_url or not target_completion_time_str:
+                response_data = json.dumps({'success': False, 'error': 'Missing video_url or target_completion_time'})
+                self.send_response(400)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Content-Length', str(len(response_data)))
+                self.end_headers()
+                self.wfile.write(response_data.encode())
+                return
+            
+            video_url = urllib.parse.unquote(video_url)
+            
+            progress = self.load_progress()
+            if video_url not in progress:
+                response_data = json.dumps({'success': False, 'error': 'Video not found'})
+                self.send_response(404)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Content-Length', str(len(response_data)))
+                self.end_headers()
+                self.wfile.write(response_data.encode())
+                return
+            
+            # Update target completion time
+            progress[video_url]['target_completion_time'] = target_completion_time_str
+            progress[video_url]['target_completion_datetime'] = target_completion_time_str
+            
+            self.save_progress(progress)
+            
+            response_data = json.dumps({'success': True, 'message': 'Video time updated successfully'})
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Content-Length', str(len(response_data)))
+            self.end_headers()
+            self.wfile.write(response_data.encode())
+        except Exception as e:
+            print(f"EXCEPTION in handle_update_video_time: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            response_data = json.dumps({'success': False, 'error': str(e)})
+            self.send_response(500)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Content-Length', str(len(response_data)))
+            self.end_headers()
+            self.wfile.write(response_data.encode())
+    
+    def handle_video_details(self):
+        """Get video details"""
+        try:
+            parsed_path = urllib.parse.urlparse(self.path)
+            query_string = parsed_path.query
+            params = urllib.parse.parse_qs(query_string)
+            
+            video_url = params.get('video_url', [None])[0]
+            
+            if not video_url:
+                response_data = json.dumps({'success': False, 'error': 'Missing video_url'})
+                self.send_response(400)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Content-Length', str(len(response_data)))
+                self.end_headers()
+                self.wfile.write(response_data.encode())
+                return
+            
+            video_url = urllib.parse.unquote(video_url)
+            
+            progress = self.load_progress()
+            if video_url not in progress:
+                response_data = json.dumps({'success': False, 'error': 'Video not found'})
+                self.send_response(404)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Content-Length', str(len(response_data)))
+                self.end_headers()
+                self.wfile.write(response_data.encode())
+                return
+            
+            video_data = progress[video_url]
+            
+            response_data = json.dumps({'success': True, 'video': video_data})
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Content-Length', str(len(response_data)))
+            self.end_headers()
+            self.wfile.write(response_data.encode())
+        except Exception as e:
+            print(f"EXCEPTION in handle_video_details: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            response_data = json.dumps({'success': False, 'error': str(e)})
+            self.send_response(500)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Content-Length', str(len(response_data)))
+            self.end_headers()
+            self.wfile.write(response_data.encode())
+    
     def load_progress(self):
         """Load progress from file"""
         if not PROGRESS_FILE.exists():
@@ -3747,6 +3977,40 @@ class DashboardHandler(BaseHTTPRequestHandler):
             </div>
         </div>
         
+        <!-- Edit Time Left Modal -->
+        <div id="edit-time-left-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10004; align-items: center; justify-content: center;">
+            <div style="background: #1a1a1a; border-radius: 0; padding: 20px; max-width: 400px; width: 90%; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 8px 32px rgba(0,0,0,0.5);">
+                <h2 style="margin: 0 0 15px 0; color: #fff; font-size: 20px;">Edit Time Left</h2>
+                <p style="color: #b0b0b0; margin-bottom: 15px; font-size: 13px;">Set how much time is left for this video to reach its goal.</p>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; color: #fff; margin-bottom: 8px; font-weight: 600; font-size: 13px;">Hours</label>
+                    <input type="number" id="edit-time-hours" placeholder="0" min="0" step="1" style="width: 100%; padding: 8px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 0; color: #fff; font-size: 14px; box-sizing: border-box;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; color: #fff; margin-bottom: 8px; font-weight: 600; font-size: 13px;">Minutes</label>
+                    <input type="number" id="edit-time-minutes" placeholder="0" min="0" max="59" step="1" style="width: 100%; padding: 8px; background: #2a2a2a; border: 1px solid rgba(255,255,255,0.2); border-radius: 0; color: #fff; font-size: 14px; box-sizing: border-box;">
+                </div>
+                <div id="edit-time-error" style="color: #ef4444; margin-bottom: 15px; font-size: 13px; display: none;"></div>
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button onclick="hideEditTimeLeftModal()" style="background: #444; color: white; border: none; padding: 8px 16px; border-radius: 0; cursor: pointer; font-size: 13px;">Cancel</button>
+                    <button onclick="saveTimeLeft()" style="background: #10b981; color: white; border: none; padding: 8px 16px; border-radius: 0; cursor: pointer; font-weight: 600; font-size: 13px;">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Video Details Modal -->
+        <div id="video-details-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10005; align-items: center; justify-content: center; overflow-y: auto;">
+            <div style="background: #1a1a1a; border-radius: 0; padding: 20px; max-width: 700px; width: 90%; max-height: 90vh; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 8px 32px rgba(0,0,0,0.5); margin: 20px 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="margin: 0; color: #fff; font-size: 20px;">Video Details</h2>
+                    <button onclick="hideVideoDetailsModal()" style="background: transparent; color: #fff; border: none; font-size: 24px; cursor: pointer; padding: 0; width: 30px; height: 30px; line-height: 30px;">&times;</button>
+                </div>
+                <div id="video-details-content" style="color: #fff; font-size: 13px; line-height: 1.6;">
+                    <p style="color: #b0b0b0;">Loading...</p>
+                </div>
+            </div>
+        </div>
+
         <!-- Edit Campaign Modal -->
         <div id="edit-campaign-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 10003; align-items: center; justify-content: center;">
             <div style="background: #1a1a1a; border-radius: 0; padding: 10px; max-width: 500px; width: 90%; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 8px 32px rgba(0,0,0,0.5);">
@@ -4603,6 +4867,171 @@ class DashboardHandler(BaseHTTPRequestHandler):
             modal.style.display = 'none';
             modal.removeAttribute('data-campaign-id');
         }
+        
+        // Edit Time Left Modal Functions
+        let currentEditTimeVideoUrl = null;
+        
+        function showEditTimeLeftModal(videoUrl, currentHours = 0, currentMinutes = 0) {
+            currentEditTimeVideoUrl = videoUrl;
+            const modal = document.getElementById('edit-time-left-modal');
+            document.getElementById('edit-time-hours').value = currentHours || '';
+            document.getElementById('edit-time-minutes').value = currentMinutes || '';
+            document.getElementById('edit-time-error').style.display = 'none';
+            modal.style.display = 'flex';
+        }
+        
+        function hideEditTimeLeftModal() {
+            const modal = document.getElementById('edit-time-left-modal');
+            modal.style.display = 'none';
+            currentEditTimeVideoUrl = null;
+        }
+        
+        async function saveTimeLeft() {
+            if (!currentEditTimeVideoUrl) return;
+            
+            const hours = parseInt(document.getElementById('edit-time-hours').value) || 0;
+            const minutes = parseInt(document.getElementById('edit-time-minutes').value) || 0;
+            
+            if (hours === 0 && minutes === 0) {
+                document.getElementById('edit-time-error').textContent = 'Please enter at least 1 minute';
+                document.getElementById('edit-time-error').style.display = 'block';
+                return;
+            }
+            
+            try {
+                const now = new Date();
+                const targetTime = new Date(now.getTime() + (hours * 60 + minutes) * 60 * 1000);
+                
+                const response = await fetch(`/api/update-video-time?video_url=${encodeURIComponent(currentEditTimeVideoUrl)}&target_completion_time=${encodeURIComponent(targetTime.toISOString())}`, {
+                    method: 'POST'
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    hideEditTimeLeftModal();
+                    loadDashboard(true);
+                } else {
+                    document.getElementById('edit-time-error').textContent = result.error || 'Failed to update time';
+                    document.getElementById('edit-time-error').style.display = 'block';
+                }
+            } catch (error) {
+                document.getElementById('edit-time-error').textContent = 'Error: ' + error.message;
+                document.getElementById('edit-time-error').style.display = 'block';
+            }
+        }
+        
+        // Video Details Modal Functions
+        let currentVideoDetailsUrl = null;
+        
+        async function showVideoDetailsModal(videoUrl) {
+            currentVideoDetailsUrl = videoUrl;
+            const modal = document.getElementById('video-details-modal');
+            const content = document.getElementById('video-details-content');
+            content.innerHTML = '<p style="color: #b0b0b0;">Loading...</p>';
+            modal.style.display = 'flex';
+            
+            try {
+                // Fetch video data
+                const response = await fetch(`/api/video-details?video_url=${encodeURIComponent(videoUrl)}`);
+                const result = await response.json();
+                
+                if (result.success && result.video) {
+                    const video = result.video;
+                    const { username, videoId } = extractVideoInfo(videoUrl);
+                    
+                    let html = `
+                        <div style="margin-bottom: 15px;">
+                            <h3 style="color: #fff; margin: 0 0 10px 0; font-size: 16px;">Video Information</h3>
+                            <p style="margin: 5px 0;"><strong style="color: #667eea;">Video ID:</strong> <a href="${videoUrl}" target="_blank" style="color: #667eea; text-decoration: none;">${videoId}</a></p>
+                            <p style="margin: 5px 0;"><strong style="color: #667eea;">URL:</strong> <a href="${videoUrl}" target="_blank" style="color: #667eea; text-decoration: none; word-break: break-all;">${videoUrl}</a></p>
+                            <p style="margin: 5px 0;"><strong style="color: #667eea;">Username:</strong> ${username || 'N/A'}</p>
+                            <p style="margin: 5px 0;"><strong style="color: #667eea;">Date Posted:</strong> ${video.start_time ? new Date(video.start_time).toLocaleString() : 'N/A'}</p>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <h3 style="color: #fff; margin: 0 0 10px 0; font-size: 16px;">Current Metrics</h3>
+                            <p style="margin: 5px 0;"><strong style="color: #667eea;">Views:</strong> ${formatNumber(video.real_views || video.initial_views || 0)}</p>
+                            <p style="margin: 5px 0;"><strong style="color: #667eea;">Likes:</strong> ${formatNumber(video.real_likes || video.initial_likes || 0)}</p>
+                            <p style="margin: 5px 0;"><strong style="color: #667eea;">Comments:</strong> ${formatNumber(video.real_comments || video.initial_comments || 0)}</p>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <h3 style="color: #fff; margin: 0 0 10px 0; font-size: 16px;">Targets</h3>
+                            <p style="margin: 5px 0;"><strong style="color: #667eea;">Target Views:</strong> ${formatNumber(video.target_views || 0)}</p>
+                            <p style="margin: 5px 0;"><strong style="color: #667eea;">Target Likes:</strong> ${formatNumber(video.target_likes || 0)}</p>
+                            <p style="margin: 5px 0;"><strong style="color: #667eea;">Target Comments:</strong> ${formatNumber(video.target_comments || 0)}</p>
+                        </div>
+                    `;
+                    
+                    const targetCompletion = video.target_completion_time || video.target_completion_datetime;
+                    if (targetCompletion) {
+                        const targetDate = new Date(targetCompletion);
+                        const now = new Date();
+                        const remainingMs = targetDate - now;
+                        if (remainingMs > 0) {
+                            const hours = Math.floor(remainingMs / (1000 * 60 * 60));
+                            const minutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+                            html += `
+                                <div style="margin-bottom: 15px;">
+                                    <h3 style="color: #fff; margin: 0 0 10px 0; font-size: 16px;">Timeline</h3>
+                                    <p style="margin: 5px 0;"><strong style="color: #667eea;">Target Completion:</strong> ${targetDate.toLocaleString()}</p>
+                                    <p style="margin: 5px 0;"><strong style="color: #667eea;">Time Left:</strong> ${hours}h ${minutes}m</p>
+                                </div>
+                            `;
+                        } else {
+                            html += `
+                                <div style="margin-bottom: 15px;">
+                                    <h3 style="color: #fff; margin: 0 0 10px 0; font-size: 16px;">Timeline</h3>
+                                    <p style="margin: 5px 0; color: #ef4444;"><strong>Status:</strong> OVERDUE</p>
+                                </div>
+                            `;
+                        }
+                    }
+                    
+                    const orderHistory = video.order_history || [];
+                    if (orderHistory.length > 0) {
+                        html += `
+                            <div style="margin-bottom: 15px;">
+                                <h3 style="color: #fff; margin: 0 0 10px 0; font-size: 16px;">Order History (${orderHistory.length})</h3>
+                                <div style="max-height: 200px; overflow-y: auto;">
+                        `;
+                        orderHistory.slice(-10).reverse().forEach(order => {
+                            const date = order.timestamp ? new Date(order.timestamp).toLocaleString() : 'N/A';
+                            html += `
+                                <div style="padding: 8px; margin-bottom: 5px; background: #2a2a2a; border-left: 3px solid #667eea;">
+                                    <p style="margin: 3px 0; font-size: 12px;"><strong>${order.service}</strong> - ${formatNumber(order.quantity || 0)} units - $${(order.cost || 0).toFixed(4)}</p>
+                                    <p style="margin: 3px 0; font-size: 11px; color: #b0b0b0;">${date} ${order.manual ? '(Manual)' : '(Scheduled)'}</p>
+                                </div>
+                            `;
+                        });
+                        html += `</div></div>`;
+                    }
+                    
+                    content.innerHTML = html;
+                } else {
+                    content.innerHTML = `<p style="color: #ef4444;">Failed to load video details: ${result.error || 'Unknown error'}</p>`;
+                }
+            } catch (error) {
+                content.innerHTML = `<p style="color: #ef4444;">Error loading video details: ${error.message}</p>`;
+            }
+        }
+        
+        function hideVideoDetailsModal() {
+            const modal = document.getElementById('video-details-modal');
+            modal.style.display = 'none';
+            currentVideoDetailsUrl = null;
+        }
+        
+        // Close modals when clicking outside
+        document.addEventListener('click', function(event) {
+            const editTimeModal = document.getElementById('edit-time-left-modal');
+            const videoDetailsModal = document.getElementById('video-details-modal');
+            
+            if (event.target === editTimeModal) {
+                hideEditTimeLeftModal();
+            }
+            if (event.target === videoDetailsModal) {
+                hideVideoDetailsModal();
+            }
+        });
         
         async function updateCampaign() {
             const modal = document.getElementById('edit-campaign-modal');
@@ -6490,11 +6919,24 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     avgLikesCostPerUnit = totalLikesUnits > 0 ? totalLikesCost / totalLikesUnits : 0;
                 }
                 
+                // Calculate current hours/minutes for time left edit
+                let currentHours = 0;
+                let currentMinutes = 0;
+                if (target_completion && startTime) {
+                    const now = new Date();
+                    const endTime = new Date(target_completion);
+                    const remainingMs = endTime - now;
+                    if (remainingMs > 0) {
+                        currentHours = Math.floor(remainingMs / (1000 * 60 * 60));
+                        currentMinutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+                    }
+                }
+                
                 html += `
-                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer;" onclick="navigateToVideo('${escapeTemplateLiteral(videoUrl)}')" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='transparent'">
-                        <td style="padding: 4px 3px; color: #667eea; font-family: monospace; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); text-align: left;" title="${escapeTemplateLiteral(videoUrl)}"><a href="#video/${encodeURIComponent(videoUrl)}" style="color: #667eea; text-decoration: none;" onclick="event.stopPropagation(); navigateToVideo('${escapeTemplateLiteral(videoUrl)}'); return false;">${videoId}</a></td>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='transparent'">
+                        <td style="padding: 4px 3px; color: #667eea; font-family: monospace; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); text-align: left;" title="${escapeTemplateLiteral(videoUrl)}"><a href="#" style="color: #667eea; text-decoration: none; cursor: pointer;" onclick="event.stopPropagation(); showVideoDetailsModal('${escapeTemplateLiteral(videoUrl)}'); return false;">${videoId}</a></td>
                         <td style="padding: 4px 3px; text-align: center; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${uploadTime}</td>
-                        <td style="padding: 4px 3px; text-align: center; color: ${timeLeft === 'OVERDUE' ? '#ef4444' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${timeLeft}</td>
+                        <td style="padding: 4px 3px; text-align: center; color: ${timeLeft === 'OVERDUE' ? '#ef4444' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; text-decoration: underline;" onclick="event.stopPropagation(); showEditTimeLeftModal('${escapeTemplateLiteral(videoUrl)}', ${currentHours}, ${currentMinutes});" title="Click to edit time left">${timeLeft}</td>
                         <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(real_views)}</td>
                         <td style="padding: 4px 3px; text-align: right; color: ${real_views >= expected_views ? '#10b981' : '#f59e0b'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(expected_views)}</td>
                         <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);"><span onclick="event.stopPropagation(); handleManualOrder('${escapeTemplateLiteral(videoUrl)}', 'views');" style="cursor: pointer; text-decoration: underline; color: #667eea;">${manualViewsOrders}</span></td>
@@ -7584,11 +8026,24 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                         avgLikesCostPerUnit = totalLikesUnits > 0 ? totalLikesCost / totalLikesUnits : 0;
                                     }
                                     
+                                    // Calculate current hours/minutes for time left edit
+                                    let currentHours = 0;
+                                    let currentMinutes = 0;
+                                    if (target_completion && startTime) {
+                                        const now = new Date();
+                                        const endTime = new Date(target_completion);
+                                        const remainingMs = endTime - now;
+                                        if (remainingMs > 0) {
+                                            currentHours = Math.floor(remainingMs / (1000 * 60 * 60));
+                                            currentMinutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+                                        }
+                                    }
+                                    
                                     tableHtml += `
-                                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer;" onclick="navigateToVideo('${escapeTemplateLiteral(videoUrl)}')" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='transparent'">
-                                            <td style="padding: 4px 3px; color: #667eea; font-family: monospace; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); text-align: left;" title="${escapeTemplateLiteral(videoUrl)}"><a href="#video/${encodeURIComponent(videoUrl)}" style="color: #667eea; text-decoration: none;" onclick="event.stopPropagation(); navigateToVideo('${escapeTemplateLiteral(videoUrl)}'); return false;">${videoId}</a></td>
+                                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='transparent'">
+                                            <td style="padding: 4px 3px; color: #667eea; font-family: monospace; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); text-align: left;" title="${escapeTemplateLiteral(videoUrl)}"><a href="#" style="color: #667eea; text-decoration: none; cursor: pointer;" onclick="event.stopPropagation(); showVideoDetailsModal('${escapeTemplateLiteral(videoUrl)}'); return false;">${videoId}</a></td>
                                             <td style="padding: 4px 3px; text-align: center; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${uploadTime}</td>
-                                            <td style="padding: 4px 3px; text-align: center; color: ${timeLeft === 'OVERDUE' ? '#ef4444' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${timeLeft}</td>
+                                            <td style="padding: 4px 3px; text-align: center; color: ${timeLeft === 'OVERDUE' ? '#ef4444' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; text-decoration: underline;" onclick="event.stopPropagation(); showEditTimeLeftModal('${escapeTemplateLiteral(videoUrl)}', ${currentHours}, ${currentMinutes});" title="Click to edit time left">${timeLeft}</td>
                                             <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(real_views)}</td>
                                             <td style="padding: 4px 3px; text-align: right; color: ${real_views >= expected_views ? '#10b981' : '#f59e0b'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(expected_views)}</td>
                                             <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);"><span onclick="event.stopPropagation(); handleManualOrder('${escapeTemplateLiteral(videoUrl)}', 'views');" style="cursor: pointer; text-decoration: underline; color: #667eea;">${manualViewsOrders}</span></td>

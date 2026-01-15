@@ -4567,7 +4567,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
             // Escape template literal special characters for display
             function escapeForTemplate(str) {
                 if (!str) return '';
-                return String(str).replace(/\\\\/g, '\\\\\\\\').replace(/`/g, '\\\\`').replace(/\\$/g, '\\\\$');
+                return String(str)
+                    .replace(/\\\\/g, '\\\\\\\\')  // Escape backslashes first
+                    .replace(/'/g, "\\'")           // Escape single quotes
+                    .replace(/`/g, '\\\\`')         // Escape backticks
+                    .replace(/\\$/g, '\\\\$');      // Escape dollar signs
             }
             if (!confirm(`Are you sure you want to remove this video from the process?\\n\\nVideo: ${escapeForTemplate(videoUrl)}\\n\\nThis will stop tracking but won't cancel existing orders.`)) {
                 return;
@@ -5882,7 +5886,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     const durM = (campaign.target_duration_minutes !== undefined) ? campaign.target_duration_minutes : 0;
                     
                     html += `<div class="campaign-card-clickable" data-campaign-id="${campaignId}" style="background: #2a2a2a; border-radius: 0; padding: 10px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: all 0.2s; position: relative; display: flex; flex-direction: column;" onmouseover="this.style.borderColor='rgba(102,126,234,0.5)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.transform='translateY(0)';">
-                        <button class="delete-campaign-btn" data-campaign-id="${campaignId}" onclick="event.stopPropagation(); deleteCampaign('${campaignId}', '${(campaign.name || 'Unnamed Campaign').replace(/'/g, "\\'").replace(/"/g, '&quot;')}');" style="position: absolute; top: 5px; right: 5px; background: rgba(239,68,68,0.25); color: #ef4444; border: 2px solid rgba(239,68,68,0.6); padding: 0; border-radius: 0; cursor: pointer; font-size: 22px; font-weight: 700; transition: all 0.2s; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; z-index: 100; line-height: 1; box-shadow: 0 2px 4px rgba(0,0,0,0.3);" onmouseover="this.style.background='rgba(239,68,68,0.5)'; this.style.borderColor='rgba(239,68,68,1)'; this.style.transform='scale(1.2)'; this.style.boxShadow='0 3px 6px rgba(239,68,68,0.4)';" onmouseout="this.style.background='rgba(239,68,68,0.25)'; this.style.borderColor='rgba(239,68,68,0.6)'; this.style.transform='scale(1)'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.3)';" title="Delete Campaign">×</button>
+                        <button class="delete-campaign-btn" data-campaign-id="${escapeTemplateLiteral(campaignId)}" data-campaign-name="${escapeTemplateLiteral(campaign.name || 'Unnamed Campaign')}" style="position: absolute; top: 5px; right: 5px; background: rgba(239,68,68,0.25); color: #ef4444; border: 2px solid rgba(239,68,68,0.6); padding: 0; border-radius: 0; cursor: pointer; font-size: 22px; font-weight: 700; transition: all 0.2s; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; z-index: 100; line-height: 1; box-shadow: 0 2px 4px rgba(0,0,0,0.3);" onmouseover="this.style.background='rgba(239,68,68,0.5)'; this.style.borderColor='rgba(239,68,68,1)'; this.style.transform='scale(1.2)'; this.style.boxShadow='0 3px 6px rgba(239,68,68,0.4)';" onmouseout="this.style.background='rgba(239,68,68,0.25)'; this.style.borderColor='rgba(239,68,68,0.6)'; this.style.transform='scale(1)'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.3)';" title="Delete Campaign">×</button>
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; padding-right: 40px;">
                             <div style="flex: 1;">
                                 <h4 style="margin: 0 0 5px 0; color: #fff; font-size: 1.1em; font-weight: 600;">${campaign.name || 'Unnamed Campaign'}</h4>
@@ -5922,12 +5926,12 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             </div>` : ''}
                         </div>
                         <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px; margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
-                            <button class="edit-campaign-btn" data-campaign-id="${campaignId}" onclick="event.stopPropagation(); showEditCampaignModal('${campaignId}');" style="flex: 1; min-width: 80px; background: #2a2a2a; color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 0; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;" onmouseover="this.style.background='#333'; this.style.borderColor='rgba(255,255,255,0.3)';" onmouseout="this.style.background='#2a2a2a'; this.style.borderColor='rgba(255,255,255,0.2)';">Edit</button>
-                            <button class="add-video-to-campaign-btn" data-campaign-id="${campaignId}" onclick="event.stopPropagation(); showAddVideoToCampaignModal('${campaignId}');" style="flex: 1; min-width: 100px; background: #2a2a2a; color: #667eea; border: 1px solid rgba(102,126,234,0.3); padding: 8px 12px; border-radius: 0; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;" onmouseover="this.style.background='#333'; this.style.borderColor='rgba(102,126,234,0.5)';" onmouseout="this.style.background='#2a2a2a'; this.style.borderColor='rgba(102,126,234,0.3)';">Add Video</button>
-                            ${campaign.status !== 'ended' ? `<button class="end-campaign-btn" data-campaign-id="${campaignId}" onclick="event.stopPropagation(); endCampaign('${campaignId}');" style="flex: 1; min-width: 120px; background: #2a2a2a; color: #ef4444; border: 1px solid rgba(239,68,68,0.3); padding: 8px 12px; border-radius: 0; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;" onmouseover="this.style.background='#333'; this.style.borderColor='rgba(239,68,68,0.5)';" onmouseout="this.style.background='#2a2a2a'; this.style.borderColor='rgba(239,68,68,0.3)';">End Campaign</button>` : '<span style="flex: 1; color: #888; font-size: 11px; padding: 8px 12px; text-align: center;">Ended</span>'}
+                            <button class="edit-campaign-btn" data-campaign-id="${escapeTemplateLiteral(campaignId)}" style="flex: 1; min-width: 80px; background: #2a2a2a; color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 0; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;" onmouseover="this.style.background='#333'; this.style.borderColor='rgba(255,255,255,0.3)';" onmouseout="this.style.background='#2a2a2a'; this.style.borderColor='rgba(255,255,255,0.2)';">Edit</button>
+                            <button class="add-video-to-campaign-btn" data-campaign-id="${escapeTemplateLiteral(campaignId)}" style="flex: 1; min-width: 100px; background: #2a2a2a; color: #667eea; border: 1px solid rgba(102,126,234,0.3); padding: 8px 12px; border-radius: 0; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;" onmouseover="this.style.background='#333'; this.style.borderColor='rgba(102,126,234,0.5)';" onmouseout="this.style.background='#2a2a2a'; this.style.borderColor='rgba(102,126,234,0.3)';">Add Video</button>
+                            ${campaign.status !== 'ended' ? `<button class="end-campaign-btn" data-campaign-id="${escapeTemplateLiteral(campaignId)}" style="flex: 1; min-width: 120px; background: #2a2a2a; color: #ef4444; border: 1px solid rgba(239,68,68,0.3); padding: 8px 12px; border-radius: 0; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;" onmouseover="this.style.background='#333'; this.style.borderColor='rgba(239,68,68,0.5)';" onmouseout="this.style.background='#2a2a2a'; this.style.borderColor='rgba(239,68,68,0.3)';">End Campaign</button>` : '<span style="flex: 1; color: #888; font-size: 11px; padding: 8px 12px; text-align: center;">Ended</span>'}
                         </div>
                         <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px; margin-top: 8px; text-align: center;">
-                            <a href="#" onclick="event.stopPropagation(); deleteCampaign('${campaignId}', '${(campaign.name || 'Unnamed Campaign').replace(/'/g, "\\'").replace(/"/g, '&quot;')}'); return false;" style="color: #fff; text-decoration: none; font-size: 12px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.textDecoration='underline'; this.style.color='#ef4444';" onmouseout="this.style.textDecoration='none'; this.style.color='#fff';">Remove Campaign</a>
+                            <a href="#" class="remove-campaign-link" data-campaign-id="${escapeTemplateLiteral(campaignId)}" data-campaign-name="${escapeTemplateLiteral(campaign.name || 'Unnamed Campaign')}" style="color: #fff; text-decoration: none; font-size: 12px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.textDecoration='underline'; this.style.color='#ef4444';" onmouseout="this.style.textDecoration='none'; this.style.color='#fff';">Remove Campaign</a>
                         </div>
                     </div>`;
                 }
@@ -8558,6 +8562,63 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 const metric = e.target.getAttribute('data-metric');
                 if (videoUrl && metric) {
                     handleManualOrder(videoUrl, metric);
+                }
+                return;
+            }
+            
+            // Handle delete campaign button
+            if (e.target && e.target.classList.contains('delete-campaign-btn')) {
+                e.preventDefault();
+                e.stopPropagation();
+                const campaignId = e.target.getAttribute('data-campaign-id');
+                const campaignName = e.target.getAttribute('data-campaign-name');
+                if (campaignId) {
+                    deleteCampaign(campaignId, campaignName || 'Unnamed Campaign');
+                }
+                return;
+            }
+            
+            // Handle remove campaign link
+            if (e.target && e.target.classList.contains('remove-campaign-link')) {
+                e.preventDefault();
+                e.stopPropagation();
+                const campaignId = e.target.getAttribute('data-campaign-id');
+                const campaignName = e.target.getAttribute('data-campaign-name');
+                if (campaignId) {
+                    deleteCampaign(campaignId, campaignName || 'Unnamed Campaign');
+                }
+                return false;
+            }
+            
+            // Handle edit campaign button
+            if (e.target && e.target.classList.contains('edit-campaign-btn')) {
+                e.preventDefault();
+                e.stopPropagation();
+                const campaignId = e.target.getAttribute('data-campaign-id');
+                if (campaignId) {
+                    showEditCampaignModal(campaignId);
+                }
+                return;
+            }
+            
+            // Handle add video to campaign button
+            if (e.target && e.target.classList.contains('add-video-to-campaign-btn')) {
+                e.preventDefault();
+                e.stopPropagation();
+                const campaignId = e.target.getAttribute('data-campaign-id');
+                if (campaignId) {
+                    showAddVideoToCampaignModal(campaignId);
+                }
+                return;
+            }
+            
+            // Handle end campaign button
+            if (e.target && e.target.classList.contains('end-campaign-btn')) {
+                e.preventDefault();
+                e.stopPropagation();
+                const campaignId = e.target.getAttribute('data-campaign-id');
+                if (campaignId) {
+                    endCampaign(campaignId);
                 }
                 return;
             }

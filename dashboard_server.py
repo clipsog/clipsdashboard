@@ -5058,11 +5058,43 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 }
                 
                 if (result.success) {
-                    hideEditTimeLeftModal();
-                    // Wait a moment for the server to process, then refresh without loading overlay
-                    await new Promise(resolve => setTimeout(resolve, 500));
-                    // Use loadDashboard(false) to avoid triggering loading overlay and multiple refreshes
-                    await loadDashboard(false);
+                    // Show "Saved" feedback briefly before closing
+                    if (saveButton) {
+                        saveButton.textContent = 'Saved ✓';
+                        saveButton.style.background = '#10b981';
+                    }
+                    
+                    // Update the UI immediately without waiting for full refresh
+                    const targetTime = new Date(now.getTime() + (hours * 60 + minutes) * 60 * 1000);
+                    
+                    // Update the time left cell directly if visible
+                    const timeLeftCell = document.querySelector(`[data-time-left][data-video-url="${escapeTemplateLiteral(currentEditTimeVideoUrl)}"]`);
+                    if (timeLeftCell) {
+                        const remainingMs = targetTime - new Date();
+                        if (remainingMs > 0) {
+                            const remainingHours = Math.floor(remainingMs / (1000 * 60 * 60));
+                            const remainingMinutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+                            const remainingSeconds = Math.floor((remainingMs % (1000 * 60)) / 1000);
+                            timeLeftCell.textContent = remainingHours + 'h' + (remainingMinutes > 0 ? remainingMinutes + 'm' : '') + remainingSeconds + 's';
+                            timeLeftCell.setAttribute('data-target-time', targetTime.toISOString());
+                        } else {
+                            timeLeftCell.textContent = 'OVERDUE';
+                            timeLeftCell.style.color = '#ef4444';
+                        }
+                    }
+                    
+                    // Close modal after brief delay, then reset button
+                    setTimeout(() => {
+                        hideEditTimeLeftModal();
+                        // Reset button after modal closes so user can save another edit
+                        if (saveButton) {
+                            saveButton.disabled = false;
+                            saveButton.textContent = 'Save';
+                            saveButton.style.background = '';
+                        }
+                        // Refresh in background without blocking
+                        loadDashboard(false).catch(err => console.error('[saveTimeLeft] Background refresh error:', err));
+                    }, 800);
                 } else {
                     document.getElementById('edit-time-error').textContent = result.error || 'Failed to update time';
                     document.getElementById('edit-time-error').style.display = 'block';
@@ -7828,7 +7860,29 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         body: params.toString()
                     });
                     
-                    const data = await response.json();
+                    // Handle server errors (502/503) gracefully
+                    if (!response.ok) {
+                        const errorMsg = `Server error ${response.status}`;
+                        errorCount++;
+                        statusLine.innerHTML = `[${i + 1}/${urls.length}] ${url.substring(0, 60)}... <span style="color: #ef4444;">✗ ${errorMsg}</span>`;
+                        results.push({ url, success: false, error: errorMsg });
+                        continue;
+                    }
+                    
+                    // Try to parse JSON
+                    let data;
+                    try {
+                        const text = await response.text();
+                        if (!text || text.trim() === '') {
+                            throw new Error('Empty response');
+                        }
+                        data = JSON.parse(text);
+                    } catch (parseError) {
+                        errorCount++;
+                        statusLine.innerHTML = `[${i + 1}/${urls.length}] ${url.substring(0, 60)}... <span style="color: #ef4444;">✗ Parse error</span>`;
+                        results.push({ url, success: false, error: 'Invalid response from server' });
+                        continue;
+                    }
                     
                     if (data.success) {
                         successCount++;
@@ -7860,14 +7914,19 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 // Show notification
                 showNotification(`${successCount} video(s) added successfully`, 'success');
                 
-                // Refresh dashboard after a short delay
-                setTimeout(async () => {
-                    await loadDashboard(false);
-                    await loadCampaigns();
-                    hideAddVideoModal();
-                    // Clear input
-                    input.value = '';
-                }, 1500);
+                // Close modal immediately for better UX
+                hideAddVideoModal();
+                // Clear input immediately
+                input.value = '';
+                
+                // Refresh in background without blocking (faster)
+                loadDashboard(false).catch(err => console.error('[addVideo] Dashboard refresh error:', err));
+                loadCampaigns().catch(err => console.error('[addVideo] Campaigns refresh error:', err));
+                
+                // Re-enable buttons
+                addButton.disabled = false;
+                cancelButton.disabled = false;
+                addButton.textContent = 'Add Video(s)';
             } else {
                 errorDiv.textContent = `Failed to add all videos. ${errorCount} error(s) occurred.`;
                 errorDiv.style.display = 'block';
@@ -8070,18 +8129,13 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 // Store all videos data for filtering
                 allVideosData = progress;
                 
-                // Load campaigns ONLY on first/full load. Avoid re-rendering campaign UI every refresh
-                // (it wipes calculator inputs, checkbox selection state, etc.).
-                if (showLoading && (!campaignsData || Object.keys(campaignsData).length === 0)) {
-                    try {
-                        await loadCampaigns();
-                    } catch (campaignError) {
-                        console.error('[loadDashboard] Failed to load campaigns:', campaignError);
-                        // Continue without campaigns if load fails
-                    }
-                }
+                // Load campaigns ONLY on first/full load OR if we're viewing a campaign and don't have it
+                // Avoid re-rendering campaign UI every refresh (it wipes calculator inputs, checkbox selection state, etc.).
+                const route = getCurrentRoute();
+                const needsCampaigns = showLoading && (!campaignsData || Object.keys(campaignsData).length === 0);
+                const needsSpecificCampaign = route.type === 'campaign' && (!campaignsData || !campaignsData[route.campaignId]);
                 
-                // Render summary stats
+                // Render summary stats immediately
                 renderSummaryStats(progress);
                 
                 if (Object.keys(progress).length === 0) {
@@ -8101,7 +8155,18 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 if (route.type === 'campaign') {
                     // Show campaign detail view with all posts - full page view
                     const campaignId = route.campaignId;
-                    const campaign = campaignsData[campaignId];
+                    
+                    // Ensure campaigns are loaded before rendering campaign view
+                    if (needsCampaigns || needsSpecificCampaign) {
+                        try {
+                            await loadCampaigns();
+                        } catch (campaignError) {
+                            console.error('[loadDashboard] Failed to load campaigns:', campaignError);
+                            // Continue without campaigns if load fails
+                        }
+                    }
+                    
+                    const campaign = campaignsData && campaignsData[campaignId] ? campaignsData[campaignId] : null;
                     
                     // Hide campaigns tab content when viewing campaign detail
                     const campaignsContent = document.getElementById('campaigns-content');
@@ -8135,6 +8200,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             </div>
                         `;
                     } else {
+                        // Render campaign header immediately for faster perceived performance
                         const campaignVideos = campaign.videos || [];
                         const financial = campaign.financial || {};
                         
@@ -8155,7 +8221,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         if (campaignVideos.length === 0) {
                             html += `<div style="text-align: center; padding: 30px; color: #b0b0b0;">No videos in this campaign yet. Add videos using the "Add Video" button.</div>`;
                         } else {
-                            // Render accounting-style table directly in HTML
+                            // Render accounting-style table directly in HTML (optimized for speed)
                             // Define escapeTemplateLiteral function for this scope
                             function escapeTemplateLiteral(str) {
                                 if (!str) return '';
@@ -8189,7 +8255,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                         <tbody>
                             `;
                             
-                            // Render table rows for each video
+                            // Render table rows for each video (optimized loop)
                             for (const videoUrl of campaignVideos) {
                                 const videoData = progress[videoUrl];
                                 if (videoData) {
@@ -8241,12 +8307,12 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                     // Order counts
                                     const orderHistory = videoData.order_history || [];
                                     const viewsOrders = orderHistory.filter(o => o.service === 'views');
-                                    const manualViewsOrders = viewsOrders.filter(o => o.manual).length;
-                                    const schedViewsOrders = viewsOrders.filter(o => !o.manual).length;
+                                    const manualViewsOrders = viewsOrders.filter(o => o.type === 'manual' || (!o.type && o.manual)).length;
+                                    const schedViewsOrders = viewsOrders.filter(o => o.type === 'scheduled' || (!o.type && !o.manual)).length;
                                     
                                     const likesOrders = orderHistory.filter(o => o.service === 'likes');
-                                    const manualLikesOrders = likesOrders.filter(o => o.manual).length;
-                                    const schedLikesOrders = likesOrders.filter(o => !o.manual).length;
+                                    const manualLikesOrders = likesOrders.filter(o => o.type === 'manual' || (!o.type && o.manual)).length;
+                                    const schedLikesOrders = likesOrders.filter(o => o.type === 'scheduled' || (!o.type && !o.manual)).length;
                                     
                                     // Units and cost per unit (average of scheduled orders only)
                                     let avgViewsUnits = 0;

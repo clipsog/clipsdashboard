@@ -5598,8 +5598,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     let html = `
                         <div style="margin-bottom: 15px;">
                             <h3 style="color: #fff; margin: 0 0 10px 0; font-size: 16px;">Video Information</h3>
-                            <p style="margin: 5px 0;"><strong style="color: #667eea;">Video ID:</strong> <a href="${videoUrl}" target="_blank" style="color: #667eea; text-decoration: none;">${videoId}</a></p>
-                            <p style="margin: 5px 0;"><strong style="color: #667eea;">URL:</strong> <a href="${videoUrl}" target="_blank" style="color: #667eea; text-decoration: none; word-break: break-all;">${videoUrl}</a></p>
+                            <p style="margin: 5px 0;"><strong style="color: #667eea;">Video ID:</strong> <a href="${escapeTemplateLiteral(videoUrl)}" target="_blank" style="color: #667eea; text-decoration: none;">${videoId}</a></p>
+                            <p style="margin: 5px 0;"><strong style="color: #667eea;">URL:</strong> <a href="${escapeTemplateLiteral(videoUrl)}" target="_blank" style="color: #667eea; text-decoration: none; word-break: break-all;">${escapeTemplateLiteral(videoUrl)}</a></p>
                             <p style="margin: 5px 0;"><strong style="color: #667eea;">Username:</strong> ${username || 'N/A'}</p>
                             <p style="margin: 5px 0;"><strong style="color: #667eea;">Date Posted:</strong> ${video.start_time ? new Date(video.start_time).toLocaleString() : 'N/A'}</p>
                         </div>

@@ -5358,12 +5358,23 @@ class DashboardHandler(BaseHTTPRequestHandler):
         }
         
         async function deleteCampaign(campaignId, campaignName) {
-            if (!confirm(`Are you sure you want to DELETE "${campaignName}"?\n\nThis action cannot be undone. All campaign data will be permanently removed.`)) {
+            // Escape campaignName for use in confirm dialog
+            function escapeForConfirm(str) {
+                if (!str) return '';
+                return String(str)
+                    .replace(/\\/g, '\\\\')  // Escape backslashes first
+                    .replace(/"/g, '\\"')     // Escape double quotes
+                    .replace(/'/g, "\\'")     // Escape single quotes
+                    .replace(/\n/g, '\\n')    // Escape newlines
+                    .replace(/\r/g, '\\r');   // Escape carriage returns
+            }
+            const safeName = escapeForConfirm(campaignName || 'Unnamed Campaign');
+            if (!confirm(`Are you sure you want to DELETE "${safeName}"?\\n\\nThis action cannot be undone. All campaign data will be permanently removed.`)) {
                 return;
             }
             
             // Double confirmation for safety
-            if (!confirm('⚠️ FINAL WARNING: This will permanently delete the campaign and all its data.\n\nClick OK to confirm deletion.')) {
+            if (!confirm('⚠️ FINAL WARNING: This will permanently delete the campaign and all its data.\\n\\nClick OK to confirm deletion.')) {
                 return;
             }
             
@@ -8239,12 +8250,21 @@ class DashboardHandler(BaseHTTPRequestHandler):
             existingUrls.push(url);
             textarea.value = existingUrls.join('\\n');
             
-            // Update UI
+            // Update UI - escape URL for HTML attribute
+            function escapeForAttr(str) {
+                if (!str) return '';
+                return String(str)
+                    .replace(/&/g, '&amp;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;');
+            }
             const urlItem = document.createElement('div');
             urlItem.style.cssText = 'display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); font-family: monospace; font-size: 12px;';
             urlItem.innerHTML = `
-                <span style="color: #b0b0b0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">${url}</span>
-                <button onclick="removeUrlFromList('${url.replace(/'/g, "\\\\'")}')" style="background: transparent; border: none; color: #ef4444; cursor: pointer; padding: 2px 6px; font-size: 14px; margin-left: 8px;">×</button>
+                <span style="color: #b0b0b0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">${escapeForAttr(url)}</span>
+                <button class="remove-url-btn" data-url="${escapeForAttr(url)}" style="background: transparent; border: none; color: #ef4444; cursor: pointer; padding: 2px 6px; font-size: 14px; margin-left: 8px;">×</button>
             `;
             urlList.appendChild(urlItem);
             
@@ -8270,14 +8290,23 @@ class DashboardHandler(BaseHTTPRequestHandler):
             const filteredUrls = existingUrls.filter(u => u !== urlToRemove);
             textarea.value = filteredUrls.join('\\n');
             
-            // Rebuild list
+            // Rebuild list - escape URL for HTML attribute
+            function escapeForAttr(str) {
+                if (!str) return '';
+                return String(str)
+                    .replace(/&/g, '&amp;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;');
+            }
             urlList.innerHTML = '';
             filteredUrls.forEach(url => {
                 const urlItem = document.createElement('div');
                 urlItem.style.cssText = 'display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,0.05); font-family: monospace; font-size: 12px;';
                 urlItem.innerHTML = `
-                    <span style="color: #b0b0b0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">${url}</span>
-                    <button onclick="removeUrlFromList('${url.replace(/'/g, "\\\\'")}')" style="background: transparent; border: none; color: #ef4444; cursor: pointer; padding: 2px 6px; font-size: 14px; margin-left: 8px;">×</button>
+                    <span style="color: #b0b0b0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">${escapeForAttr(url)}</span>
+                    <button class="remove-url-btn" data-url="${escapeForAttr(url)}" style="background: transparent; border: none; color: #ef4444; cursor: pointer; padding: 2px 6px; font-size: 14px; margin-left: 8px;">×</button>
                 `;
                 urlList.appendChild(urlItem);
             });
@@ -8619,6 +8648,17 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 const campaignId = e.target.getAttribute('data-campaign-id');
                 if (campaignId) {
                     endCampaign(campaignId);
+                }
+                return;
+            }
+            
+            // Handle remove URL button
+            if (e.target && e.target.classList.contains('remove-url-btn')) {
+                e.preventDefault();
+                e.stopPropagation();
+                const url = e.target.getAttribute('data-url');
+                if (url) {
+                    removeUrlFromList(url);
                 }
                 return;
             }

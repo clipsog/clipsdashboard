@@ -8511,7 +8511,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             for (const [campaignId, campaign] of Object.entries(campaignsData || {})) {
                 const name = (campaign && campaign.name) ? String(campaign.name) : 'Unnamed Campaign';
                 const safeName = name.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\\"/g, '&quot;');
-                html += `<option value="${campaignId}">${safeName}</option>`;
+                html += `<option value="${escapeTemplateLiteral(campaignId)}">${safeName}</option>`;
             }
             selector.innerHTML = html;
         }

@@ -5068,9 +5068,15 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     const targetTime = new Date(now.getTime() + (hours * 60 + minutes) * 60 * 1000);
                     
                     // Update the time left cell directly if visible
-                    // Escape the URL for use in querySelector
-                    const escapedUrl = currentEditTimeVideoUrl.replace(/"/g, '\\"').replace(/'/g, "\\'");
-                    const timeLeftCell = document.querySelector(`[data-time-left][data-video-url="${escapedUrl}"]`);
+                    // Find cell by iterating through all time-left cells (more reliable than querySelector with special chars)
+                    const timeLeftCells = document.querySelectorAll('[data-time-left]');
+                    let timeLeftCell = null;
+                    for (const cell of timeLeftCells) {
+                        if (cell.getAttribute('data-video-url') === currentEditTimeVideoUrl) {
+                            timeLeftCell = cell;
+                            break;
+                        }
+                    }
                     if (timeLeftCell) {
                         const remainingMs = targetTime - new Date();
                         if (remainingMs > 0) {

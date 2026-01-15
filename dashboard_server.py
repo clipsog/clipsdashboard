@@ -6093,7 +6093,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
             // Escape template literal special characters
             function escapeTemplateLiteral(str) {
                 if (!str) return '';
-                return String(str).replace(/\\\\/g, '\\\\\\\\').replace(/`/g, '\\\\`').replace(/\\$/g, '\\\\$');
+                return String(str)
+                    .replace(/\\\\/g, '\\\\\\\\')  // Escape backslashes first
+                    .replace(/'/g, "\\'")           // Escape single quotes
+                    .replace(/`/g, '\\\\`')         // Escape backticks
+                    .replace(/\\$/g, '\\\\$');      // Escape dollar signs
             }
             
             const displayName = username ? `@${escapeTemplateLiteral(username)}` : 'Unknown';

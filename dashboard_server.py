@@ -5843,7 +5843,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 for (const [campaignId, campaign] of campaigns) {
                     const name = (campaign && campaign.name) ? String(campaign.name) : 'Unnamed Campaign';
                     const safeName = name.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-                    html += `<option value="${campaignId}">${safeName}</option>`;
+                    html += `<option value="${escapeTemplateLiteral(campaignId)}">${safeName}</option>`;
                 }
                 html += '</select>';
             }
@@ -5885,7 +5885,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     const durH = (campaign.target_duration_hours !== undefined) ? campaign.target_duration_hours : 24;
                     const durM = (campaign.target_duration_minutes !== undefined) ? campaign.target_duration_minutes : 0;
                     
-                    html += `<div class="campaign-card-clickable" data-campaign-id="${campaignId}" style="background: #2a2a2a; border-radius: 0; padding: 10px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: all 0.2s; position: relative; display: flex; flex-direction: column;" onmouseover="this.style.borderColor='rgba(102,126,234,0.5)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.transform='translateY(0)';">
+                    html += `<div class="campaign-card-clickable" data-campaign-id="${escapeTemplateLiteral(campaignId)}" style="background: #2a2a2a; border-radius: 0; padding: 10px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: all 0.2s; position: relative; display: flex; flex-direction: column;" onmouseover="this.style.borderColor='rgba(102,126,234,0.5)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.transform='translateY(0)';">
                         <button class="delete-campaign-btn" data-campaign-id="${escapeTemplateLiteral(campaignId)}" data-campaign-name="${escapeTemplateLiteral(campaign.name || 'Unnamed Campaign')}" style="position: absolute; top: 5px; right: 5px; background: rgba(239,68,68,0.25); color: #ef4444; border: 2px solid rgba(239,68,68,0.6); padding: 0; border-radius: 0; cursor: pointer; font-size: 22px; font-weight: 700; transition: all 0.2s; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; z-index: 100; line-height: 1; box-shadow: 0 2px 4px rgba(0,0,0,0.3);" onmouseover="this.style.background='rgba(239,68,68,0.5)'; this.style.borderColor='rgba(239,68,68,1)'; this.style.transform='scale(1.2)'; this.style.boxShadow='0 3px 6px rgba(239,68,68,0.4)';" onmouseout="this.style.background='rgba(239,68,68,0.25)'; this.style.borderColor='rgba(239,68,68,0.6)'; this.style.transform='scale(1)'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.3)';" title="Delete Campaign">×</button>
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; padding-right: 40px;">
                             <div style="flex: 1;">

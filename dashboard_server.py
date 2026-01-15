@@ -5030,6 +5030,13 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 return;
             }
             
+            // Disable save button to prevent multiple submissions
+            const saveButton = document.querySelector('#edit-time-left-modal button[onclick="saveTimeLeft()"]');
+            if (saveButton) {
+                saveButton.disabled = true;
+                saveButton.textContent = 'Saving...';
+            }
+            
             try {
                 const now = new Date();
                 const targetTime = new Date(now.getTime() + (hours * 60 + minutes) * 60 * 1000);
@@ -5038,23 +5045,39 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     method: 'POST'
                 });
                 
-                const result = await response.json();
+                // Handle server errors
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+                
+                let result;
+                try {
+                    result = await response.json();
+                } catch (parseError) {
+                    throw new Error('Failed to parse server response');
+                }
+                
                 if (result.success) {
                     hideEditTimeLeftModal();
-                    // Force immediate refresh - wait for it to complete
-                    await loadDashboard(true);
-                    // Also refresh campaigns if we're on campaign detail view
-                    const route = getCurrentRoute();
-                    if (route.type === 'campaign') {
-                        await loadCampaigns();
-                    }
+                    // Wait a moment for the server to process, then refresh without loading overlay
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    // Use loadDashboard(false) to avoid triggering loading overlay and multiple refreshes
+                    await loadDashboard(false);
                 } else {
                     document.getElementById('edit-time-error').textContent = result.error || 'Failed to update time';
                     document.getElementById('edit-time-error').style.display = 'block';
+                    if (saveButton) {
+                        saveButton.disabled = false;
+                        saveButton.textContent = 'Save';
+                    }
                 }
             } catch (error) {
                 document.getElementById('edit-time-error').textContent = 'Error: ' + error.message;
                 document.getElementById('edit-time-error').style.display = 'block';
+                if (saveButton) {
+                    saveButton.disabled = false;
+                    saveButton.textContent = 'Save';
+                }
             }
         }
         
@@ -8001,7 +8024,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
             // Prevent multiple simultaneous refreshes
             if (isRefreshing) {
                 console.log('Already refreshing, skipping...');
-                return;
+                // Return a resolved promise so await doesn't hang
+                return Promise.resolve();
             }
             isRefreshing = true;
             

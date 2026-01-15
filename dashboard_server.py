@@ -5583,7 +5583,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     // Escape videoUrl for use in onclick handlers - use same escaping as elsewhere
                     function escapeTemplateLiteral(str) {
                         if (!str) return '';
-                        return String(str).replace(/\\\\/g, '\\\\\\\\').replace(/`/g, '\\\\`').replace(/\\$/g, '\\\\$');
+                        return String(str)
+                            .replace(/\\\\/g, '\\\\\\\\')  // Escape backslashes first
+                            .replace(/'/g, "\\'")           // Escape single quotes
+                            .replace(/`/g, '\\\\`')         // Escape backticks
+                            .replace(/\\$/g, '\\\\$');      // Escape dollar signs
                     }
                     const safeVideoUrlAttr = escapeTemplateLiteral(videoUrl);
                     
@@ -7493,7 +7497,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 const { username, videoId } = extractVideoInfo(videoUrl);
                 function escapeTemplateLiteral(str) {
                     if (!str) return '';
-                    return String(str).replace(/\\\\/g, '\\\\\\\\').replace(/`/g, '\\\\`').replace(/\\$/g, '\\\\$');
+                    return String(str)
+                        .replace(/\\\\/g, '\\\\\\\\')  // Escape backslashes first
+                        .replace(/'/g, "\\'")           // Escape single quotes
+                        .replace(/`/g, '\\\\`')         // Escape backticks
+                        .replace(/\\$/g, '\\\\$');      // Escape dollar signs
                 }
                 
                 // Get start time (date posted) and calculate time left
@@ -7739,7 +7747,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
         // Global helper function to escape template literals
         function escapeTemplateLiteral(str) {
             if (!str) return '';
-            return String(str).replace(/\\\\/g, '\\\\\\\\').replace(/`/g, '\\\\`').replace(/\\$/g, '\\\\$');
+            return String(str)
+                .replace(/\\\\/g, '\\\\\\\\')  // Escape backslashes first
+                .replace(/'/g, "\\'")           // Escape single quotes
+                .replace(/`/g, '\\\\`')         // Escape backticks
+                .replace(/\\$/g, '\\\\$');      // Escape dollar signs
         }
         
         function getCurrentRoute() {
@@ -8778,7 +8790,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             // Define escapeTemplateLiteral function for this scope
                             function escapeTemplateLiteral(str) {
                                 if (!str) return '';
-                                return String(str).replace(/\\\\/g, '\\\\\\\\').replace(/`/g, '\\\\`').replace(/\\$/g, '\\\\$');
+                                return String(str)
+                                    .replace(/\\\\/g, '\\\\\\\\')  // Escape backslashes first
+                                    .replace(/'/g, "\\'")           // Escape single quotes
+                                    .replace(/`/g, '\\\\`')         // Escape backticks
+                                    .replace(/\\$/g, '\\\\$');      // Escape dollar signs
                             }
                             
                             // Ensure progress data exists
@@ -9199,7 +9215,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         // Escape error message for template literal
                         function escapeTemplateLiteral(str) {
                             if (!str) return '';
-                            return String(str).replace(/\\\\/g, '\\\\\\\\').replace(/`/g, '\\\\`').replace(/\\$/g, '\\\\$');
+                            return String(str)
+                                .replace(/\\\\/g, '\\\\\\\\')  // Escape backslashes first
+                                .replace(/'/g, "\\'")           // Escape single quotes
+                                .replace(/`/g, '\\\\`')         // Escape backticks
+                                .replace(/\\$/g, '\\\\$');      // Escape dollar signs
                         }
                         const errorMsg = error && error.message ? error.message : String(error);
                         content.innerHTML = `

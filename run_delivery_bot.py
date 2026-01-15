@@ -512,31 +512,94 @@ class DeliveryBot:
                     print(f"{Fore.RED}Unknown service: {service}{Style.RESET_ALL}")
                     continue
                 
-                # CHECK IF GOAL REACHED - Don't place order if target already met
+                # CHECK IF GOAL REACHED - Use REAL delivered counts, not just ordered counts
+                # Critical fix: Orders take time to deliver, so we must check actual delivered counts
                 progress = self.load_progress()
                 if self.video_url in progress:
                     video_progress = progress[self.video_url]
-                    
-                    # Get current stats
-                    orders_placed = video_progress.get('orders_placed', {})
-                    real_views = video_progress.get('real_views', 0) or video_progress.get('initial_views', 0)
-                    real_likes = video_progress.get('real_likes', 0) or video_progress.get('initial_likes', 0)
-                    
-                    # Calculate total (ordered + real)
-                    total_views = orders_placed.get('views', 0) + real_views
-                    total_likes = orders_placed.get('likes', 0) + real_likes
                     
                     # Get targets
                     target_views = video_progress.get('target_views', 4000)
                     target_likes = video_progress.get('target_likes', 125)
                     
-                    # Check if goal already reached for this service
-                    if service_key == 'views' and total_views >= target_views:
-                        print(f"{Fore.GREEN}✓ Views goal reached ({total_views}/{target_views}) - skipping order{Style.RESET_ALL}")
-                        continue
-                    elif service_key == 'likes' and total_likes >= target_likes:
-                        print(f"{Fore.GREEN}✓ Likes goal reached ({total_likes}/{target_likes}) - skipping order{Style.RESET_ALL}")
-                        continue
+                    # Get initial counts (baseline when campaign started)
+                    initial_views = video_progress.get('real_views', 0) or video_progress.get('initial_views', 0)
+                    initial_likes = video_progress.get('real_likes', 0) or video_progress.get('initial_likes', 0)
+                    
+                    # Get orders placed (what we ordered)
+                    orders_placed = video_progress.get('orders_placed', {})
+                    ordered_views = orders_placed.get('views', 0)
+                    ordered_likes = orders_placed.get('likes', 0)
+                    
+                    # Fetch REAL current analytics to check actual delivered counts
+                    # Only fetch if we're close to target to avoid excessive API calls
+                    # Use cached analytics if available and recent (within last 5 minutes)
+                    last_analytics_time = video_progress.get('last_analytics_fetch_time')
+                    current_analytics = None
+                    
+                    if last_analytics_time:
+                        try:
+                            last_fetch = datetime.fromisoformat(last_analytics_time.replace('Z', '+00:00'))
+                            time_since_fetch = (datetime.now() - last_fetch.replace(tzinfo=None)).total_seconds()
+                            # Use cached if less than 5 minutes old
+                            if time_since_fetch < 300:
+                                current_analytics = video_progress.get('cached_analytics', {})
+                        except:
+                            pass
+                    
+                    # Fetch fresh analytics if:
+                    # 1. No cached data
+                    # 2. Cache is old
+                    # 3. We're close to target (within 20% of ordered amount)
+                    should_fetch = (current_analytics is None or 
+                                   (service_key == 'views' and ordered_views > 0 and ordered_views >= target_views * 0.8) or
+                                   (service_key == 'likes' and ordered_likes > 0 and ordered_likes >= target_likes * 0.8))
+                    
+                    if should_fetch:
+                        # Fetch quietly to avoid spam
+                        self._analytics_fetch_quiet = True
+                        current_analytics = self.fetch_all_analytics()
+                        self._analytics_fetch_quiet = False
+                        
+                        # Cache the results
+                        video_progress['cached_analytics'] = current_analytics
+                        video_progress['last_analytics_fetch_time'] = datetime.now().isoformat()
+                        self.save_progress(progress)
+                    
+                    if current_analytics:
+                        current_real_views = current_analytics.get('views', 0)
+                        current_real_likes = current_analytics.get('likes', 0)
+                        
+                        # Calculate delivered counts (current - initial = what was delivered)
+                        delivered_views = max(0, current_real_views - initial_views)
+                        delivered_likes = max(0, current_real_likes - initial_likes)
+                        
+                        # Check if ACTUAL delivered count has reached target
+                        # Use 95% threshold to account for delivery delays and rounding
+                        if service_key == 'views':
+                            if delivered_views >= target_views * 0.95:
+                                print(f"{Fore.GREEN}✓ Views goal reached (delivered: {delivered_views}/{target_views}, ordered: {ordered_views}) - skipping order{Style.RESET_ALL}")
+                                continue
+                            # Also check if ordered + delivered is way over target (safety check)
+                            elif (delivered_views + ordered_views) >= target_views * 1.2:
+                                print(f"{Fore.YELLOW}⚠ Views over-ordered (delivered: {delivered_views}, ordered: {ordered_views}, target: {target_views}) - skipping order{Style.RESET_ALL}")
+                                continue
+                        elif service_key == 'likes':
+                            if delivered_likes >= target_likes * 0.95:
+                                print(f"{Fore.GREEN}✓ Likes goal reached (delivered: {delivered_likes}/{target_likes}, ordered: {ordered_likes}) - skipping order{Style.RESET_ALL}")
+                                continue
+                            elif (delivered_likes + ordered_likes) >= target_likes * 1.2:
+                                print(f"{Fore.YELLOW}⚠ Likes over-ordered (delivered: {delivered_likes}, ordered: {ordered_likes}, target: {target_likes}) - skipping order{Style.RESET_ALL}")
+                                continue
+                    else:
+                        # Fallback: Use ordered counts if we can't fetch analytics
+                        # But be more conservative - only skip if significantly over-ordered
+                        if service_key == 'views' and ordered_views >= target_views * 1.1:
+                            print(f"{Fore.YELLOW}⚠ Views likely reached (ordered: {ordered_views}/{target_views}) - skipping order (could not fetch current analytics){Style.RESET_ALL}")
+                            continue
+                        elif service_key == 'likes' and ordered_likes >= target_likes * 1.1:
+                            print(f"{Fore.YELLOW}⚠ Likes likely reached (ordered: {ordered_likes}/{target_likes}) - skipping order (could not fetch current analytics){Style.RESET_ALL}")
+                            continue
                 
                 print(f"{Fore.YELLOW}[{purchase['time_str']}] Placing order: {quantity} {service.lower()}...{Style.RESET_ALL}")
                 

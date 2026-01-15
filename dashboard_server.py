@@ -66,107 +66,157 @@ MINIMUMS = {
 class DashboardHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         """Handle GET requests"""
-        parsed_path = urllib.parse.urlparse(self.path)
-        path = parsed_path.path
-        
-        if path == '/' or path == '/index.html':
-            self.send_dashboard()
-        elif path == '/api/progress':
-            self.send_progress_json()
-        elif path == '/api/update-target':
-            self.handle_update_target()
-        elif path == '/api/update-comments':
-            self.handle_update_comments()
-        elif path == '/api/remove-video':
-            self.handle_remove_video()
-        elif path == '/api/add-video':
-            self.handle_add_video()
-        elif path == '/api/order-comments':
-            self.handle_order_comments()
-        elif path == '/api/fetch-comments':
-            self.handle_fetch_comments()
-        elif path == '/api/order-comment-likes':
-            self.handle_order_comment_likes()
-        elif path == '/api/campaigns':
-            self.handle_get_campaigns()
-        elif path == '/api/create-campaign':
-            self.handle_create_campaign()
-        elif path == '/api/update-campaign':
-            self.handle_update_campaign()
-        elif path == '/api/end-campaign':
-            self.handle_end_campaign()
-        elif path == '/api/assign-videos':
-            self.handle_assign_videos()
-        elif path == '/api/save-next-purchase-time':
-            self.handle_save_next_purchase_time()
-        elif path == '/api/catch-up':
-            self.handle_catch_up()
-        elif path == '/api/manual-order':
-            self.handle_manual_order()
-        elif path == '/api/update-video-time':
-            self.handle_update_video_time()
-        elif path == '/api/video-details':
-            self.handle_video_details()
-        elif path == '/health' or path == '/api/health':
-            self.handle_health()
-        else:
-            self.send_error(404)
+        try:
+            parsed_path = urllib.parse.urlparse(self.path)
+            path = parsed_path.path
+            
+            if path == '/' or path == '/index.html':
+                self.send_dashboard()
+            elif path == '/api/progress':
+                self.send_progress_json()
+            elif path == '/api/update-target':
+                self.handle_update_target()
+            elif path == '/api/update-comments':
+                self.handle_update_comments()
+            elif path == '/api/remove-video':
+                self.handle_remove_video()
+            elif path == '/api/add-video':
+                self.handle_add_video()
+            elif path == '/api/order-comments':
+                self.handle_order_comments()
+            elif path == '/api/fetch-comments':
+                self.handle_fetch_comments()
+            elif path == '/api/order-comment-likes':
+                self.handle_order_comment_likes()
+            elif path == '/api/campaigns':
+                self.handle_get_campaigns()
+            elif path == '/api/create-campaign':
+                self.handle_create_campaign()
+            elif path == '/api/update-campaign':
+                self.handle_update_campaign()
+            elif path == '/api/end-campaign':
+                self.handle_end_campaign()
+            elif path == '/api/delete-campaign':
+                self.handle_delete_campaign()
+            elif path == '/api/assign-videos':
+                self.handle_assign_videos()
+            elif path == '/api/save-next-purchase-time':
+                self.handle_save_next_purchase_time()
+            elif path == '/api/catch-up':
+                self.handle_catch_up()
+            elif path == '/api/manual-order':
+                self.handle_manual_order()
+            elif path == '/api/update-video-time':
+                self.handle_update_video_time()
+            elif path == '/api/stop-overtime':
+                self.handle_stop_overtime()
+            elif path == '/api/video-details':
+                self.handle_video_details()
+            elif path == '/health' or path == '/api/health':
+                self.handle_health()
+            else:
+                self.send_error(404)
+        except Exception as e:
+            print(f"❌ Unhandled exception in do_GET: {e}")
+            import traceback
+            traceback.print_exc()
+            try:
+                self.send_response(500)
+                self.send_header('Content-type', 'text/plain')
+                self.end_headers()
+                self.wfile.write(f"Internal Server Error: {str(e)}".encode())
+            except:
+                pass  # Connection may be closed
     
     def do_POST(self):
         """Handle POST requests"""
-        parsed_path = urllib.parse.urlparse(self.path)
-        path = parsed_path.path
-        
-        if path == '/api/update-target':
-            self.handle_update_target()
-        elif path == '/api/update-comments':
-            self.handle_update_comments()
-        elif path == '/api/remove-video':
-            self.handle_remove_video()
-        elif path == '/api/add-video':
-            self.handle_add_video()
-        elif path == '/api/order-comments':
-            self.handle_order_comments()
-        elif path == '/api/fetch-comments':
-            self.handle_fetch_comments()
-        elif path == '/api/order-comment-likes':
-            self.handle_order_comment_likes()
-        elif path == '/api/campaigns':
-            self.handle_get_campaigns()
-        elif path == '/api/create-campaign':
-            self.handle_create_campaign()
-        elif path == '/api/update-campaign':
-            self.handle_update_campaign()
-        elif path == '/api/end-campaign':
-            self.handle_end_campaign()
-        elif path == '/api/assign-videos':
-            self.handle_assign_videos()
-        elif path == '/api/save-next-purchase-time':
-            self.handle_save_next_purchase_time()
-        elif path == '/api/catch-up':
-            self.handle_catch_up()
-        elif path == '/api/manual-order':
-            self.handle_manual_order()
-        elif path == '/api/update-video-time':
-            self.handle_update_video_time()
-        elif path == '/api/video-details':
-            self.handle_video_details()
-        elif path == '/health' or path == '/api/health':
-            self.handle_health()
-        else:
-            self.send_error(404)
+        try:
+            parsed_path = urllib.parse.urlparse(self.path)
+            path = parsed_path.path
+            
+            if path == '/api/update-target':
+                self.handle_update_target()
+            elif path == '/api/update-comments':
+                self.handle_update_comments()
+            elif path == '/api/remove-video':
+                self.handle_remove_video()
+            elif path == '/api/add-video':
+                self.handle_add_video()
+            elif path == '/api/order-comments':
+                self.handle_order_comments()
+            elif path == '/api/fetch-comments':
+                self.handle_fetch_comments()
+            elif path == '/api/order-comment-likes':
+                self.handle_order_comment_likes()
+            elif path == '/api/campaigns':
+                self.handle_get_campaigns()
+            elif path == '/api/create-campaign':
+                self.handle_create_campaign()
+            elif path == '/api/update-campaign':
+                self.handle_update_campaign()
+            elif path == '/api/end-campaign':
+                self.handle_end_campaign()
+            elif path == '/api/delete-campaign':
+                self.handle_delete_campaign()
+            elif path == '/api/assign-videos':
+                self.handle_assign_videos()
+            elif path == '/api/save-next-purchase-time':
+                self.handle_save_next_purchase_time()
+            elif path == '/api/catch-up':
+                self.handle_catch_up()
+            elif path == '/api/manual-order':
+                self.handle_manual_order()
+            elif path == '/api/update-video-time':
+                self.handle_update_video_time()
+            elif path == '/api/stop-overtime':
+                self.handle_stop_overtime()
+            elif path == '/api/video-details':
+                self.handle_video_details()
+            elif path == '/health' or path == '/api/health':
+                self.handle_health()
+            else:
+                self.send_error(404)
+        except Exception as e:
+            print(f"❌ Unhandled exception in do_POST: {e}")
+            import traceback
+            traceback.print_exc()
+            try:
+                self.send_response(500)
+                self.send_header('Content-type', 'text/plain')
+                self.end_headers()
+                self.wfile.write(f"Internal Server Error: {str(e)}".encode())
+            except:
+                pass  # Connection may be closed
     
     def send_dashboard(self):
         """Send the HTML dashboard"""
-        html = self.get_dashboard_html()
-        self.send_response(200)
-        self.send_header('Content-type', 'text/html')
-        self.end_headers()
         try:
-            self.wfile.write(html.encode())
-        except BrokenPipeError:
-            # Client disconnected, ignore
-            pass
+            html = self.get_dashboard_html()
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+            try:
+                self.wfile.write(html.encode())
+            except BrokenPipeError:
+                # Client disconnected, ignore
+                pass
+        except Exception as e:
+            print(f"❌ Error in send_dashboard: {e}")
+            import traceback
+            traceback.print_exc()
+            try:
+                self.send_response(500)
+                self.send_header('Content-type', 'text/html')
+                self.end_headers()
+                error_html = f"""<!DOCTYPE html>
+<html><head><title>Error</title></head>
+<body><h1>500 Internal Server Error</h1>
+<p>An error occurred while loading the dashboard.</p>
+<p>Error: {str(e)}</p>
+</body></html>"""
+                self.wfile.write(error_html.encode())
+            except:
+                pass
     
     def fetch_real_analytics_for_video(self, video_url):
         """Fetch real-time analytics for a single video"""
@@ -1561,8 +1611,25 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 cost = (quantity / 1000.0) * rate
                                 total_spent += cost
                         
-                        # Calculate earned from views
+                        # Calculate earned from views - try multiple sources
+                        # Priority: real_views > initial_views > orders_placed (as estimate)
                         real_views = video_data.get('real_views', 0) or video_data.get('initial_views', 0)
+                        
+                        # If no real views found, use orders_placed as fallback estimate
+                        if real_views == 0:
+                            orders_placed = video_data.get('orders_placed', {})
+                            ordered_views = orders_placed.get('views', 0)
+                            if ordered_views > 0:
+                                # Use ordered views as estimate if real views not available
+                                # This helps show progress even if analytics haven't been fetched yet
+                                real_views = ordered_views
+                        
+                        # Also check if there's a current views count from recent analytics fetch
+                        # Some videos might have this updated more recently than real_views
+                        current_views = video_data.get('current_views', 0)
+                        if current_views > real_views:
+                            real_views = current_views
+                        
                         total_views += real_views
                 
                 # Calculate earned (CPM * views / 1000)
@@ -1725,6 +1792,23 @@ class DashboardHandler(BaseHTTPRequestHandler):
             target_duration_minutes = _parse_int(target_duration_minutes_str, 0)
             
             campaigns = self.load_campaigns()
+            
+            # Check for duplicate campaign name
+            campaign_name_lower = campaign_name.lower().strip()
+            for existing_id, existing_campaign in campaigns.items():
+                if existing_campaign.get('name', '').lower().strip() == campaign_name_lower:
+                    response_data = json.dumps({
+                        'success': False,
+                        'error': f'A campaign with the name "{campaign_name}" already exists. Please use a different name.'
+                    })
+                    self.send_response(400)
+                    self.send_header('Content-type', 'application/json')
+                    self.send_header('Access-Control-Allow-Origin', '*')
+                    self.send_header('Content-Length', str(len(response_data)))
+                    self.end_headers()
+                    self.wfile.write(response_data.encode())
+                    return
+            
             campaign_id = f"campaign_{len(campaigns) + 1}_{int(datetime.now().timestamp())}"
             
             campaigns[campaign_id] = {
@@ -2430,6 +2514,152 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(response_data.encode())
     
+    def handle_delete_campaign(self):
+        """Delete a campaign permanently"""
+        try:
+            parsed_path = urllib.parse.urlparse(self.path)
+            query_string = parsed_path.query
+            
+            if self.command == 'GET':
+                params = urllib.parse.parse_qs(query_string)
+            else:
+                content_length = int(self.headers.get('Content-Length', 0))
+                if content_length > 0:
+                    post_data = self.rfile.read(content_length)
+                    params = urllib.parse.parse_qs(post_data.decode())
+                else:
+                    params = {}
+            
+            campaign_id = params.get('campaign_id', [None])[0]
+            
+            if not campaign_id:
+                response_data = json.dumps({'success': False, 'error': 'Missing campaign_id'})
+                self.send_response(400)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Content-Length', str(len(response_data)))
+                self.end_headers()
+                self.wfile.write(response_data.encode())
+                return
+            
+            campaigns = self.load_campaigns()
+            
+            if campaign_id not in campaigns:
+                response_data = json.dumps({'success': False, 'error': 'Campaign not found'})
+                self.send_response(404)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Content-Length', str(len(response_data)))
+                self.end_headers()
+                self.wfile.write(response_data.encode())
+                return
+            
+            # Delete campaign from database
+            if DATABASE_AVAILABLE:
+                try:
+                    import database
+                    with database.get_db_connection() as conn:
+                        if conn:
+                            cursor = conn.cursor()
+                            cursor.execute("DELETE FROM campaigns WHERE campaign_id = %s", (campaign_id,))
+                            conn.commit()
+                            print(f"[DELETE] Deleted campaign {campaign_id} from database")
+                except Exception as e:
+                    print(f"❌ Error deleting campaign from database: {e}")
+                    import traceback
+                    traceback.print_exc()
+                    # If database delete failed, don't proceed
+                    response_data = json.dumps({'success': False, 'error': f'Failed to delete campaign from database: {str(e)}'})
+                    self.send_response(500)
+                    self.send_header('Content-type', 'application/json')
+                    self.send_header('Access-Control-Allow-Origin', '*')
+                    self.send_header('Content-Length', str(len(response_data)))
+                    self.end_headers()
+                    self.wfile.write(response_data.encode())
+                    return
+            
+            # Note: We don't need to save campaigns dict after deletion since we've already deleted from DB
+            # The campaigns dict will be reloaded on the next request
+            
+            response_data = json.dumps({
+                'success': True,
+                'message': 'Campaign deleted successfully'
+            })
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Content-Length', str(len(response_data)))
+            self.end_headers()
+            self.wfile.write(response_data.encode())
+            
+        except Exception as e:
+            print(f"EXCEPTION in handle_delete_campaign: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            response_data = json.dumps({'success': False, 'error': str(e)})
+            self.send_response(500)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Content-Length', str(len(response_data)))
+            self.end_headers()
+            self.wfile.write(response_data.encode())
+    
+    def handle_stop_overtime(self):
+        """Stop overtime mode for a video"""
+        try:
+            parsed_path = urllib.parse.urlparse(self.path)
+            query_string = parsed_path.query
+            params = urllib.parse.parse_qs(query_string)
+            
+            video_url = params.get('video_url', [None])[0]
+            if not video_url:
+                response_data = json.dumps({'success': False, 'error': 'Missing video_url'})
+                self.send_response(400)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Content-Length', str(len(response_data)))
+                self.end_headers()
+                self.wfile.write(response_data.encode())
+                return
+            
+            progress = self.load_progress()
+            if video_url not in progress:
+                response_data = json.dumps({'success': False, 'error': 'Video not found'})
+                self.send_response(404)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Content-Length', str(len(response_data)))
+                self.end_headers()
+                self.wfile.write(response_data.encode())
+                return
+            
+            # Set overtime_stopped flag
+            progress[video_url]['overtime_stopped'] = True
+            self.save_progress(progress)
+            
+            response_data = json.dumps({
+                'success': True,
+                'message': 'Overtime stopped successfully'
+            })
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Content-Length', str(len(response_data)))
+            self.end_headers()
+            self.wfile.write(response_data.encode())
+            
+        except Exception as e:
+            print(f"EXCEPTION in handle_stop_overtime: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            response_data = json.dumps({'success': False, 'error': str(e)})
+            self.send_response(500)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Content-Length', str(len(response_data)))
+            self.end_headers()
+            self.wfile.write(response_data.encode())
+    
     def handle_assign_videos(self):
         """Assign videos to a campaign"""
         try:
@@ -2898,6 +3128,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
             font-size: 1em;
             margin-bottom: 1px;
             font-weight: 600;
+        }
+        
+        .header h1:hover {
+            color: #667eea;
+            text-decoration: underline;
         }
         
         .header p {
@@ -3404,6 +3639,19 @@ class DashboardHandler(BaseHTTPRequestHandler):
             background: #333;
         }
         
+        .delete-campaign-btn {
+            position: absolute !important;
+            top: 5px !important;
+            right: 5px !important;
+            z-index: 100 !important;
+            display: flex !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            background: rgba(239,68,68,0.25) !important;
+            color: #ef4444 !important;
+            border: 2px solid rgba(239,68,68,0.6) !important;
+        }
+        
         .comments-save-status {
             margin-top: 12px;
             padding: 8px;
@@ -3876,6 +4124,16 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 padding: 12px !important;
             }
             
+            .delete-campaign-btn {
+                position: absolute !important;
+                top: 5px !important;
+                right: 5px !important;
+                z-index: 100 !important;
+                display: flex !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+            }
+            
             .container {
                 padding: 0 10px;
             }
@@ -3929,7 +4187,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
 <body>
     <div class="container">
         <div class="header">
-            <h1>Campaign Dashboard</h1>
+            <h1 style="cursor: pointer;" onclick="navigateToHome();" title="Click to go home">Campaign Dashboard</h1>
             <p>Monitor your videos and set target completion times</p>
         </div>
         
@@ -4199,6 +4457,23 @@ class DashboardHandler(BaseHTTPRequestHandler):
         </svg>
     </button>
     
+    <!-- Global Loading Overlay -->
+    <div id="global-loading" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 99999; align-items: center; justify-content: center; flex-direction: column;">
+        <div style="background: #1a1a1a; padding: 20px 30px; border-radius: 0; border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 15px;">
+            <div class="spinner" style="width: 24px; height: 24px; border: 3px solid rgba(102,126,234,0.3); border-top-color: #667eea; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+            <span id="loading-message" style="color: #fff; font-size: 14px; font-weight: 600;">Loading...</span>
+        </div>
+    </div>
+    
+    <style>
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .spinner {
+            animation: spin 0.8s linear infinite;
+        }
+    </style>
+    
     <script>
         function formatNumber(num) {
             return new Intl.NumberFormat().format(Math.floor(num));
@@ -4238,13 +4513,18 @@ class DashboardHandler(BaseHTTPRequestHandler):
             }
         }
         
-        function calculateTimeRemaining(targetTime) {
+        function calculateTimeRemaining(targetTime, isOvertimeStopped = false) {
             if (!targetTime) return null;
             try {
                 const target = new Date(targetTime);
                 const now = new Date();
                 const diff = target - now;
-                if (diff < 0) return 'Past due';
+                if (diff < 0) {
+                    if (isOvertimeStopped) {
+                        return 'Overtime stopped';
+                    }
+                    return 'OVERTIME';
+                }
                 const hours = Math.floor(diff / (1000 * 60 * 60));
                 const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                 if (hours > 0) return `${hours}h ${minutes}m remaining`;
@@ -4294,6 +4574,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             }
             
             try {
+                showLoading('Removing video...');
                 const params = new URLSearchParams({
                     video_url: videoUrl
                 });
@@ -4307,20 +4588,22 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 });
                 
                 const data = await response.json();
+                hideLoading();
                 
                 if (data.success) {
-                    alert('✅ Video removed successfully!');
+                    showNotification('Video removed successfully', 'success');
                     // Navigate to home if we're on detail page
                     const route = getCurrentRoute();
                     if (route.type === 'detail') {
                         navigateToHome();
                     } else {
-                        loadDashboard(false);
+                        await loadDashboard(false);
                     }
                 } else {
                     alert('Error: ' + (data.error || 'Failed to remove video'));
                 }
             } catch (error) {
+                hideLoading();
                 console.error('Error:', error);
                 alert('Error removing video: ' + error.message);
             }
@@ -4360,7 +4643,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
             const button = buttonElement || event.target;
             const originalText = button.textContent;
             button.disabled = true;
-            button.textContent = 'Placing order...';
+            button.textContent = 'Placing...';
+            showLoading(`Placing order for ${amount.toLocaleString()} ${metric}...`);
             
             try {
                 const params = new URLSearchParams({
@@ -4378,16 +4662,17 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 });
                 
                 const data = await response.json();
+                hideLoading();
                 if (data.success) {
-                    alert(`Order placed! Order ID: ${data.order_id}\nAmount: ${data.amount.toLocaleString()} ${metric}`);
-                    // Reload dashboard to show updated stats
-                    await loadDashboard(true);
+                    showNotification(`Order placed! ID: ${data.order_id}`, 'success');
+                    await loadDashboard(false);
                 } else {
                     alert('Error: ' + (data.error || 'Failed to place catch-up order'));
                     button.disabled = false;
                     button.textContent = originalText;
                 }
             } catch (error) {
+                hideLoading();
                 console.error('Error:', error);
                 alert('Error placing catch-up order: ' + error.message);
                 button.disabled = false;
@@ -4396,6 +4681,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
         }
         
         async function manualOrder(videoUrl, metric, minimum, buttonElement) {
+            showLoading(`Placing manual order for ${metric}...`);
             const button = buttonElement || (event && event.target) || null;
             const amountStr = prompt(`Enter amount of ${metric} to order (minimum: ${minimum}):`, minimum);
             
@@ -4416,8 +4702,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
             const originalText = button ? button.textContent : '';
             if (button) {
                 button.disabled = true;
-                button.textContent = 'Placing order...';
+                button.textContent = 'Placing...';
             }
+            showLoading(`Placing manual order for ${amount.toLocaleString()} ${metric}...`);
             
             try {
                 const params = new URLSearchParams({
@@ -4435,10 +4722,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 });
                 
                 const data = await response.json();
+                hideLoading();
                 if (data.success) {
-                    alert(`Manual order placed! Order ID: ${data.order_id}\nAmount: ${data.amount.toLocaleString()} ${metric}`);
-                    // Reload dashboard to show updated stats
-                    await loadDashboard(true);
+                    showNotification(`Manual order placed! ID: ${data.order_id}`, 'success');
+                    await loadDashboard(false);
                 } else {
                     alert('Error: ' + (data.error || 'Failed to place manual order'));
                     if (button) {
@@ -4447,6 +4734,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     }
                 }
             } catch (error) {
+                hideLoading();
                 console.error('Error:', error);
                 alert('Error placing manual order: ' + error.message);
                 if (button) {
@@ -4457,6 +4745,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
         }
         
         async function saveComments(videoUrl, textareaId) {
+            showLoading('Saving comments...');
             const textarea = document.getElementById(textareaId);
             const comments = textarea.value.trim();
             const statusDiv = document.getElementById('comments-status-' + textareaId.replace('comments-', ''));
@@ -4495,7 +4784,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     statusDiv.textContent = `✅ ${data.message || 'Comments saved successfully!'}`;
                     // Refresh dashboard after a short delay
                     setTimeout(() => {
-                        loadDashboard(false);
+                        loadDashboard(false).catch(() => {});
                         statusDiv.className = 'comments-save-status';
                     }, 2000);
                 } else {
@@ -4879,6 +5168,12 @@ class DashboardHandler(BaseHTTPRequestHandler):
         }
         
         async function createCampaign() {
+            // Prevent duplicate submissions
+            const createBtn = document.querySelector('#create-campaign-modal button[onclick="createCampaign()"]');
+            if (createBtn && createBtn.disabled) {
+                return; // Already submitting
+            }
+            
             const nameInput = document.getElementById('new-campaign-name');
             const cpmInput = document.getElementById('new-campaign-cpm');
             const targetViewsInput = document.getElementById('new-campaign-target-views');
@@ -4903,43 +5198,123 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 return;
             }
             
-            try {
-                const params = new URLSearchParams({
-                    campaign_name: name,
-                    cpm: cpm.toString(),
-                    target_views: targetViews.toString(),
-                    target_likes: targetLikes.toString(),
-                    target_comments: targetComments.toString(),
-                    target_comment_likes: targetCommentLikes.toString(),
-                    target_duration_hours: targetDurationHours.toString(),
-                    target_duration_minutes: targetDurationMinutes.toString()
-                });
+            // Disable button and show loading state
+            if (createBtn) {
+                createBtn.disabled = true;
+                const originalText = createBtn.textContent;
+                createBtn.textContent = 'Creating...';
+                createBtn.style.opacity = '0.6';
+                createBtn.style.cursor = 'not-allowed';
                 
-                const response = await fetch('/api/create-campaign?' + params.toString(), {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: params.toString()
+                try {
+                    const params = new URLSearchParams({
+                        campaign_name: name,
+                        cpm: cpm.toString(),
+                        target_views: targetViews.toString(),
+                        target_likes: targetLikes.toString(),
+                        target_comments: targetComments.toString(),
+                        target_comment_likes: targetCommentLikes.toString(),
+                        target_duration_hours: targetDurationHours.toString(),
+                        target_duration_minutes: targetDurationMinutes.toString()
+                    });
+                    
+                    const response = await fetch('/api/create-campaign?' + params.toString(), {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: params.toString()
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        hideCreateCampaignModal();
+                        await loadCampaigns();
+                        // Auto-select the new campaign
+                        const selector = document.getElementById('campaign-selector');
+                        if (selector && data.campaign_id) {
+                            selector.value = data.campaign_id;
+                        }
+                    } else {
+                        errorDiv.textContent = data.error || 'Failed to create campaign';
+                        errorDiv.style.display = 'block';
+                    }
+                } catch (error) {
+                    errorDiv.textContent = 'Error: ' + error.message;
+                    errorDiv.style.display = 'block';
+                } finally {
+                    // Re-enable button
+                    createBtn.disabled = false;
+                    createBtn.textContent = originalText;
+                    createBtn.style.opacity = '1';
+                    createBtn.style.cursor = 'pointer';
+                }
+            } else {
+                // Fallback if button not found
+                try {
+                    const params = new URLSearchParams({
+                        campaign_name: name,
+                        cpm: cpm.toString(),
+                        target_views: targetViews.toString(),
+                        target_likes: targetLikes.toString(),
+                        target_comments: targetComments.toString(),
+                        target_comment_likes: targetCommentLikes.toString(),
+                        target_duration_hours: targetDurationHours.toString(),
+                        target_duration_minutes: targetDurationMinutes.toString()
+                    });
+                    
+                    const response = await fetch('/api/create-campaign?' + params.toString(), {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: params.toString()
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        hideCreateCampaignModal();
+                        await loadCampaigns();
+                        const selector = document.getElementById('campaign-selector');
+                        if (selector && data.campaign_id) {
+                            selector.value = data.campaign_id;
+                        }
+                    } else {
+                        errorDiv.textContent = data.error || 'Failed to create campaign';
+                        errorDiv.style.display = 'block';
+                    }
+                } catch (error) {
+                    errorDiv.textContent = 'Error: ' + error.message;
+                    errorDiv.style.display = 'block';
+                }
+            }
+        }
+        
+        async function stopOvertime(videoUrl) {
+            if (!confirm('Stop overtime mode for this video? Orders will no longer be placed until goal is reached.')) {
+                return;
+            }
+            
+            try {
+                showLoading('Stopping overtime...');
+                const response = await fetch(`/api/stop-overtime?video_url=${encodeURIComponent(videoUrl)}`, {
+                    method: 'POST'
                 });
                 
                 const data = await response.json();
+                hideLoading();
                 
                 if (data.success) {
-                    hideCreateCampaignModal();
-                    await loadCampaigns();
-                    // Auto-select the new campaign
-                    const selector = document.getElementById('campaign-selector');
-                    if (selector && data.campaign_id) {
-                        selector.value = data.campaign_id;
-                    }
+                    showNotification('Overtime stopped successfully', 'success');
+                    await loadDashboard(false);
                 } else {
-                    errorDiv.textContent = data.error || 'Failed to create campaign';
-                    errorDiv.style.display = 'block';
+                    alert('Error: ' + (data.error || 'Failed to stop overtime'));
                 }
             } catch (error) {
-                errorDiv.textContent = 'Error: ' + error.message;
-                errorDiv.style.display = 'block';
+                hideLoading();
+                alert('Error: ' + error.message);
             }
         }
         
@@ -4949,6 +5324,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             }
             
             try {
+                showLoading('Ending campaign...');
                 const params = new URLSearchParams({
                     campaign_id: campaignId
                 });
@@ -4962,6 +5338,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 });
                 
                 const data = await response.json();
+                hideLoading();
                 
                 if (data.success) {
                     showNotification('Campaign ended successfully', 'success');
@@ -4971,6 +5348,56 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     alert('Error: ' + (data.error || 'Failed to end campaign'));
                 }
             } catch (error) {
+                hideLoading();
+                alert('Error: ' + error.message);
+            }
+        }
+        
+        async function deleteCampaign(campaignId, campaignName) {
+            if (!confirm(`Are you sure you want to DELETE "${campaignName}"?\n\nThis action cannot be undone. All campaign data will be permanently removed.`)) {
+                return;
+            }
+            
+            // Double confirmation for safety
+            if (!confirm('⚠️ FINAL WARNING: This will permanently delete the campaign and all its data.\n\nClick OK to confirm deletion.')) {
+                return;
+            }
+            
+            try {
+                showLoading('Deleting campaign...');
+                const params = new URLSearchParams({
+                    campaign_id: campaignId
+                });
+                
+                const response = await fetch('/api/delete-campaign?' + params.toString(), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: params.toString()
+                });
+                
+                const data = await response.json();
+                hideLoading();
+                
+                if (data.success) {
+                    showNotification('Campaign deleted successfully', 'success');
+                    await loadCampaigns();
+                    await loadDashboard(false);
+                    // Navigate to home if we're viewing this campaign
+                    if (typeof getCurrentRoute === 'function') {
+                        const route = getCurrentRoute();
+                        if (route.type === 'campaign' && route.campaignId === campaignId) {
+                            if (typeof navigateToHome === 'function') {
+                                navigateToHome();
+                            }
+                        }
+                    }
+                } else {
+                    alert('Error: ' + (data.error || 'Failed to delete campaign'));
+                }
+            } catch (error) {
+                hideLoading();
                 alert('Error: ' + error.message);
             }
         }
@@ -5023,8 +5450,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
             
             const hours = parseInt(document.getElementById('edit-time-hours').value) || 0;
             const minutes = parseInt(document.getElementById('edit-time-minutes').value) || 0;
+            showLoading('Saving time left...');
             
             if (hours === 0 && minutes === 0) {
+                hideLoading();
                 document.getElementById('edit-time-error').textContent = 'Please enter at least 1 minute';
                 document.getElementById('edit-time-error').style.display = 'block';
                 return;
@@ -5058,6 +5487,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 }
                 
                 if (result.success) {
+                    hideLoading();
                     // Show "Saved" feedback briefly before closing
                     if (saveButton) {
                         saveButton.textContent = 'Saved ✓';
@@ -5085,9 +5515,17 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             const remainingSeconds = Math.floor((remainingMs % (1000 * 60)) / 1000);
                             timeLeftCell.textContent = remainingHours + 'h' + (remainingMinutes > 0 ? remainingMinutes + 'm' : '') + remainingSeconds + 's';
                             timeLeftCell.setAttribute('data-target-time', targetTime.toISOString());
+                            timeLeftCell.style.color = '#fff';
                         } else {
-                            timeLeftCell.textContent = 'OVERDUE';
-                            timeLeftCell.style.color = '#ef4444';
+                            // Check if overtime is stopped - fetch current video data
+                            const isOvertimeStopped = allVideosData && allVideosData[currentEditTimeVideoUrl] && allVideosData[currentEditTimeVideoUrl].overtime_stopped === true;
+                            if (isOvertimeStopped) {
+                                timeLeftCell.textContent = 'Overtime stopped';
+                                timeLeftCell.style.color = '#888';
+                            } else {
+                                timeLeftCell.textContent = 'OVERTIME';
+                                timeLeftCell.style.color = '#f59e0b';
+                            }
                         }
                     }
                     
@@ -5104,6 +5542,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         loadDashboard(false).catch(err => console.error('[saveTimeLeft] Background refresh error:', err));
                     }, 800);
                 } else {
+                    hideLoading();
                     document.getElementById('edit-time-error').textContent = result.error || 'Failed to update time';
                     document.getElementById('edit-time-error').style.display = 'block';
                     if (saveButton) {
@@ -5112,6 +5551,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     }
                 }
             } catch (error) {
+                hideLoading();
                 document.getElementById('edit-time-error').textContent = 'Error: ' + error.message;
                 document.getElementById('edit-time-error').style.display = 'block';
                 if (saveButton) {
@@ -5139,6 +5579,13 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 if (result.success && result.video) {
                     const video = result.video;
                     const { username, videoId } = extractVideoInfo(videoUrl);
+                    
+                    // Escape videoUrl for use in onclick handlers
+                    function escapeForAttr(str) {
+                        if (!str) return '';
+                        return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                    }
+                    const safeVideoUrlAttr = escapeForAttr(videoUrl);
                     
                     let html = `
                         <div style="margin-bottom: 15px;">
@@ -5178,10 +5625,12 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 </div>
                             `;
                         } else {
+                            const isOvertimeStopped = video.overtime_stopped === true;
                             html += `
                                 <div style="margin-bottom: 15px;">
                                     <h3 style="color: #fff; margin: 0 0 10px 0; font-size: 16px;">Timeline</h3>
-                                    <p style="margin: 5px 0; color: #ef4444;"><strong>Status:</strong> OVERDUE</p>
+                                    <p style="margin: 5px 0; color: ${isOvertimeStopped ? '#888' : '#f59e0b'};"><strong>Status:</strong> ${isOvertimeStopped ? 'Overtime stopped' : 'OVERTIME'}</p>
+                                    ${!isOvertimeStopped ? `<button onclick="stopOvertime('${safeVideoUrlAttr}')" style="margin-top: 8px; background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 0; cursor: pointer; font-size: 12px; font-weight: 600;">End Overtime</button>` : ''}
                                 </div>
                             `;
                         }
@@ -5429,9 +5878,12 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     const durM = (campaign.target_duration_minutes !== undefined) ? campaign.target_duration_minutes : 0;
                     
                     html += `<div class="campaign-card-clickable" data-campaign-id="${campaignId}" style="background: #2a2a2a; border-radius: 0; padding: 10px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: all 0.2s; position: relative; display: flex; flex-direction: column;" onmouseover="this.style.borderColor='rgba(102,126,234,0.5)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.transform='translateY(0)';">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                            <h4 style="margin: 0; color: #fff; font-size: 1.1em; font-weight: 600;">${campaign.name || 'Unnamed Campaign'}</h4>
-                            ${campaign.cpm > 0 ? `<span style="color: #667eea; font-size: 0.9em;">CPM: $${campaign.cpm.toFixed(2)}</span>` : '<span style="color: #888; font-size: 0.9em;">No CPM set</span>'}
+                        <button class="delete-campaign-btn" data-campaign-id="${campaignId}" onclick="event.stopPropagation(); deleteCampaign('${campaignId}', '${(campaign.name || 'Unnamed Campaign').replace(/'/g, "\\'").replace(/"/g, '&quot;')}');" style="position: absolute; top: 5px; right: 5px; background: rgba(239,68,68,0.25); color: #ef4444; border: 2px solid rgba(239,68,68,0.6); padding: 0; border-radius: 0; cursor: pointer; font-size: 22px; font-weight: 700; transition: all 0.2s; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; z-index: 100; line-height: 1; box-shadow: 0 2px 4px rgba(0,0,0,0.3);" onmouseover="this.style.background='rgba(239,68,68,0.5)'; this.style.borderColor='rgba(239,68,68,1)'; this.style.transform='scale(1.2)'; this.style.boxShadow='0 3px 6px rgba(239,68,68,0.4)';" onmouseout="this.style.background='rgba(239,68,68,0.25)'; this.style.borderColor='rgba(239,68,68,0.6)'; this.style.transform='scale(1)'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.3)';" title="Delete Campaign">×</button>
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; padding-right: 40px;">
+                            <div style="flex: 1;">
+                                <h4 style="margin: 0 0 5px 0; color: #fff; font-size: 1.1em; font-weight: 600;">${campaign.name || 'Unnamed Campaign'}</h4>
+                                ${campaign.cpm > 0 ? `<span style="color: #667eea; font-size: 0.85em;">CPM: $${campaign.cpm.toFixed(2)}</span>` : '<span style="color: #888; font-size: 0.85em;">No CPM set</span>'}
+                            </div>
                         </div>
                         <div style="color: #b0b0b0; font-size: 0.85em; margin-bottom: 10px;">
                             <div>Goals/post: ${formatNumber(goalViews)} views · ${formatNumber(goalLikes)} likes · ${formatNumber(goalComments)} comments · ${formatNumber(goalCommentLikes)} comment likes</div>
@@ -5469,6 +5921,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             <button class="edit-campaign-btn" data-campaign-id="${campaignId}" onclick="event.stopPropagation(); showEditCampaignModal('${campaignId}');" style="flex: 1; min-width: 80px; background: #2a2a2a; color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 0; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;" onmouseover="this.style.background='#333'; this.style.borderColor='rgba(255,255,255,0.3)';" onmouseout="this.style.background='#2a2a2a'; this.style.borderColor='rgba(255,255,255,0.2)';">Edit</button>
                             <button class="add-video-to-campaign-btn" data-campaign-id="${campaignId}" onclick="event.stopPropagation(); showAddVideoToCampaignModal('${campaignId}');" style="flex: 1; min-width: 100px; background: #2a2a2a; color: #667eea; border: 1px solid rgba(102,126,234,0.3); padding: 8px 12px; border-radius: 0; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;" onmouseover="this.style.background='#333'; this.style.borderColor='rgba(102,126,234,0.5)';" onmouseout="this.style.background='#2a2a2a'; this.style.borderColor='rgba(102,126,234,0.3)';">Add Video</button>
                             ${campaign.status !== 'ended' ? `<button class="end-campaign-btn" data-campaign-id="${campaignId}" onclick="event.stopPropagation(); endCampaign('${campaignId}');" style="flex: 1; min-width: 120px; background: #2a2a2a; color: #ef4444; border: 1px solid rgba(239,68,68,0.3); padding: 8px 12px; border-radius: 0; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;" onmouseover="this.style.background='#333'; this.style.borderColor='rgba(239,68,68,0.5)';" onmouseout="this.style.background='#2a2a2a'; this.style.borderColor='rgba(239,68,68,0.3)';">End Campaign</button>` : '<span style="flex: 1; color: #888; font-size: 11px; padding: 8px 12px; text-align: center;">Ended</span>'}
+                        </div>
+                        <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px; margin-top: 8px; text-align: center;">
+                            <a href="#" onclick="event.stopPropagation(); deleteCampaign('${campaignId}', '${(campaign.name || 'Unnamed Campaign').replace(/'/g, "\\'").replace(/"/g, '&quot;')}'); return false;" style="color: #fff; text-decoration: none; font-size: 12px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.textDecoration='underline'; this.style.color='#ef4444';" onmouseout="this.style.textDecoration='none'; this.style.color='#fff';">Remove Campaign</a>
                         </div>
                     </div>`;
                 }
@@ -5849,8 +6304,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 }
             }
             
-            // Check if target is overdue
+            // Check if target is overdue and if overtime is stopped
             const isTargetOverdue = targetCompletionTime && hoursToTarget <= 0;
+            const isOvertimeStopped = video.overtime_stopped === true;
             
             // Pricing rates (per 1000 units)
             const rates = {
@@ -5870,7 +6326,13 @@ class DashboardHandler(BaseHTTPRequestHandler):
             
             // Calculate next purchase info for each metric
             function calculateNextPurchase(metricName, needed, hoursRemaining, combinedPerHour, minOrder) {
-                if (needed <= 0 || hoursRemaining <= 0 || isTargetOverdue) {
+                // In overtime mode, continue ordering until goal is reached (ignore time limit)
+                const isOvertimeStopped = video.overtime_stopped === true;
+                if (needed <= 0 || isOvertimeStopped) {
+                    return null;
+                }
+                // In overtime mode, ignore hoursRemaining check - continue ordering
+                if (!isTargetOverdue && hoursRemaining <= 0) {
                     return null;
                 }
                 
@@ -5917,8 +6379,18 @@ class DashboardHandler(BaseHTTPRequestHandler):
             let hoursToCommentsGoal = 0;
             let hoursToCommentLikesGoal = 0;
             
-            if (isTargetOverdue) {
-                // Target is overdue - set all to negative/zero to show "Past due"
+            // Check if overtime is stopped
+            const isOvertimeStopped = video.overtime_stopped === true;
+            
+            if (isTargetOverdue && !isOvertimeStopped) {
+                // Target is overdue - OVERTIME MODE: Continue ordering until goal reached
+                // Calculate time based on delivery rates (no time limit)
+                hoursToViewsGoal = combinedViewsPerHour > 0 ? viewsNeeded / combinedViewsPerHour : 999;
+                hoursToLikesGoal = combinedLikesPerHour > 0 ? likesNeeded / combinedLikesPerHour : 999;
+                hoursToCommentsGoal = combinedCommentsPerHour > 0 ? commentsNeeded / combinedCommentsPerHour : 999;
+                hoursToCommentLikesGoal = commentLikesPerHour > 0 ? commentLikesNeeded / commentLikesPerHour : 999;
+            } else if (isTargetOverdue && isOvertimeStopped) {
+                // Overtime stopped - show as stopped
                 hoursToViewsGoal = viewsNeeded > 0 ? -1 : 0;
                 hoursToLikesGoal = likesNeeded > 0 ? -1 : 0;
                 hoursToCommentsGoal = commentsNeeded > 0 ? -1 : 0;
@@ -6105,7 +6577,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             
             // Format time remaining helper with seconds
             function formatTimeRemaining(hours) {
-                if (hours < 0) return 'Past due';
+                if (hours < 0) return 'OVERTIME';
                 if (hours <= 0 || !isFinite(hours)) return 'N/A';
                 const totalSeconds = Math.floor(hours * 3600);
                 const days = Math.floor(totalSeconds / (24 * 3600));
@@ -6128,7 +6600,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             
             // Format time remaining with seconds (for countdowns that need real-time updates)
             function formatTimeRemainingWithSeconds(totalSeconds) {
-                if (totalSeconds < 0) return 'Past due';
+                if (totalSeconds < 0) return 'OVERTIME';
                 if (totalSeconds <= 0 || !isFinite(totalSeconds)) return 'N/A';
                 const days = Math.floor(totalSeconds / (24 * 3600));
                 const remainingAfterDays = totalSeconds % (24 * 3600);
@@ -6250,7 +6722,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 <div style="color: #b0b0b0; margin-bottom: 6px;">Gap: <span style="color: #ef4444; font-weight: 600;">${formatNumber(viewsCatchUp)}</span></div>
                                 <button class="catch-up-btn" data-video-url="${safeVideoUrlAttr}" data-metric="views" data-amount="${viewsCatchUp}" style="width: 100%; background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 0; cursor: pointer; font-weight: 600; font-size: 0.9em;">Catch Up (${formatNumber(viewsCatchUp)})</button>
                             </div>` : ''}
-                            ${viewsNeeded > 0 && hoursToViewsGoal > 0 ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;" data-time-to-goal data-hours="${hoursToViewsGoal}" data-metric="views"><span data-countdown-to-goal>${formatTimeRemaining(hoursToViewsGoal)}</span> to goal</div>` : viewsNeeded <= 0 ? `<div style="color: #10b981; font-size: 0.85em; margin-top: 5px;">Target reached</div>` : viewsNeeded > 0 && isTargetOverdue ? `<div style="color: #ef4444; font-size: 0.85em; margin-top: 5px;">Past due</div>` : ''}
+                            ${viewsNeeded > 0 && hoursToViewsGoal > 0 ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;" data-time-to-goal data-hours="${hoursToViewsGoal}" data-metric="views"><span data-countdown-to-goal>${formatTimeRemaining(hoursToViewsGoal)}</span> to goal</div>` : viewsNeeded <= 0 ? `<div style="color: #10b981; font-size: 0.85em; margin-top: 5px;">Target reached</div>` : viewsNeeded > 0 && isTargetOverdue && !isOvertimeStopped ? `<div style="color: #f59e0b; font-size: 0.85em; margin-top: 5px;">OVERTIME</div>` : viewsNeeded > 0 && isTargetOverdue && isOvertimeStopped ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;">Overtime stopped</div>` : ''}
                             ${nextViewsPurchase ? `<div style="background: rgba(102, 126, 234, 0.1); border-radius: 0; padding: 8px; margin-top: 8px; font-size: 0.85em;">
                                 <div style="color: #667eea; font-weight: 600; margin-bottom: 4px;">Next Purchase</div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Time: <span data-next-purchase data-purchase-time="${nextViewsPurchase.nextPurchaseTime.toISOString()}" data-metric="views" style="color: #fff;"><span data-countdown-display>${formatTimeRemaining(nextViewsPurchase.timeUntilNext)}</span></span></div>
@@ -6280,7 +6752,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 <div style="color: #b0b0b0; margin-bottom: 6px;">Gap: <span style="color: #ef4444; font-weight: 600;">${formatNumber(likesCatchUp)}</span></div>
                                 <button class="catch-up-btn" data-video-url="${safeVideoUrlAttr}" data-metric="likes" data-amount="${likesCatchUp}" style="width: 100%; background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 0; cursor: pointer; font-weight: 600; font-size: 0.9em;">Catch Up (${formatNumber(likesCatchUp)})</button>
                             </div>` : ''}
-                            ${likesNeeded > 0 && hoursToLikesGoal > 0 ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;" data-time-to-goal data-hours="${hoursToLikesGoal}" data-metric="likes"><span data-countdown-to-goal>${formatTimeRemaining(hoursToLikesGoal)}</span> to goal</div>` : likesNeeded <= 0 ? `<div style="color: #10b981; font-size: 0.85em; margin-top: 5px;">Target reached</div>` : likesNeeded > 0 && isTargetOverdue ? `<div style="color: #ef4444; font-size: 0.85em; margin-top: 5px;">Past due</div>` : likesNeeded > 0 && targetCompletionTime ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;" data-time-to-goal data-hours="${hoursToTarget}" data-metric="likes"><span data-countdown-to-goal>${formatTimeRemaining(hoursToTarget)}</span> to goal</div>` : ''}
+                            ${likesNeeded > 0 && hoursToLikesGoal > 0 ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;" data-time-to-goal data-hours="${hoursToLikesGoal}" data-metric="likes"><span data-countdown-to-goal>${formatTimeRemaining(hoursToLikesGoal)}</span> to goal</div>` : likesNeeded <= 0 ? `<div style="color: #10b981; font-size: 0.85em; margin-top: 5px;">Target reached</div>` : likesNeeded > 0 && isTargetOverdue && !isOvertimeStopped ? `<div style="color: #f59e0b; font-size: 0.85em; margin-top: 5px;">OVERTIME</div>` : likesNeeded > 0 && isTargetOverdue && isOvertimeStopped ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;">Overtime stopped</div>` : likesNeeded > 0 && targetCompletionTime ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;" data-time-to-goal data-hours="${hoursToTarget}" data-metric="likes"><span data-countdown-to-goal>${formatTimeRemaining(hoursToTarget)}</span> to goal</div>` : ''}
                             ${nextLikesPurchase ? `<div style="background: rgba(102, 126, 234, 0.1); border-radius: 0; padding: 8px; margin-top: 8px; font-size: 0.85em;">
                                 <div style="color: #667eea; font-weight: 600; margin-bottom: 4px;">Next Purchase</div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Time: <span data-next-purchase data-purchase-time="${nextLikesPurchase.nextPurchaseTime.toISOString()}" data-metric="likes" style="color: #fff;"><span data-countdown-display>${formatTimeRemaining(nextLikesPurchase.timeUntilNext)}</span></span></div>
@@ -6303,7 +6775,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             <div class="metric-value">${totalComments}</div>
                             <div class="metric-target">/ ${targetComments} (${formatPercentage(totalComments, targetComments)})</div>
                             ${commentsOrdered > 0 ? `<div style="color: #667eea; font-size: 0.85em; margin-top: 3px;">Orders placed: <strong>${commentsOrdersCount}</strong> (${formatNumber(commentsOrdered)} total ordered)</div>` : ''}
-                            ${commentsNeeded > 0 && hoursToCommentsGoal > 0 ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;" data-time-to-goal data-hours="${hoursToCommentsGoal}" data-metric="comments"><span data-countdown-to-goal>${formatTimeRemaining(hoursToCommentsGoal)}</span> to goal</div>` : commentsNeeded <= 0 ? `<div style="color: #10b981; font-size: 0.85em; margin-top: 5px;">Target reached</div>` : commentsNeeded > 0 && isTargetOverdue ? `<div style="color: #ef4444; font-size: 0.85em; margin-top: 5px;">Past due</div>` : commentsNeeded > 0 && targetCompletionTime ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;" data-time-to-goal data-hours="${hoursToTarget}" data-metric="comments"><span data-countdown-to-goal>${formatTimeRemaining(hoursToTarget)}</span> to goal</div>` : ''}
+                            ${commentsNeeded > 0 && hoursToCommentsGoal > 0 ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;" data-time-to-goal data-hours="${hoursToCommentsGoal}" data-metric="comments"><span data-countdown-to-goal>${formatTimeRemaining(hoursToCommentsGoal)}</span> to goal</div>` : commentsNeeded <= 0 ? `<div style="color: #10b981; font-size: 0.85em; margin-top: 5px;">Target reached</div>` : commentsNeeded > 0 && isTargetOverdue && !isOvertimeStopped ? `<div style="color: #f59e0b; font-size: 0.85em; margin-top: 5px;">OVERTIME</div>` : commentsNeeded > 0 && isTargetOverdue && isOvertimeStopped ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;">Overtime stopped</div>` : commentsNeeded > 0 && targetCompletionTime ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;" data-time-to-goal data-hours="${hoursToTarget}" data-metric="comments"><span data-countdown-to-goal>${formatTimeRemaining(hoursToTarget)}</span> to goal</div>` : ''}
                             ${nextCommentsPurchase ? `<div style="background: rgba(102, 126, 234, 0.1); border-radius: 0; padding: 8px; margin-top: 8px; font-size: 0.85em;">
                                 <div style="color: #667eea; font-weight: 600; margin-bottom: 4px;">Next Purchase</div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Time: <span data-next-purchase data-purchase-time="${nextCommentsPurchase.nextPurchaseTime.toISOString()}" data-metric="comments" style="color: #fff;"><span data-countdown-display>${formatTimeRemaining(nextCommentsPurchase.timeUntilNext)}</span></span></div>
@@ -6324,7 +6796,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             <div class="metric-value">${commentLikesOrdered}</div>
                             <div class="metric-target">/ ${targetCommentLikes} (${formatPercentage(commentLikesOrdered, targetCommentLikes)})</div>
                             ${commentLikesOrdered > 0 ? `<div style="color: #667eea; font-size: 0.85em; margin-top: 3px;">Orders placed: <strong>${commentLikesOrdersCount}</strong> (${formatNumber(commentLikesOrdered)} total ordered)</div>` : ''}
-                            ${commentLikesNeeded > 0 && hoursToCommentLikesGoal > 0 ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;" data-time-to-goal data-hours="${hoursToCommentLikesGoal}" data-metric="comment_likes"><span data-countdown-to-goal>${formatTimeRemaining(hoursToCommentLikesGoal)}</span> to goal</div>` : commentLikesNeeded <= 0 ? `<div style="color: #10b981; font-size: 0.85em; margin-top: 5px;">Target reached</div>` : commentLikesNeeded > 0 && isTargetOverdue ? `<div style="color: #ef4444; font-size: 0.85em; margin-top: 5px;">Past due</div>` : commentLikesNeeded > 0 && targetCompletionTime ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;" data-time-to-goal data-hours="${hoursToTarget}" data-metric="comment_likes"><span data-countdown-to-goal>${formatTimeRemaining(hoursToTarget)}</span> to goal</div>` : ''}
+                            ${commentLikesNeeded > 0 && hoursToCommentLikesGoal > 0 ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;" data-time-to-goal data-hours="${hoursToCommentLikesGoal}" data-metric="comment_likes"><span data-countdown-to-goal>${formatTimeRemaining(hoursToCommentLikesGoal)}</span> to goal</div>` : commentLikesNeeded <= 0 ? `<div style="color: #10b981; font-size: 0.85em; margin-top: 5px;">Target reached</div>` : commentLikesNeeded > 0 && isTargetOverdue && !isOvertimeStopped ? `<div style="color: #f59e0b; font-size: 0.85em; margin-top: 5px;">OVERTIME</div>` : commentLikesNeeded > 0 && isTargetOverdue && isOvertimeStopped ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;">Overtime stopped</div>` : commentLikesNeeded > 0 && targetCompletionTime ? `<div style="color: #888; font-size: 0.85em; margin-top: 5px;" data-time-to-goal data-hours="${hoursToTarget}" data-metric="comment_likes"><span data-countdown-to-goal>${formatTimeRemaining(hoursToTarget)}</span> to goal</div>` : ''}
                             ${nextCommentLikesPurchase ? `<div style="background: rgba(102, 126, 234, 0.1); border-radius: 0; padding: 8px; margin-top: 8px; font-size: 0.85em;">
                                 <div style="color: #667eea; font-weight: 600; margin-bottom: 4px;">Next Purchase</div>
                                 <div style="color: #b0b0b0; margin-bottom: 2px;">Time: <span data-next-purchase data-purchase-time="${nextCommentLikesPurchase.nextPurchaseTime.toISOString()}" data-metric="comment_likes" style="color: #fff;"><span data-countdown-display>${formatTimeRemaining(nextCommentLikesPurchase.timeUntilNext)}</span></span></div>
@@ -6747,7 +7219,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             
                             // If target is overdue, show that
                             if (isTargetOverdueLocal && viewsNeeded > 0) {
-                                hoursToGoal = -1; // Will show "Past due"
+                                hoursToGoal = -1; // Will show "OVERTIME"
                             }
                             
                             let statusHtml = '';
@@ -6801,7 +7273,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             if (viewsNeeded > 0) {
                                 let timeToGoal = '';
                                 if (hoursToGoal < 0 || isTargetOverdue) {
-                                    timeToGoal = 'Past due';
+                                    timeToGoal = 'OVERTIME';
                                 } else if (hoursToGoal > 0) {
                                     const totalSeconds = Math.floor(hoursToGoal * 3600);
                                     const days = Math.floor(totalSeconds / (24 * 3600));
@@ -7037,7 +7509,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         const remainingSeconds = Math.floor((remainingMs % (1000 * 60)) / 1000);
                         timeLeft = remainingHours + 'h' + (remainingMinutes > 0 ? remainingMinutes + 'm' : '') + remainingSeconds + 's';
                     } else {
-                        timeLeft = 'OVERDUE';
+                        // Check if overtime is stopped
+                        const videoOvertimeStopped = videoData && videoData.overtime_stopped === true;
+                        timeLeft = videoOvertimeStopped ? 'Overtime stopped' : 'OVERTIME';
                     }
                 }
                 
@@ -7211,7 +7685,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='transparent'">
                         <td style="padding: 4px 3px; color: #667eea; font-family: monospace; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); text-align: left;" title="${escapeTemplateLiteral(videoUrl)}"><a href="#" style="color: #667eea; text-decoration: none; cursor: pointer;" onclick="event.stopPropagation(); showVideoDetailsModal('${escapeTemplateLiteral(videoUrl)}'); return false;">${videoId}</a></td>
                         <td style="padding: 4px 3px; text-align: center; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${uploadTime}</td>
-                        <td style="padding: 4px 3px; text-align: center; color: ${timeLeft === 'OVERDUE' ? '#ef4444' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; text-decoration: underline;" onclick="event.stopPropagation(); showEditTimeLeftModal('${escapeTemplateLiteral(videoUrl)}', ${currentHours}, ${currentMinutes});" title="Click to edit time left" data-time-left data-target-time="${target_completion || ''}" data-video-url="${escapeTemplateLiteral(videoUrl)}">${timeLeft}</td>
+                        <td style="padding: 4px 3px; text-align: center; color: ${timeLeft === 'OVERTIME' ? '#f59e0b' : timeLeft === 'Overtime stopped' ? '#888' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; text-decoration: underline;" onclick="event.stopPropagation(); showEditTimeLeftModal('${escapeTemplateLiteral(videoUrl)}', ${currentHours}, ${currentMinutes});" title="Click to edit time left" data-time-left data-target-time="${target_completion || ''}" data-video-url="${escapeTemplateLiteral(videoUrl)}">${timeLeft}</td>
                         <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-real-views data-video-url="${escapeTemplateLiteral(videoUrl)}">${formatNumber(real_views)}</td>
                         <td style="padding: 4px 3px; text-align: right; color: ${real_views >= expected_views ? '#10b981' : '#f59e0b'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(expected_views)}</td>
                         <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-manual-views-orders data-video-url="${escapeTemplateLiteral(videoUrl)}"><span onclick="event.stopPropagation(); handleManualOrder('${escapeTemplateLiteral(videoUrl)}', 'views');" style="cursor: pointer; text-decoration: underline; color: #667eea;">${manualViewsOrders}</span></td>
@@ -7240,6 +7714,23 @@ class DashboardHandler(BaseHTTPRequestHandler):
         
         let isRefreshing = false;
         let allVideosData = {};
+        
+        // Loading indicator functions
+        function showLoading(message = 'Loading...') {
+            const loadingEl = document.getElementById('global-loading');
+            const messageEl = document.getElementById('loading-message');
+            if (loadingEl) {
+                messageEl.textContent = message;
+                loadingEl.style.display = 'flex';
+            }
+        }
+        
+        function hideLoading() {
+            const loadingEl = document.getElementById('global-loading');
+            if (loadingEl) {
+                loadingEl.style.display = 'none';
+            }
+        }
         
         // Global helper function to escape template literals
         function escapeTemplateLiteral(str) {
@@ -8087,22 +8578,23 @@ class DashboardHandler(BaseHTTPRequestHandler):
             });
         });
         
-        async function loadDashboard(showLoading = false) {
+        async function loadDashboard(showLoadingIndicator = false) {
             // Prevent multiple simultaneous refreshes
             if (isRefreshing) {
                 console.log('Already refreshing, skipping...');
-                // Return a resolved promise so await doesn't hang
                 return Promise.resolve();
             }
             isRefreshing = true;
             
             const route = getCurrentRoute();
-            console.log('loadDashboard - route:', route);
             const content = document.getElementById('dashboard-content');
             
-            // Only show loading on manual refresh or first load
-            if (showLoading) {
-                content.style.opacity = '0.5';
+            // Show loading indicator
+            if (showLoadingIndicator) {
+                showLoading('Refreshing dashboard...');
+            } else {
+                // Subtle loading state
+                if (content) content.style.opacity = '0.7';
             }
             
             try {
@@ -8114,7 +8606,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     // Don't crash, use empty progress and let periodic refresh retry
                     const progress = {};
                     allVideosData = progress;
-                    content.style.opacity = '1';
+                    if (content) content.style.opacity = '1';
+                    hideLoading();
                     isRefreshing = false;
                     return;
                 }
@@ -8153,7 +8646,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             <p>Add a video using: python run_delivery_bot.py &lt;video_url&gt;</p>
                         </div>
                     `;
-                    content.style.opacity = '1';
+                    if (content) content.style.opacity = '1';
+                    hideLoading();
                     isRefreshing = false;
                     return;
                 }
@@ -8296,7 +8790,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                             const remainingSeconds = Math.floor((remainingMs % (1000 * 60)) / 1000);
                                             timeLeft = remainingHours + 'h' + (remainingMinutes > 0 ? remainingMinutes + 'm' : '') + remainingSeconds + 's';
                                         } else {
-                                            timeLeft = 'OVERDUE';
+                                            // Check if overtime is stopped
+                                            const videoOvertimeStopped = videoData && videoData.overtime_stopped === true;
+                                            timeLeft = videoOvertimeStopped ? 'Overtime stopped' : 'OVERTIME';
                                         }
                                     }
                                     
@@ -8452,7 +8948,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                         <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='transparent'">
                                             <td style="padding: 4px 3px; color: #667eea; font-family: monospace; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); text-align: left;" title="${escapeTemplateLiteral(videoUrl || '')}"><a href="#" style="color: #667eea; text-decoration: none; cursor: pointer;" onclick="event.stopPropagation(); showVideoDetailsModal('${escapeTemplateLiteral(videoUrl || '')}'); return false;">${videoId || 'N/A'}</a></td>
                                             <td style="padding: 4px 3px; text-align: center; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${uploadTime}</td>
-                                            <td style="padding: 4px 3px; text-align: center; color: ${timeLeft === 'OVERDUE' ? '#ef4444' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; text-decoration: underline;" onclick="event.stopPropagation(); showEditTimeLeftModal('${escapeTemplateLiteral(videoUrl)}', ${currentHours}, ${currentMinutes});" title="Click to edit time left" data-time-left data-target-time="${target_completion || ''}" data-video-url="${escapeTemplateLiteral(videoUrl)}">${timeLeft}</td>
+                                            <td style="padding: 4px 3px; text-align: center; color: ${timeLeft === 'OVERTIME' ? '#f59e0b' : timeLeft === 'Overtime stopped' ? '#888' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; text-decoration: underline;" onclick="event.stopPropagation(); showEditTimeLeftModal('${escapeTemplateLiteral(videoUrl)}', ${currentHours}, ${currentMinutes});" title="Click to edit time left" data-time-left data-target-time="${target_completion || ''}" data-video-url="${escapeTemplateLiteral(videoUrl)}">${timeLeft}</td>
                                             <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-real-views data-video-url="${escapeTemplateLiteral(videoUrl)}">${formatNumber(real_views)}</td>
                                             <td style="padding: 4px 3px; text-align: right; color: ${real_views >= expected_views ? '#10b981' : '#f59e0b'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(expected_views)}</td>
                                             <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-manual-views-orders data-video-url="${escapeTemplateLiteral(videoUrl)}"><span onclick="event.stopPropagation(); handleManualOrder('${escapeTemplateLiteral(videoUrl)}', 'views');" style="cursor: pointer; text-decoration: underline; color: #667eea;">${manualViewsOrders}</span></td>
@@ -8671,9 +9167,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     // For auto-refresh, just use empty state silently
                     allVideosData = {};
                 }
-                content.style.opacity = '1';
+                if (content) content.style.opacity = '1';
             } finally {
-                // Always reset refreshing flag, even on error
+                // Always reset refreshing flag and hide loading, even on error
+                hideLoading();
                 isRefreshing = false;
             }
         }

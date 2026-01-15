@@ -8195,14 +8195,14 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         html = `
                             <div class="empty-state">
                                 <h2>Campaign Not Found</h2>
-                                <p>The requested campaign no longer exists.</p>
+                                <p>The requested campaign no longer exists or is still loading.</p>
                                 <div class="back-button" data-action="navigate-home" style="margin-top: 20px;">← Back to All Campaigns</div>
                             </div>
                         `;
                     } else {
                         // Render campaign header immediately for faster perceived performance
-                        const campaignVideos = campaign.videos || [];
-                        const financial = campaign.financial || {};
+                        const campaignVideos = (campaign && campaign.videos) ? campaign.videos : [];
+                        const financial = (campaign && campaign.financial) ? campaign.financial : {};
                         
                         html += '<div class="back-button" data-action="navigate-home" data-switch-to="campaigns">← Back to All Campaigns</div>';
                         html += `<div style="background: #1a1a1a; border-radius: 0; padding: 10px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.1);">`;
@@ -8226,6 +8226,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             function escapeTemplateLiteral(str) {
                                 if (!str) return '';
                                 return String(str).replace(/\\\\/g, '\\\\\\\\').replace(/`/g, '\\\\`').replace(/\\$/g, '\\\\$');
+                            }
+                            
+                            // Ensure progress data exists
+                            if (!progress || typeof progress !== 'object') {
+                                progress = {};
                             }
                             
                             let tableHtml = `
@@ -8257,8 +8262,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             
                             // Render table rows for each video (optimized loop)
                             for (const videoUrl of campaignVideos) {
+                                if (!videoUrl) continue; // Skip invalid URLs
                                 const videoData = progress[videoUrl];
-                                if (videoData) {
+                                if (!videoData) continue; // Skip if video data not found
+                                
+                                try {
                                     // Extract video ID
                                     const videoIdMatch = videoUrl.match(/video\\/(\\d+)/);
                                     const videoId = videoIdMatch ? videoIdMatch[1] : videoUrl.substring(videoUrl.length - 15);
@@ -8434,7 +8442,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                     
                                     tableHtml += `
                                         <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);" onmouseover="this.style.background='#252525'" onmouseout="this.style.background='transparent'">
-                                            <td style="padding: 4px 3px; color: #667eea; font-family: monospace; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); text-align: left;" title="${escapeTemplateLiteral(videoUrl)}"><a href="#" style="color: #667eea; text-decoration: none; cursor: pointer;" onclick="event.stopPropagation(); showVideoDetailsModal('${escapeTemplateLiteral(videoUrl)}'); return false;">${videoId}</a></td>
+                                            <td style="padding: 4px 3px; color: #667eea; font-family: monospace; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); text-align: left;" title="${escapeTemplateLiteral(videoUrl || '')}"><a href="#" style="color: #667eea; text-decoration: none; cursor: pointer;" onclick="event.stopPropagation(); showVideoDetailsModal('${escapeTemplateLiteral(videoUrl || '')}'); return false;">${videoId || 'N/A'}</a></td>
                                             <td style="padding: 4px 3px; text-align: center; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${uploadTime}</td>
                                             <td style="padding: 4px 3px; text-align: center; color: ${timeLeft === 'OVERDUE' ? '#ef4444' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; text-decoration: underline;" onclick="event.stopPropagation(); showEditTimeLeftModal('${escapeTemplateLiteral(videoUrl)}', ${currentHours}, ${currentMinutes});" title="Click to edit time left" data-time-left data-target-time="${target_completion || ''}" data-video-url="${escapeTemplateLiteral(videoUrl)}">${timeLeft}</td>
                                             <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-real-views data-video-url="${escapeTemplateLiteral(videoUrl)}">${formatNumber(real_views)}</td>
@@ -8453,6 +8461,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                             <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px;">${avgLikesCostPerUnit > 0 ? '$' + avgLikesCostPerUnit.toFixed(4) : '-'}</td>
                                         </tr>
                                     `;
+                                } catch (rowError) {
+                                    console.error('[loadDashboard] Error rendering table row for', videoUrl, ':', rowError);
+                                    // Continue with next video instead of crashing
                                 }
                             }
                             

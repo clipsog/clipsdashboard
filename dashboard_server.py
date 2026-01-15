@@ -5580,12 +5580,12 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     const video = result.video;
                     const { username, videoId } = extractVideoInfo(videoUrl);
                     
-                    // Escape videoUrl for use in onclick handlers
-                    function escapeForAttr(str) {
+                    // Escape videoUrl for use in onclick handlers - use same escaping as elsewhere
+                    function escapeTemplateLiteral(str) {
                         if (!str) return '';
-                        return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                        return String(str).replace(/\\\\/g, '\\\\\\\\').replace(/`/g, '\\\\`').replace(/\\$/g, '\\\\$');
                     }
-                    const safeVideoUrlAttr = escapeForAttr(videoUrl);
+                    const safeVideoUrlAttr = escapeTemplateLiteral(videoUrl);
                     
                     let html = `
                         <div style="margin-bottom: 15px;">
@@ -5630,7 +5630,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 <div style="margin-bottom: 15px;">
                                     <h3 style="color: #fff; margin: 0 0 10px 0; font-size: 16px;">Timeline</h3>
                                     <p style="margin: 5px 0; color: ${isOvertimeStopped ? '#888' : '#f59e0b'};"><strong>Status:</strong> ${isOvertimeStopped ? 'Overtime stopped' : 'OVERTIME'}</p>
-                                    ${!isOvertimeStopped ? `<button onclick="stopOvertime('${safeVideoUrlAttr}')" style="margin-top: 8px; background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 0; cursor: pointer; font-size: 12px; font-weight: 600;">End Overtime</button>` : ''}
+                                    ${!isOvertimeStopped ? `<button class="stop-overtime-btn" data-video-url="${safeVideoUrlAttr}" style="margin-top: 8px; background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 0; cursor: pointer; font-size: 12px; font-weight: 600;">End Overtime</button>` : ''}
                                 </div>
                             `;
                         }
@@ -8499,6 +8499,16 @@ class DashboardHandler(BaseHTTPRequestHandler):
         // Close modals when clicking outside
         // Event delegation for catch-up buttons (they're dynamically created)
         document.addEventListener('click', function(e) {
+            if (e.target && e.target.classList.contains('stop-overtime-btn')) {
+                e.preventDefault();
+                e.stopPropagation();
+                const videoUrl = e.target.getAttribute('data-video-url');
+                if (videoUrl) {
+                    stopOvertime(videoUrl);
+                }
+                return;
+            }
+            
             if (e.target && e.target.classList.contains('catch-up-btn')) {
                 e.preventDefault();
                 e.stopPropagation();

@@ -8640,20 +8640,32 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 console.error('Error loading dashboard:', error);
                 // Only show error on manual refresh, not auto-refresh
                 if (showLoading) {
-                    // Escape error message for template literal
-                    function escapeTemplateLiteral(str) {
-                        if (!str) return '';
-                        return String(str).replace(/\\\\/g, '\\\\\\\\').replace(/`/g, '\\\\`').replace(/\\$/g, '\\\\$');
+                    try {
+                        // Escape error message for template literal
+                        function escapeTemplateLiteral(str) {
+                            if (!str) return '';
+                            return String(str).replace(/\\\\/g, '\\\\\\\\').replace(/`/g, '\\\\`').replace(/\\$/g, '\\\\$');
+                        }
+                        const errorMsg = error && error.message ? error.message : String(error);
+                        content.innerHTML = `
+                            <div class="empty-state">
+                                <h2>Error loading dashboard</h2>
+                                <p>${escapeTemplateLiteral(errorMsg)}</p>
+                                <button onclick="loadDashboard(true)" style="margin-top: 20px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer;">Retry</button>
+                            </div>
+                        `;
+                    } catch (innerError) {
+                        console.error('Error rendering error message:', innerError);
+                        // Fallback to simple error message
+                        content.innerHTML = '<div class="empty-state"><h2>Error loading dashboard</h2><p>Please refresh the page.</p></div>';
                     }
-                    content.innerHTML = `
-                        <div class="empty-state">
-                            <h2>Error loading dashboard</h2>
-                            <p>${escapeTemplateLiteral(error.message)}</p>
-                        </div>
-                    `;
+                } else {
+                    // For auto-refresh, just use empty state silently
+                    allVideosData = {};
                 }
                 content.style.opacity = '1';
             } finally {
+                // Always reset refreshing flag, even on error
                 isRefreshing = false;
             }
         }

@@ -2564,6 +2564,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             cursor.execute("DELETE FROM campaigns WHERE campaign_id = %s", (campaign_id,))
                             conn.commit()
                             print(f"[DELETE] Deleted campaign {campaign_id} from database")
+                        else:
+                            print(f"❌ No database connection available")
                 except Exception as e:
                     print(f"❌ Error deleting campaign from database: {e}")
                     import traceback
@@ -2578,8 +2580,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     self.wfile.write(response_data.encode())
                     return
             
-            # Note: We don't need to save campaigns dict after deletion since we've already deleted from DB
-            # The campaigns dict will be reloaded on the next request
+            # Remove campaign from in-memory dict and save
+            if campaign_id in campaigns:
+                del campaigns[campaign_id]
+                self.save_campaigns(campaigns)
+                print(f"[DELETE] Removed campaign {campaign_id} from in-memory dict")
             
             response_data = json.dumps({
                 'success': True,

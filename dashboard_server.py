@@ -8539,7 +8539,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             let html = '<option value="">No campaign</option>';
             for (const [campaignId, campaign] of Object.entries(campaignsData || {})) {
                 const name = (campaign && campaign.name) ? String(campaign.name) : 'Unnamed Campaign';
-                const safeName = name.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\\"/g, '&quot;');
+                const safeName = name.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
                 html += `<option value="${escapeTemplateLiteral(campaignId)}">${safeName}</option>`;
             }
             selector.innerHTML = html;

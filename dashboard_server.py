@@ -6862,7 +6862,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                     const date = new Date(h.timestamp);
                                     const label = date.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
                                     // Escape any special characters that could break template literals
-                                    return String(label || '').replace(/`/g, '\\`').replace(/\$/g, '\\$');
+                                    return String(label || '').split('`').join('\\`').split('$').join('\\$');
                                 } catch (e) {
                                     return '';
                                 }

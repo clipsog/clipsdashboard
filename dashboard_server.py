@@ -9287,14 +9287,31 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 progress = {};
                             } else {
                                 console.log('[Campaign Table] Progress data available for', Object.keys(progress).length, 'videos');
-                                // Log a sample video to see data structure
+                                // Log a sample video to see data structure - CHECK FOR VIEWS DATA
                                 const sampleUrl = Object.keys(progress)[0];
-                                if (sampleUrl) {
-                                    console.log('[Campaign Table] Sample video data:', sampleUrl.substring(0, 50), '...', {
-                                        real_views: progress[sampleUrl].real_views,
-                                        real_likes: progress[sampleUrl].real_likes,
-                                        target_views: progress[sampleUrl].target_views
+                                if (sampleUrl && progress[sampleUrl]) {
+                                    const sample = progress[sampleUrl];
+                                    console.log('[Campaign Table] Sample video:', sampleUrl.substring(0, 50), '...');
+                                    console.log('[Campaign Table] Sample data fields:', {
+                                        real_views: sample.real_views,
+                                        real_likes: sample.real_likes,
+                                        target_views: sample.target_views,
+                                        target_likes: sample.target_likes,
+                                        hasRealViews: sample.real_views !== undefined,
+                                        viewsValue: sample.real_views,
+                                        allKeys: Object.keys(sample)
                                     });
+                                }
+                                
+                                // Check a few campaign videos specifically
+                                const campaignVideosToCheck = campaignVideos.slice(0, 3);
+                                console.log('[Campaign Table] Checking first 3 campaign videos for data:');
+                                for (const videoUrl of campaignVideosToCheck) {
+                                    if (progress[videoUrl]) {
+                                        console.log(`  - ${videoUrl.substring(0, 40)}... real_views: ${progress[videoUrl].real_views}, real_likes: ${progress[videoUrl].real_likes}`);
+                                    } else {
+                                        console.warn(`  - ${videoUrl.substring(0, 40)}... NOT FOUND IN PROGRESS DATA!`);
+                                    }
                                 }
                             }
                             

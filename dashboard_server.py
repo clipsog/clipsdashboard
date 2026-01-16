@@ -105,6 +105,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 self.handle_update_campaign()
             elif path == '/api/end-campaign':
                 self.handle_end_campaign()
+            elif path == '/api/pause-campaign':
+                self.handle_pause_campaign()
             elif path == '/api/delete-campaign':
                 self.handle_delete_campaign()
             elif path == '/api/assign-videos':
@@ -165,6 +167,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 self.handle_update_campaign()
             elif path == '/api/end-campaign':
                 self.handle_end_campaign()
+            elif path == '/api/pause-campaign':
+                self.handle_pause_campaign()
             elif path == '/api/delete-campaign':
                 self.handle_delete_campaign()
             elif path == '/api/assign-videos':
@@ -6036,6 +6040,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             </div>` : ''}
                         </div>
                         <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px; margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button class="pause-campaign-btn" data-campaign-id="${escapeTemplateLiteral(campaignId)}" style="flex: 1; min-width: 90px; background: #2a2a2a; color: ${isPaused ? '#10b981' : '#f59e0b'}; border: 1px solid ${isPaused ? 'rgba(16,185,129,0.3)' : 'rgba(245,158,11,0.3)'}; padding: 8px 12px; border-radius: 0; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;" onmouseover="this.style.background='#333';" onmouseout="this.style.background='#2a2a2a';" title="${isPaused ? 'Resume orders for this campaign' : 'Pause all orders for this campaign'}">${isPaused ? '▶ Resume' : '⏸ Pause'}</button>
                             <button class="edit-campaign-btn" data-campaign-id="${escapeTemplateLiteral(campaignId)}" style="flex: 1; min-width: 80px; background: #2a2a2a; color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 0; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;" onmouseover="this.style.background='#333'; this.style.borderColor='rgba(255,255,255,0.3)';" onmouseout="this.style.background='#2a2a2a'; this.style.borderColor='rgba(255,255,255,0.2)';">Edit</button>
                             <button class="add-video-to-campaign-btn" data-campaign-id="${escapeTemplateLiteral(campaignId)}" style="flex: 1; min-width: 100px; background: #2a2a2a; color: #667eea; border: 1px solid rgba(102,126,234,0.3); padding: 8px 12px; border-radius: 0; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;" onmouseover="this.style.background='#333'; this.style.borderColor='rgba(102,126,234,0.5)';" onmouseout="this.style.background='#2a2a2a'; this.style.borderColor='rgba(102,126,234,0.3)';">Add Video</button>
                             ${campaign.status !== 'ended' ? `<button class="end-campaign-btn" data-campaign-id="${escapeTemplateLiteral(campaignId)}" style="flex: 1; min-width: 120px; background: #2a2a2a; color: #ef4444; border: 1px solid rgba(239,68,68,0.3); padding: 8px 12px; border-radius: 0; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s;" onmouseover="this.style.background='#333'; this.style.borderColor='rgba(239,68,68,0.5)';" onmouseout="this.style.background='#2a2a2a'; this.style.borderColor='rgba(239,68,68,0.3)';">End Campaign</button>` : '<span style="flex: 1; color: #888; font-size: 11px; padding: 8px 12px; text-align: center;">Ended</span>'}
@@ -8845,6 +8850,58 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 if (campaignId) {
                     showAddVideoToCampaignModal(campaignId);
                 }
+                return;
+            }
+            
+            // Handle pause campaign button
+            if (e.target && e.target.classList.contains('pause-campaign-btn')) {
+                e.preventDefault();
+                e.stopPropagation();
+                const campaignId = e.target.getAttribute('data-campaign-id');
+                const btn = e.target;
+                
+                // Show loading
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '⏳ ...';
+                btn.disabled = true;
+                
+                fetch(`/api/pause-campaign?campaign_id=${encodeURIComponent(campaignId)}`, {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const action = data.paused ? 'paused' : 'resumed';
+                        showNotification(`Campaign ${action} successfully`, 'success');
+                        
+                        // Update button text and style
+                        if (data.paused) {
+                            btn.innerHTML = '▶ Resume';
+                            btn.style.borderColor = '#10b981';
+                            btn.style.color = '#10b981';
+                            btn.setAttribute('title', 'Resume orders for this campaign');
+                        } else {
+                            btn.innerHTML = '⏸ Pause';
+                            btn.style.borderColor = '#f59e0b';
+                            btn.style.color = '#f59e0b';
+                            btn.setAttribute('title', 'Pause all orders for this campaign');
+                        }
+                        
+                        // Reload campaigns to show updated state
+                        setTimeout(() => loadCampaigns(), 500);
+                    } else {
+                        showNotification('Error: ' + (data.error || 'Unknown error'), 'error');
+                        btn.innerHTML = originalText;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error pausing/resuming campaign:', error);
+                    showNotification('Error updating campaign', 'error');
+                    btn.innerHTML = originalText;
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                });
                 return;
             }
             

@@ -4634,6 +4634,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 
                 if (data.success) {
                     showNotification('Video removed successfully', 'success');
+                    invalidateCache(); // Force fresh data
                     // Navigate to home if we're on detail page
                     const route = getCurrentRoute();
                     if (route.type === 'detail') {
@@ -5272,6 +5273,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     
                     if (data.success) {
                         hideCreateCampaignModal();
+                        invalidateCache(); // Force fresh data
                         await loadCampaigns();
                         // Auto-select the new campaign
                         const selector = document.getElementById('campaign-selector');
@@ -5384,8 +5386,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 
                 if (data.success) {
                     showNotification('Campaign ended successfully', 'success');
+                    invalidateCache(); // Force fresh data
                     await loadCampaigns();
-                    await loadDashboard(false);
+                    await loadDashboard(false, true);
                 } else {
                     alert('Error: ' + (data.error || 'Failed to end campaign'));
                 }
@@ -5435,8 +5438,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 
                 if (data.success) {
                     showNotification('Campaign deleted successfully', 'success');
+                    invalidateCache(); // Force fresh data
                     await loadCampaigns();
-                    await loadDashboard(false);
+                    await loadDashboard(false, true);
                     // Navigate to home if we're viewing this campaign
                     if (typeof getCurrentRoute === 'function') {
                         const route = getCurrentRoute();
@@ -7778,6 +7782,31 @@ class DashboardHandler(BaseHTTPRequestHandler):
         
         let isRefreshing = false;
         let allVideosData = {};
+        let cachedProgressData = null;
+        let lastProgressFetch = 0;
+        const CACHE_DURATION = 5000; // Cache for 5 seconds
+        
+        // Invalidate cache to force fresh data load (call after mutations)
+        function invalidateCache() {
+            cachedProgressData = null;
+            lastProgressFetch = 0;
+            console.log('Cache invalidated - next load will fetch fresh data');
+        }
+        
+        // Instant render from cached data (no API calls) - FOR FAST NAVIGATION
+        function renderFromCache(progress, route, content) {
+            allVideosData = progress;
+            renderSummaryStats(progress);
+            
+            if (Object.keys(progress).length === 0) {
+                content.innerHTML = '<div class="empty-state"><h2>No videos in progress</h2></div>';
+                return;
+            }
+            
+            // Just render the current view instantly, trigger full reload in background
+            // This gives instant perceived performance
+            setTimeout(() => loadDashboard(false, true), 100);
+        }
         
         // Loading indicator functions
         function showLoading(message = 'Loading...') {
@@ -8779,7 +8808,18 @@ class DashboardHandler(BaseHTTPRequestHandler):
             });
         });
         
-        async function loadDashboard(showLoadingIndicator = false) {
+        async function loadDashboard(showLoadingIndicator = false, forceRefresh = false) {
+            const route = getCurrentRoute();
+            const content = document.getElementById('dashboard-content');
+            const now = Date.now();
+            
+            // FAST PATH: Use cached data for instant navigation (if available and fresh)
+            if (!forceRefresh && cachedProgressData && (now - lastProgressFetch) < CACHE_DURATION) {
+                console.log('Using cached data for instant navigation');
+                renderFromCache(cachedProgressData, route, content);
+                return Promise.resolve();
+            }
+            
             // Prevent multiple simultaneous refreshes
             if (isRefreshing) {
                 console.log('Already refreshing, skipping...');
@@ -8787,15 +8827,12 @@ class DashboardHandler(BaseHTTPRequestHandler):
             }
             isRefreshing = true;
             
-            const route = getCurrentRoute();
-            const content = document.getElementById('dashboard-content');
-            
-            // Show loading indicator
+            // Show subtle loading only if not using cache
             if (showLoadingIndicator) {
-                showLoading('Refreshing dashboard...');
-            } else {
-                // Subtle loading state
-                if (content) content.style.opacity = '0.7';
+                showLoading('Loading...');
+            } else if (content && !cachedProgressData) {
+                // Only dim if no cache available
+                content.style.opacity = '0.7';
             }
             
             try {
@@ -8830,6 +8867,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 
                 // Store all videos data for filtering
                 allVideosData = progress;
+                
+                // Update cache
+                cachedProgressData = progress;
+                lastProgressFetch = Date.now();
                 
                 // Load campaigns ONLY on first/full load OR if we're viewing a campaign and don't have it
                 // Avoid re-rendering campaign UI every refresh (it wipes calculator inputs, checkbox selection state, etc.).
@@ -10560,10 +10601,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
             }
         }); // Regular event bubbling
         
-        // Listen for hash changes (back/forward browser buttons)
+        // Listen for hash changes (back/forward browser buttons) - INSTANT navigation
         window.addEventListener('hashchange', () => {
             console.log('Hash changed to:', window.location.hash);
-            loadDashboard(false);
+            // Use cached data for instant navigation, no forced refresh
+            loadDashboard(false, false);
         });
 
         // -----------------------------

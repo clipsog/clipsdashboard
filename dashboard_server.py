@@ -4640,7 +4640,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     if (route.type === 'detail') {
                         navigateToHome();
                     } else {
-                        await loadDashboard(false);
+                        // Fast refresh in background
+                        loadDashboard(false, true);
                     }
                 } else {
                     alert('Error: ' + (data.error || 'Failed to remove video'));
@@ -4708,7 +4709,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 hideLoading();
                 if (data.success) {
                     showNotification(`Order placed! ID: ${data.order_id}`, 'success');
-                    await loadDashboard(false);
+                    invalidateCache();
+                    loadDashboard(false, true); // Background refresh
                 } else {
                     alert('Error: ' + (data.error || 'Failed to place catch-up order'));
                     button.disabled = false;
@@ -4768,8 +4770,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 hideLoading();
                 if (data.success) {
                     showNotification(`Manual order placed! ID: ${data.order_id}`, 'success');
-                    await loadDashboard(false);
-                } else {
+                    invalidateCache();
+                    loadDashboard(false, true); // Background refresh
+                } else{
                     alert('Error: ' + (data.error || 'Failed to place manual order'));
                     if (button) {
                         button.disabled = false;
@@ -5352,7 +5355,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 
                 if (data.success) {
                     showNotification('Overtime stopped successfully', 'success');
-                    await loadDashboard(false);
+                    invalidateCache();
+                    loadDashboard(false, true); // Background refresh
                 } else {
                     alert('Error: ' + (data.error || 'Failed to stop overtime'));
                 }
@@ -5799,8 +5803,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 
                 if (data.success) {
                     hideEditCampaignModal();
-                    await loadCampaigns();
-                    await loadDashboard(false);
+                    invalidateCache();
+                    loadCampaigns();
+                    loadDashboard(false, true); // Background refresh
                 } else {
                     errorDiv.textContent = data.error || 'Failed to update campaign';
                     errorDiv.style.display = 'block';
@@ -5850,8 +5855,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 if (data.success) {
                     alert('✅ ' + data.message);
                     clearSelection();
-                    await loadCampaigns();
-                    await loadDashboard(false);
+                    invalidateCache();
+                    loadCampaigns();
+                    loadDashboard(false, true); // Background refresh
                 } else {
                     alert('Error: ' + (data.error || 'Failed to assign videos'));
                 }
@@ -7531,8 +7537,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
         }
         
         function navigateToHome() {
+            // INSTANT navigation - hashchange handler will render
             window.location.hash = '';
-            loadDashboard(false);
         }
         
         function renderHomepage(videos) {
@@ -7884,10 +7890,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
         }
         
         function navigateToCampaign(campaignId) {
+            // INSTANT navigation - just change hash
             // Switch to dashboard tab and navigate to campaign detail
             switchTab('dashboard');
             window.location.hash = '#campaign/' + encodeURIComponent(campaignId);
-            loadDashboard(false);
+            // hashchange handler will trigger rendering with cached data
         }
         
         function navigateToVideo(videoUrl) {

@@ -408,6 +408,21 @@ class DeliveryBot:
             
             video_progress = progress[self.video_url]
             
+            # Check if campaign is paused
+            campaign_id = video_progress.get('campaign_id')
+            if campaign_id:
+                campaigns_file = self.progress_file.parent / 'campaigns.json'
+                if campaigns_file.exists():
+                    try:
+                        with open(campaigns_file, 'r') as f:
+                            campaigns = json.load(f)
+                        
+                        if campaign_id in campaigns and campaigns[campaign_id].get('paused', False):
+                            print(f"{Fore.YELLOW}⏸ Campaign {campaign_id} is PAUSED - skipping orders for {self.video_url}{Style.RESET_ALL}")
+                            return False
+                    except Exception as e:
+                        print(f"Warning: Could not check campaign pause status: {e}")
+            
             # Check if in OVERTIME mode
             target_completion_time = video_progress.get('target_completion_time') or video_progress.get('target_completion_datetime')
             overtime_stopped = video_progress.get('overtime_stopped', False)

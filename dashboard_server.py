@@ -9240,12 +9240,14 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                             
                                             if (viewsNeeded <= 0) {
                                                 timeToNext = 'DONE';
+                                                schedViewsOrdersNeeded = 0;
                                             } else {
                                                 // Use average from scheduled orders, or minimum if no orders
                                                 let unitsPerOrder = avgViewsUnits > 0 ? avgViewsUnits : MIN_VIEWS_ORDER;
                                                 
                                                 // Calculate orders needed based on units per order
                                                 const ordersNeeded = Math.ceil(viewsNeeded / unitsPerOrder);
+                                                schedViewsOrdersNeeded = ordersNeeded;
                                                 
                                                 if (ordersNeeded > 0) {
                                                     const timePerOrder = remainingMs / ordersNeeded;
@@ -9278,12 +9280,14 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                             
                                             if (likesNeeded <= 0) {
                                                 likesTimeToNext = 'DONE';
+                                                schedLikesOrdersNeeded = 0;
                                             } else {
                                                 // Use average from scheduled orders, or minimum if no orders
                                                 let unitsPerOrder = avgLikesUnits > 0 ? avgLikesUnits : MIN_LIKES_ORDER;
                                                 
                                                 // Calculate orders needed based on units per order
                                                 const ordersNeeded = Math.ceil(likesNeeded / unitsPerOrder);
+                                                schedLikesOrdersNeeded = ordersNeeded;
                                                 
                                                 if (ordersNeeded > 0) {
                                                     const timePerOrder = remainingMs / ordersNeeded;

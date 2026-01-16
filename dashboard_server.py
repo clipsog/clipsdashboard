@@ -7885,8 +7885,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
         }
         
         function navigateToHome() {
+            // INSTANT navigation - hashchange handler will render
             window.location.hash = '';
-            loadDashboard(false);
         }
         
         function navigateToCampaign(campaignId) {

@@ -1567,77 +1567,79 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         print(f"[DEFENSIVE REBUILD] Restored missing video {video_url[:50]}... to campaign {campaign_id}")
             
             # Calculate financial data for each campaign
-            for campaign_id, campaign_data in campaigns.items():
-                # Backfill defaults for older campaigns (goals + speed)
-                if 'target_views' not in campaign_data:
-                    campaign_data['target_views'] = 4000
-                    campaigns_changed = True
-                if 'target_likes' not in campaign_data:
-                    campaign_data['target_likes'] = 125
-                    campaigns_changed = True
-                if 'target_comments' not in campaign_data:
-                    campaign_data['target_comments'] = 7
-                    campaigns_changed = True
-                if 'target_comment_likes' not in campaign_data:
-                    campaign_data['target_comment_likes'] = 15
-                    campaigns_changed = True
-                if 'target_duration_hours' not in campaign_data:
-                    campaign_data['target_duration_hours'] = 24
-                    campaigns_changed = True
-                if 'target_duration_minutes' not in campaign_data:
-                    campaign_data['target_duration_minutes'] = 0
-                    campaigns_changed = True
+            # Wrap in try-except to prevent individual campaign errors from crashing entire request
+            for campaign_id, campaign_data in list(campaigns.items()):
+                try:
+                    # Backfill defaults for older campaigns (goals + speed)
+                    if 'target_views' not in campaign_data:
+                        campaign_data['target_views'] = 4000
+                        campaigns_changed = True
+                    if 'target_likes' not in campaign_data:
+                        campaign_data['target_likes'] = 125
+                        campaigns_changed = True
+                    if 'target_comments' not in campaign_data:
+                        campaign_data['target_comments'] = 7
+                        campaigns_changed = True
+                    if 'target_comment_likes' not in campaign_data:
+                        campaign_data['target_comment_likes'] = 15
+                        campaigns_changed = True
+                    if 'target_duration_hours' not in campaign_data:
+                        campaign_data['target_duration_hours'] = 24
+                        campaigns_changed = True
+                    if 'target_duration_minutes' not in campaign_data:
+                        campaign_data['target_duration_minutes'] = 0
+                        campaigns_changed = True
 
-                video_urls = campaign_data.get('videos', [])
-                cpm = campaign_data.get('cpm', 0)  # Cost per mille (per 1000 views)
-                
-                total_spent = 0
-                total_views = 0
-                total_earned = 0
-                
-                for video_url in video_urls:
-                    if video_url in progress:
-                        video_data = progress[video_url]
-                        # Calculate spent from order history
-                        order_history = video_data.get('order_history', [])
-                        for order in order_history:
-                            # Use stored cost if available, otherwise calculate
-                            if 'cost' in order:
-                                total_spent += float(order.get('cost', 0))
-                            else:
-                                quantity = order.get('quantity', 0)
-                                service = order.get('service', '')
-                                # Pricing rates (per 1000 units) - approximate rates
-                                rates = {'views': 0.0140, 'likes': 0.2100, 'comments': 13.5000, 'comment_likes': 0.2100}
-                                rate = rates.get(service, 0)
-                                cost = (quantity / 1000.0) * rate
-                                total_spent += cost
-                        
-                        # Calculate earned from views - try multiple sources
-                        # Priority: real_views > initial_views > orders_placed (as estimate)
-                        real_views = video_data.get('real_views', 0) or video_data.get('initial_views', 0)
-                        
-                        # If no real views found, use orders_placed as fallback estimate
-                        if real_views == 0:
-                            orders_placed = video_data.get('orders_placed', {})
-                            ordered_views = orders_placed.get('views', 0)
-                            if ordered_views > 0:
-                                # Use ordered views as estimate if real views not available
-                                # This helps show progress even if analytics haven't been fetched yet
-                                real_views = ordered_views
-                        
-                        # Also check if there's a current views count from recent analytics fetch
-                        # Some videos might have this updated more recently than real_views
-                        current_views = video_data.get('current_views', 0)
-                        if current_views > real_views:
-                            real_views = current_views
-                        
-                        total_views += real_views
-                
-                # Calculate earned (CPM * views / 1000)
-                total_earned = (total_views / 1000.0) * cpm if cpm > 0 else 0
-                profit = total_earned - total_spent
-                roi = (profit / total_spent * 100) if total_spent > 0 else 0
+                    video_urls = campaign_data.get('videos', [])
+                    cpm = campaign_data.get('cpm', 0)  # Cost per mille (per 1000 views)
+                    
+                    total_spent = 0
+                    total_views = 0
+                    total_earned = 0
+                    
+                    for video_url in video_urls:
+                        if video_url in progress:
+                            video_data = progress[video_url]
+                            # Calculate spent from order history
+                            order_history = video_data.get('order_history', [])
+                            for order in order_history:
+                                # Use stored cost if available, otherwise calculate
+                                if 'cost' in order:
+                                    total_spent += float(order.get('cost', 0))
+                                else:
+                                    quantity = order.get('quantity', 0)
+                                    service = order.get('service', '')
+                                    # Pricing rates (per 1000 units) - approximate rates
+                                    rates = {'views': 0.0140, 'likes': 0.2100, 'comments': 13.5000, 'comment_likes': 0.2100}
+                                    rate = rates.get(service, 0)
+                                    cost = (quantity / 1000.0) * rate
+                                    total_spent += cost
+                            
+                            # Calculate earned from views - try multiple sources
+                            # Priority: real_views > initial_views > orders_placed (as estimate)
+                            real_views = video_data.get('real_views', 0) or video_data.get('initial_views', 0)
+                            
+                            # If no real views found, use orders_placed as fallback estimate
+                            if real_views == 0:
+                                orders_placed = video_data.get('orders_placed', {})
+                                ordered_views = orders_placed.get('views', 0)
+                                if ordered_views > 0:
+                                    # Use ordered views as estimate if real views not available
+                                    # This helps show progress even if analytics haven't been fetched yet
+                                    real_views = ordered_views
+                            
+                            # Also check if there's a current views count from recent analytics fetch
+                            # Some videos might have this updated more recently than real_views
+                            current_views = video_data.get('current_views', 0)
+                            if current_views > real_views:
+                                real_views = current_views
+                            
+                            total_views += real_views
+                    
+                    # Calculate earned (CPM * views / 1000)
+                    total_earned = (total_views / 1000.0) * cpm if cpm > 0 else 0
+                    profit = total_earned - total_spent
+                    roi = (profit / total_spent * 100) if total_spent > 0 else 0
                 
                 # IMPORTANT: Do NOT remove videos from campaigns here!
                 # The rebuild logic above already handles adding videos back.
@@ -1652,13 +1654,25 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 # DO NOT DO THIS: campaign_data['videos'] = [v for v in video_urls if v in progress]
                 # This was causing videos to disappear!
                 
-                campaign_data['financial'] = {
-                    'total_spent': round(total_spent, 2),
-                    'total_views': total_views,
-                    'total_earned': round(total_earned, 2),
-                    'profit': round(profit, 2),
-                    'roi': round(roi, 2)
-                }
+                    campaign_data['financial'] = {
+                        'total_spent': round(total_spent, 2),
+                        'total_views': total_views,
+                        'total_earned': round(total_earned, 2),
+                        'profit': round(profit, 2),
+                        'roi': round(roi, 2)
+                    }
+                except Exception as e:
+                    print(f"⚠️ Error calculating financial data for campaign {campaign_id}: {e}")
+                    import traceback
+                    traceback.print_exc()
+                    # Set default financial data to prevent crashes
+                    campaign_data['financial'] = {
+                        'total_spent': 0,
+                        'total_views': 0,
+                        'total_earned': 0,
+                        'profit': 0,
+                        'roi': 0
+                    }
 
             # VERIFICATION: Check for videos that have campaign_id but aren't in campaigns
             # This helps diagnose the "videos disappearing" issue
@@ -2590,6 +2604,20 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 del campaigns[campaign_id]
                 self.save_campaigns(campaigns)
                 print(f"[DELETE] Removed campaign {campaign_id} from in-memory dict")
+            
+            # CRITICAL: Clean up campaign_id from all videos in progress.json
+            # This prevents orphaned references that cause crashes when loading campaigns
+            progress = self.load_progress()
+            videos_cleaned = 0
+            for video_url, video_data in progress.items():
+                if video_data.get('campaign_id') == campaign_id:
+                    video_data['campaign_id'] = None
+                    videos_cleaned += 1
+                    print(f"[DELETE] Cleaned campaign_id from video {video_url[:50]}...")
+            
+            if videos_cleaned > 0:
+                self.save_progress(progress)
+                print(f"[DELETE] Cleaned {videos_cleaned} video(s) from deleted campaign")
             
             response_data = json.dumps({
                 'success': True,

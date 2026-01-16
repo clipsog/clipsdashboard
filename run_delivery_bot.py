@@ -491,6 +491,11 @@ class DeliveryBot:
             # This catches up on missed orders after server restarts/downtime
             due_orders = []
             
+            print(f"{Fore.CYAN}🔍 Checking {len(views_likes_purchases)} scheduled order(s)...{Style.RESET_ALL}")
+            print(f"   Start time: {start_time.strftime('%Y-%m-%d %H:%M:%S')}")
+            print(f"   Current time: {now.strftime('%Y-%m-%d %H:%M:%S')}")
+            print(f"   Completed: {len(completed_purchases)} order(s)")
+            
             # For timer-based ordering: Find the NEXT pending order for each service
             # This ensures we respect the timers and place the next order when timer expires
             for purchase in views_likes_purchases:
@@ -501,12 +506,17 @@ class DeliveryBot:
                 purchase_time = start_time + timedelta(seconds=purchase.get('time_seconds', 0))
                 time_diff = (now - purchase_time).total_seconds()
                 
+                # Debug log for each order
+                print(f"   [{purchase['service']}] {purchase['quantity']} @ {purchase['time_str']} (scheduled: {purchase_time.strftime('%H:%M:%S')}, diff: {time_diff/60:.1f}min)")
+                
                 # Order is due if time has passed (allow 1 minute early execution)
                 # We removed the catch-up window restriction to respect timers
                 if time_diff >= -60:
                     due_orders.append((purchase, purchase_time))
+                    print(f"      ✓ DUE - Will place order")
             
             if not due_orders:
+                print(f"{Fore.YELLOW}No orders due for: {self.video_url[:60]}...{Style.RESET_ALL}")
                 return False
             
             # Sort by purchase time to place in order

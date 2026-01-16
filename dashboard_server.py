@@ -6396,6 +6396,30 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 if (needed <= 0 || isOvertimeStopped) {
                     return null;
                 }
+                
+                // OVERTIME MODE: Check if bot has set a next_purchase_time
+                if (isTargetOverdue && !isOvertimeStopped) {
+                    const nextPurchaseTimeStr = video[`next_${metricName}_purchase_time`];
+                    if (nextPurchaseTimeStr) {
+                        // Use the time set by the bot (every 30s in overtime)
+                        const nextPurchaseTime = new Date(nextPurchaseTimeStr);
+                        const msUntilNext = Math.max(0, nextPurchaseTime - Date.now());
+                        const hoursUntilNext = msUntilNext / 3600000;
+                        const orderSize = Math.min(needed, minOrder * 2);
+                        const cost = (orderSize / 1000.0) * rates[metricName];
+                        
+                        return {
+                            timeUntilNext: hoursUntilNext,
+                            nextPurchaseTime: nextPurchaseTime,
+                            units: orderSize,
+                            cost: cost,
+                            totalCost: cost,
+                            purchasesCount: Math.ceil(needed / orderSize),
+                            totalUnitsNeeded: needed
+                        };
+                    }
+                }
+                
                 // In overtime mode, ignore hoursRemaining check - continue ordering
                 if (!isTargetOverdue && hoursRemaining <= 0) {
                     return null;

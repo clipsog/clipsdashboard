@@ -10680,11 +10680,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
         // Initialize charts after a short delay to ensure Chart.js is loaded
         setTimeout(initializeGrowthCharts, 500);
         
-        // Auto-refresh every 60 seconds (1 minute) to reduce API load
+        // Auto-refresh every 30 seconds - uses cache so very fast
         setInterval(() => {
             if (shouldPauseAutoRefresh()) return;
-            loadDashboard(false);
-        }, 60000);
+            loadDashboard(false, false); // Don't force refresh, use cache if available
+        }, 30000);
     </script>
 </body>
 </html>"""

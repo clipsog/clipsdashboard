@@ -1,9 +1,10 @@
 services:
+  # Dashboard Web Service
   - type: web
-    name: smmfollows-dashboard
+    name: clipsdashboard
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: python app.py
+    startCommand: python dashboard_server.py
     healthCheckPath: /health
     envVars:
       - key: PYTHON_VERSION
@@ -15,3 +16,14 @@ services:
       # Name: DATABASE_URL
       # Value: postgresql://postgres.sthmpgvzdcmveihmqjpl:MJmCf99X$$$@aws-1-us-east-2.pooler.supabase.com:6543/postgres
       # (The password contains $$$ which needs to be set directly, not in YAML)
+  
+  # Continuous Ordering Worker Service (CRITICAL - keeps ordering until goals reached!)
+  - type: worker
+    name: ordering-service
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python continuous_ordering_service.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0
+      # DATABASE_URL will be inherited from environment

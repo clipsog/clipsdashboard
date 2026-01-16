@@ -4568,7 +4568,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             function escapeForTemplate(str) {
                 if (!str) return '';
                 return String(str)
-                    .replace(/\\\\\\\\/g, '\\\\\\\\\\\\\\\\')  // Escape backslashes first
+                    .replace(/\\\\\\\\\\\\\\\\/g, '\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\')  // Escape backslashes first
                     .replace(/'/g, "\\\\'")           // Escape single quotes
                     .replace(/`/g, '\\\\\\\\`')         // Escape backticks
                     .replace(/\\$/g, '\\\\$');      // Escape dollar signs
@@ -5599,7 +5599,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     function escapeTemplateLiteral(str) {
                         if (!str) return '';
                         return String(str)
-                            .replace(/\\\\\\\\/g, '\\\\\\\\\\\\\\\\')  // Escape backslashes first
+                            .replace(/\\\\\\\\\\\\\\\\/g, '\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\')  // Escape backslashes first
                             .replace(/'/g, "\\\\'")           // Escape single quotes
                             .replace(/`/g, '\\\\\\\\`')         // Escape backticks
                             .replace(/\\$/g, '\\\\$');      // Escape dollar signs
@@ -6113,7 +6113,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             function escapeTemplateLiteral(str) {
                 if (!str) return '';
                 return String(str)
-                    .replace(/\\\\\\\\/g, '\\\\\\\\\\\\\\\\')  // Escape backslashes first
+                    .replace(/\\\\\\\\\\\\\\\\/g, '\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\')  // Escape backslashes first
                     .replace(/'/g, "\\\\'")           // Escape single quotes
                     .replace(/`/g, '\\\\\\\\`')         // Escape backticks
                     .replace(/\\$/g, '\\\\$');      // Escape dollar signs
@@ -7513,7 +7513,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 function escapeTemplateLiteral(str) {
                     if (!str) return '';
                     return String(str)
-                        .replace(/\\\\\\\\/g, '\\\\\\\\\\\\\\\\')  // Escape backslashes first
+                        .replace(/\\\\\\\\\\\\\\\\/g, '\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\')  // Escape backslashes first
                         .replace(/'/g, "\\\\'")           // Escape single quotes
                         .replace(/`/g, '\\\\\\\\`')         // Escape backticks
                         .replace(/\\$/g, '\\\\$');      // Escape dollar signs

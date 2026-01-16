@@ -8847,8 +8847,14 @@ class DashboardHandler(BaseHTTPRequestHandler):
             // FAST PATH: Use cached data for instant navigation (if available and fresh)
             if (!forceRefresh && cachedProgressData && (now - lastProgressFetch) < CACHE_DURATION) {
                 console.log('[FAST PATH] Using cached data (age: ' + Math.floor((now - lastProgressFetch)/1000) + 's)');
-                // Don't call renderFromCache which might trigger another load
-                // Just return immediately - the cached data is fresh enough
+                // CRITICAL: Still need to start countdown timers even with cached data!
+                try {
+                    setTimeout(startNextPurchaseCountdowns, 100);
+                    setTimeout(startTimeToGoalCountdowns, 150);
+                    setTimeout(startTableCountdowns, 200);
+                } catch(e) {
+                    console.error('Error starting countdowns:', e);
+                }
                 return Promise.resolve();
             }
             

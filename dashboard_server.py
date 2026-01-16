@@ -7820,6 +7820,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
         window.timerStates = window.timerStates || {};
         // Format: { videoUrl: { targetTime: timestamp, type: 'views'|'likes' } }
         
+        // ORDER QUEUE: Prevent multiple simultaneous orders from crashing server
+        window.orderQueue = window.orderQueue || [];
+        window.processingOrder = false;
+        
         // Invalidate cache to force fresh data load (call after mutations)
         function invalidateCache() {
             cachedProgressData = null;

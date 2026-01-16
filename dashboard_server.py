@@ -7816,6 +7816,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
         let lastProgressFetch = 0;
         const CACHE_DURATION = 5000; // Cache for 5 seconds
         
+        // TIMER PERSISTENCE: Store timer target times globally so they survive refreshes
+        window.timerStates = window.timerStates || {};
+        // Format: { videoUrl: { targetTime: timestamp, type: 'views'|'likes' } }
+        
         // Invalidate cache to force fresh data load (call after mutations)
         function invalidateCache() {
             cachedProgressData = null;
@@ -10166,22 +10170,14 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 if (success) {
                                     cell.textContent = 'ORDERED ✓';
                                     cell.style.color = '#10b981';
-                                    // Reset orderPlaced flag after a delay to allow next order
+                                    // Reset and recalculate WITHOUT reloading dashboard
                                     setTimeout(() => {
                                         orderPlaced = false;
                                         orderPlacedTime = 0;
-                                        // Recalculate next order time
                                         recalculateNextOrderTime();
+                                        // Invalidate cache so next manual refresh gets fresh data
+                                        invalidateCache();
                                     }, 5000);
-                                    // Refresh dashboard after a short delay to show new order and recalculate TIME NEXT
-                                    setTimeout(() => {
-                                        loadDashboard(false).then(() => {
-                                            // Restart countdowns after refresh to recalculate TIME NEXT
-                                            setTimeout(() => {
-                                                startTableCountdowns();
-                                            }, 500);
-                                        });
-                                    }, 3000);
                                 } else {
                                     cell.textContent = 'ERROR';
                                     cell.style.color = '#ef4444';
@@ -10189,7 +10185,6 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                     setTimeout(() => {
                                         orderPlaced = false;
                                         orderPlacedTime = 0;
-                                        // Recalculate next order time
                                         recalculateNextOrderTime();
                                     }, 30000);
                                 }
@@ -10372,22 +10367,14 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 if (success) {
                                     cell.textContent = 'ORDERED ✓';
                                     cell.style.color = '#10b981';
-                                    // Reset orderPlaced flag after a delay to allow next order
+                                    // Reset and recalculate WITHOUT reloading dashboard
                                     setTimeout(() => {
                                         orderPlaced = false;
                                         orderPlacedTime = 0;
-                                        // Recalculate next order time
                                         recalculateNextOrderTime();
+                                        // Invalidate cache so next manual refresh gets fresh data
+                                        invalidateCache();
                                     }, 5000);
-                                    // Refresh dashboard after a short delay to show new order and recalculate TIME NEXT
-                                    setTimeout(() => {
-                                        loadDashboard(false).then(() => {
-                                            // Restart countdowns after refresh to recalculate TIME NEXT
-                                            setTimeout(() => {
-                                                startTableCountdowns();
-                                            }, 500);
-                                        });
-                                    }, 3000);
                                 } else {
                                     cell.textContent = 'ERROR';
                                     cell.style.color = '#ef4444';
@@ -10395,7 +10382,6 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                     setTimeout(() => {
                                         orderPlaced = false;
                                         orderPlacedTime = 0;
-                                        // Recalculate next order time
                                         recalculateNextOrderTime();
                                     }, 30000);
                                 }
@@ -10446,7 +10432,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             });
         }
         
-        // Refresh table data periodically (every 30 seconds)
+        // Refresh table data periodically - UPDATE ONLY, don't rebuild HTML
         function startTableDataRefresh() {
             // Clear any existing interval
             if (window.tableDataRefreshInterval) {
@@ -10456,19 +10442,19 @@ class DashboardHandler(BaseHTTPRequestHandler):
             window.tableDataRefreshInterval = setInterval(function() {
                 const route = getCurrentRoute();
                 if (route.type === 'home' || route.type === 'campaign') {
-                    // Fast refresh using cache - much more responsive
-                    loadDashboard(false, false).then(() => {
-                        // DON'T restart countdowns - let them continue counting down!
-                        // Only restart if they don't exist yet
-                        if (!window.tableCountdownIntervals || window.tableCountdownIntervals.length === 0) {
-                            startTableCountdowns();
-                        }
-                    }).catch(error => {
-                        console.error('[startTableDataRefresh] Refresh error:', error);
-                        // Don't crash on refresh errors
-                    });
+                    // Silently fetch fresh data and update cache WITHOUT rebuilding UI
+                    fetch('/api/progress')
+                        .then(response => response.json())
+                        .then(data => {
+                            cachedProgressData = data;
+                            lastProgressFetch = Date.now();
+                            console.log('[Silent Refresh] Cache updated, timers continue running');
+                        })
+                        .catch(error => {
+                            console.error('[Silent Refresh] Error:', error);
+                        });
                 }
-            }, 60000); // Refresh every 60 seconds (increased from 30s to let timers count down)
+            }, 120000); // Every 2 minutes - timers run independently
         }
         
         // Event delegation for all buttons
@@ -10713,11 +10699,19 @@ class DashboardHandler(BaseHTTPRequestHandler):
         // Initialize charts after a short delay to ensure Chart.js is loaded
         setTimeout(initializeGrowthCharts, 500);
         
-        // Auto-refresh every 2 minutes - let timers count down to 0 first
+        // Background cache update - timers run independently, no UI rebuilds
         setInterval(() => {
             if (shouldPauseAutoRefresh()) return;
-            loadDashboard(false, false); // Don't force refresh, use cache if available
-        }, 120000); // 2 minutes - gives timers time to reach 0
+            // Silently update cache without rebuilding UI or resetting timers
+            fetch('/api/progress')
+                .then(response => response.json())
+                .then(data => {
+                    cachedProgressData = data;
+                    lastProgressFetch = Date.now();
+                    console.log('[Background Update] Cache refreshed, timers unaffected');
+                })
+                .catch(error => console.error('[Background Update] Error:', error));
+        }, 180000); // 3 minutes - timers are completely independent
     </script>
 </body>
 </html>"""

@@ -497,12 +497,15 @@ class DashboardHandler(BaseHTTPRequestHandler):
         force_refresh = query_params.get('force_refresh', ['false'])[0].lower() == 'true'
         
         if force_refresh:
-            print(f"[FORCE REFRESH] Clearing analytics cache and fetching fresh data...")
+            print(f"[FORCE REFRESH] Clearing analytics cache and fetching fresh data for {len(progress)} videos...")
             with CACHE_LOCK:
                 ANALYTICS_CACHE.clear()
         
         # Fetch analytics with caching to prevent server overload
-        for video_url in list(progress.keys()):
+        videos_to_fetch = list(progress.keys())
+        print(f"[ANALYTICS FETCH] Starting fetch for {len(videos_to_fetch)} videos (force_refresh={force_refresh})")
+        
+        for video_url in videos_to_fetch:
             try:
                 # Check cache first (unless force_refresh)
                 cache_key = video_url
@@ -560,17 +563,27 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 progress[video_url]['real_views'] = analytics['views']
                 progress[video_url]['real_likes'] = analytics['likes']
                 progress[video_url]['real_comments'] = analytics['comments']
-                print(f"Updated analytics for {video_url}: views={analytics['views']}, likes={analytics['likes']}, comments={analytics['comments']}")
+                
+                if force_refresh or analytics['views'] > 0:
+                    print(f"✓ Updated analytics for {video_url[:60]}...: views={analytics['views']}, likes={analytics['likes']}, comments={analytics['comments']}")
+                elif analytics['views'] == 0:
+                    print(f"⚠️ ZERO VIEWS returned for {video_url[:60]}... - TikTok might be blocking or video is private!")
             except Exception as e:
                 print(f"Error fetching analytics for {video_url}: {e}")
                 import traceback
                 traceback.print_exc()
         
         # Save updated progress to database
+        videos_with_views = sum(1 for v in progress.values() if v.get('real_views', 0) > 0)
+        print(f"[ANALYTICS SUMMARY] Fetched {len(progress)} videos, {videos_with_views} have views > 0")
+        
         try:
             self.save_progress(progress)
+            print(f"✓ Saved progress to database with updated analytics")
         except Exception as e:
             print(f"⚠️ Failed to save progress after analytics update: {e}")
+            import traceback
+            traceback.print_exc()
             # Continue anyway - at least return the updated data
         
         self.send_response(200)

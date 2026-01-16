@@ -10431,9 +10431,12 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     const campaignId = videoData ? videoData.campaign_id : null;
                     
                     if (campaignId && window.pausedCampaigns && window.pausedCampaigns.has(campaignId)) {
+                        console.log(`[PAUSE CHECK VIEWS] Video ${videoUrl.substring(0, 50)}... belongs to paused campaign ${campaignId} - showing PAUSED`);
                         cell.textContent = 'PAUSED';
                         cell.style.color = '#f59e0b';
                         return; // Skip all countdown logic
+                    } else if (!campaignId) {
+                        console.warn(`[PAUSE CHECK VIEWS] Video ${videoUrl.substring(0, 50)}... has NO campaign_id! Cannot check if paused!`);
                     }
                     
                     const now = Date.now();
@@ -10492,12 +10495,16 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             const videoData = cachedProgressData ? cachedProgressData[videoUrl] : null;
                             const campaignId = videoData ? videoData.campaign_id : null;
                             
+                            console.log(`[ORDER CHECK VIEWS] Video ${videoUrl.substring(0, 50)}... campaign_id: ${campaignId}, pausedCampaigns:`, Array.from(window.pausedCampaigns || []));
+                            
                             if (campaignId && window.pausedCampaigns && window.pausedCampaigns.has(campaignId)) {
-                                console.log(`[Auto Order] Campaign ${campaignId} is PAUSED - skipping order for ${videoUrl}`);
+                                console.log(`[Auto Order VIEWS] Campaign ${campaignId} is PAUSED - skipping order for ${videoUrl.substring(0, 50)}...`);
                                 cell.textContent = 'PAUSED';
                                 cell.style.color = '#f59e0b';
                                 // Don't set orderPlaced, so it will retry if resumed
                                 return;
+                            } else if (!campaignId) {
+                                console.warn(`[ORDER CHECK VIEWS] Video ${videoUrl.substring(0, 50)}... has NO campaign_id - placing order anyway!`);
                             }
                             
                             orderPlaced = true;

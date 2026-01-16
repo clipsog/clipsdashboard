@@ -10231,15 +10231,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     
                     const now = Date.now();
                     const targetTime = new Date(targetTimeStr).getTime();
+                    const inOvertime = targetTime <= now;
                     
-                    if (targetTime <= now) {
-                        cell.textContent = 'OVERTIME';
-                        cell.style.color = '#ef4444';
-                        clearInterval(interval);
-                        return;
-                    }
-                    
-                    // Check if we need to recalculate (views might have changed)
+                    // Check if goal reached first
                     let realViews = parseFloat(cell.getAttribute('data-real-views')) || 0;
                     const realViewsCell = document.querySelector('[data-real-views][data-video-url="' + videoUrl + '"]');
                     if (realViewsCell) {
@@ -10255,14 +10249,22 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         return;
                     }
                     
-                    // Only recalculate if nextOrderTime is null OR if we've passed it (should have placed order)
-                    if (!nextOrderTime || (nextOrderTime && now >= nextOrderTime)) {
-                        recalculateNextOrderTime();
-                        // If still no nextOrderTime after recalculation, show READY
-                        if (!nextOrderTime) {
-                            cell.textContent = 'READY';
-                            cell.style.color = '#10b981';
-                            return;
+                    // OVERTIME MODE: Continue with 20-second countdowns (don't stop!)
+                    if (inOvertime) {
+                        // Recalculate if needed
+                        if (!nextOrderTime || now >= nextOrderTime) {
+                            recalculateNextOrderTime();
+                        }
+                    } else {
+                        // NORMAL MODE: Recalculate if passed time
+                        if (!nextOrderTime || (nextOrderTime && now >= nextOrderTime)) {
+                            recalculateNextOrderTime();
+                            // If still no nextOrderTime after recalculation, show READY
+                            if (!nextOrderTime) {
+                                cell.textContent = 'READY';
+                                cell.style.color = '#10b981';
+                                return;
+                            }
                         }
                     }
                     

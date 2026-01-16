@@ -2030,6 +2030,90 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(response_data.encode())
     
+    def handle_pause_campaign(self):
+        """Handle campaign pause/resume"""
+        try:
+            # Parse query string
+            parsed_path = urllib.parse.urlparse(self.path)
+            params = urllib.parse.parse_qs(parsed_path.query)
+            
+            campaign_id = params.get('campaign_id', [None])[0]
+            if not campaign_id:
+                response_data = json.dumps({'success': False, 'error': 'No campaign_id provided'})
+                self.send_response(400)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Content-Length', str(len(response_data)))
+                self.end_headers()
+                self.wfile.write(response_data.encode())
+                return
+            
+            # Load campaigns using class method
+            campaigns = self.load_campaigns()
+            
+            if campaign_id not in campaigns:
+                response_data = json.dumps({'success': False, 'error': 'Campaign not found'})
+                self.send_response(404)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Content-Length', str(len(response_data)))
+                self.end_headers()
+                self.wfile.write(response_data.encode())
+                return
+            
+            # Toggle paused state
+            current_state = campaigns[campaign_id].get('paused', False)
+            campaigns[campaign_id]['paused'] = not current_state
+            
+            # Save campaigns using class method
+            try:
+                self.save_campaigns(campaigns)
+            except Exception as save_error:
+                print(f"❌ Error saving campaigns: {save_error}")
+                import traceback
+                traceback.print_exc()
+                response_data = json.dumps({'success': False, 'error': f'Failed to save: {str(save_error)}'})
+                self.send_response(500)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Content-Length', str(len(response_data)))
+                self.end_headers()
+                self.wfile.write(response_data.encode())
+                return
+            
+            action = 'paused' if campaigns[campaign_id]['paused'] else 'resumed'
+            print(f"✓ Campaign {campaign_id} {action}")
+            
+            # Send success response
+            response_data = json.dumps({
+                'success': True,
+                'paused': campaigns[campaign_id]['paused'],
+                'message': f'Campaign {action} successfully'
+            })
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Content-Length', str(len(response_data)))
+            self.end_headers()
+            self.wfile.write(response_data.encode())
+            
+        except Exception as e:
+            print(f"❌ Error pausing/resuming campaign: {e}")
+            import traceback
+            traceback.print_exc()
+            
+            # Return proper JSON error response
+            try:
+                response_data = json.dumps({'success': False, 'error': str(e)})
+                self.send_response(500)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Content-Length', str(len(response_data)))
+                self.end_headers()
+                self.wfile.write(response_data.encode())
+            except:
+                pass  # Connection may be closed
+    
     def handle_save_next_purchase_time(self):
         """Save next purchase time for a video"""
         try:

@@ -10525,35 +10525,43 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     }
                 }, 1000);
                 
-                // Initial update
-                let initialRealViews = parseFloat(cell.getAttribute('data-real-views')) || 0;
-                const initialRealViewsCell = document.querySelector('[data-real-views][data-video-url="' + videoUrl + '"]');
-                if (initialRealViewsCell) {
-                    const cellText = initialRealViewsCell.textContent.replace(/,/g, '');
-                    initialRealViews = parseFloat(cellText) || initialRealViews;
-                }
+                // Initial update - CHECK PAUSE FIRST!
+                const videoData = cachedProgressData ? cachedProgressData[videoUrl] : null;
+                const campaignId = videoData ? videoData.campaign_id : null;
                 
-                const now = new Date();
-                const targetTime = new Date(targetTimeStr);
-                const remainingMs = targetTime - now;
-                const viewsNeeded = Math.max(0, targetViews - initialRealViews);
-                if (viewsNeeded <= 0) {
-                    cell.textContent = 'DONE';
-                    cell.style.color = '#10b981';
+                if (campaignId && window.pausedCampaigns && window.pausedCampaigns.has(campaignId)) {
+                    cell.textContent = 'PAUSED';
+                    cell.style.color = '#f59e0b';
                 } else {
-                    const ordersNeeded = Math.ceil(viewsNeeded / avgUnits);
-                    if (ordersNeeded > 0) {
-                        const timePerOrder = remainingMs / ordersNeeded;
-                        const remainingSeconds = Math.floor(timePerOrder / 1000);
-                        if (remainingSeconds > 0) {
-                            cell.textContent = formatTimeWithSeconds(remainingSeconds);
+                    let initialRealViews = parseFloat(cell.getAttribute('data-real-views')) || 0;
+                    const initialRealViewsCell = document.querySelector('[data-real-views][data-video-url="' + videoUrl + '"]');
+                    if (initialRealViewsCell) {
+                        const cellText = initialRealViewsCell.textContent.replace(/,/g, '');
+                        initialRealViews = parseFloat(cellText) || initialRealViews;
+                    }
+                    
+                    const now = new Date();
+                    const targetTime = new Date(targetTimeStr);
+                    const remainingMs = targetTime - now;
+                        const viewsNeeded = Math.max(0, targetViews - initialRealViews);
+                    if (viewsNeeded <= 0) {
+                        cell.textContent = 'DONE';
+                        cell.style.color = '#10b981';
+                    } else {
+                        const ordersNeeded = Math.ceil(viewsNeeded / avgUnits);
+                        if (ordersNeeded > 0) {
+                            const timePerOrder = remainingMs / ordersNeeded;
+                            const remainingSeconds = Math.floor(timePerOrder / 1000);
+                            if (remainingSeconds > 0) {
+                                cell.textContent = formatTimeWithSeconds(remainingSeconds);
+                            } else {
+                                cell.textContent = 'READY';
+                                cell.style.color = '#10b981';
+                            }
                         } else {
                             cell.textContent = 'READY';
                             cell.style.color = '#10b981';
                         }
-                    } else {
-                        cell.textContent = 'READY';
-                        cell.style.color = '#10b981';
                     }
                 }
                 
@@ -10755,35 +10763,43 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     }
                 }, 1000);
                 
-                // Initial update
-                let initialRealLikes = parseFloat(cell.getAttribute('data-real-likes')) || 0;
-                const initialRealLikesCell = document.querySelector('[data-real-likes][data-video-url="' + videoUrl + '"]');
-                if (initialRealLikesCell) {
-                    const cellText = initialRealLikesCell.textContent.replace(/,/g, '');
-                    initialRealLikes = parseFloat(cellText) || initialRealLikes;
-                }
+                // Initial update - CHECK PAUSE FIRST!
+                const videoData = cachedProgressData ? cachedProgressData[videoUrl] : null;
+                const campaignId = videoData ? videoData.campaign_id : null;
                 
-                const now = new Date();
-                const targetTime = new Date(targetTimeStr);
-                const remainingMs = targetTime - now;
-                const likesNeeded = Math.max(0, targetLikes - initialRealLikes);
-                if (likesNeeded <= 0) {
-                    cell.textContent = 'DONE';
-                    cell.style.color = '#10b981';
+                if (campaignId && window.pausedCampaigns && window.pausedCampaigns.has(campaignId)) {
+                    cell.textContent = 'PAUSED';
+                    cell.style.color = '#f59e0b';
                 } else {
-                    const ordersNeeded = Math.ceil(likesNeeded / avgUnits);
-                    if (ordersNeeded > 0) {
-                        const timePerOrder = remainingMs / ordersNeeded;
-                        const remainingSeconds = Math.floor(timePerOrder / 1000);
-                        if (remainingSeconds > 0) {
-                            cell.textContent = formatTimeWithSeconds(remainingSeconds);
+                    let initialRealLikes = parseFloat(cell.getAttribute('data-real-likes')) || 0;
+                    const initialRealLikesCell = document.querySelector('[data-real-likes][data-video-url="' + videoUrl + '"]');
+                    if (initialRealLikesCell) {
+                        const cellText = initialRealLikesCell.textContent.replace(/,/g, '');
+                        initialRealLikes = parseFloat(cellText) || initialRealLikes;
+                    }
+                    
+                    const now = new Date();
+                    const targetTime = new Date(targetTimeStr);
+                    const remainingMs = targetTime - now;
+                        const likesNeeded = Math.max(0, targetLikes - initialRealLikes);
+                    if (likesNeeded <= 0) {
+                        cell.textContent = 'DONE';
+                        cell.style.color = '#10b981';
+                    } else {
+                        const ordersNeeded = Math.ceil(likesNeeded / avgUnits);
+                        if (ordersNeeded > 0) {
+                            const timePerOrder = remainingMs / ordersNeeded;
+                            const remainingSeconds = Math.floor(timePerOrder / 1000);
+                            if (remainingSeconds > 0) {
+                                cell.textContent = formatTimeWithSeconds(remainingSeconds);
+                            } else {
+                                cell.textContent = 'READY';
+                                cell.style.color = '#10b981';
+                            }
                         } else {
                             cell.textContent = 'READY';
                             cell.style.color = '#10b981';
                         }
-                    } else {
-                        cell.textContent = 'READY';
-                        cell.style.color = '#10b981';
                     }
                 }
                 

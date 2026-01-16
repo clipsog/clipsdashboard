@@ -7584,23 +7584,23 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     <table style="width: 100%; border-collapse: collapse; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); font-family: monospace; font-size: 10px;">
                         <thead>
                             <tr style="background: #252525; border-bottom: 2px solid rgba(255,255,255,0.1);">
-                                <th style="padding: 6px 4px; text-align: left; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">VIDEO ID</th>
-                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">DATE POSTED</th>
-                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">TIME LEFT</th>
-                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">CURR VIEWS</th>
-                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">EXP VIEWS</th>
-                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">MANUAL ORD</th>
-                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">SCHED ORD</th>
-                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">TIME NEXT</th>
-                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">UNITS/ORD</th>
-                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">$/UNIT</th>
-                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">CURR LIKES</th>
-                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">EXP LIKES</th>
-                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">LIKES MAN</th>
-                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">LIKES SCH</th>
-                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">LIKES NEXT</th>
-                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">LIKES UNITS</th>
-                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px;">LIKES $/U</th>
+                                <th data-sort="video-id" style="padding: 6px 4px; text-align: left; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; user-select: none;">VIDEO ID ▼</th>
+                                <th data-sort="date" style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; user-select: none;">DATE POSTED ▼</th>
+                                <th data-sort="time-left" style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; user-select: none;">TIME LEFT ▼</th>
+                                <th data-sort="curr-views" style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; user-select: none;">CURR VIEWS ▼</th>
+                                <th data-sort="exp-views" style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; user-select: none;">EXP VIEWS ▼</th>
+                                <th data-sort="manual-ord" style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; user-select: none;">MANUAL ORD ▼</th>
+                                <th data-sort="sched-ord" style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; user-select: none;">SCHED ORD ▼</th>
+                                <th data-sort="time-next" style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; user-select: none;">TIME NEXT ▼</th>
+                                <th data-sort="units-ord" style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; user-select: none;">UNITS/ORD ▼</th>
+                                <th data-sort="cost-unit" style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; user-select: none;">$/UNIT ▼</th>
+                                <th data-sort="curr-likes" style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; user-select: none;">CURR LIKES ▼</th>
+                                <th data-sort="exp-likes" style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; user-select: none;">EXP LIKES ▼</th>
+                                <th data-sort="likes-man" style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; user-select: none;">LIKES MAN ▼</th>
+                                <th data-sort="likes-sch" style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; user-select: none;">LIKES SCH ▼</th>
+                                <th data-sort="likes-next" style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; user-select: none;">LIKES NEXT ▼</th>
+                                <th data-sort="likes-units" style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; user-select: none;">LIKES UNITS ▼</th>
+                                <th data-sort="likes-cost" style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; cursor: pointer; user-select: none;">LIKES $/U ▼</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -7814,14 +7814,14 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-real-views data-video-url="${escapeTemplateLiteral(videoUrl)}">${formatNumber(real_views)}</td>
                         <td style="padding: 4px 3px; text-align: right; color: ${real_views >= expected_views ? '#10b981' : '#f59e0b'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(expected_views)}</td>
                         <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-manual-views-orders data-video-url="${escapeTemplateLiteral(videoUrl)}"><span class="manual-order-link" data-video-url="${escapeTemplateLiteral(videoUrl)}" data-metric="views" style="cursor: pointer; text-decoration: underline; color: #667eea;">${manualViewsOrders}</span></td>
-                        <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-sched-views-orders data-video-url="${escapeTemplateLiteral(videoUrl)}">${schedViewsOrders}</td>
+                        <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-sched-views-orders data-video-url="${escapeTemplateLiteral(videoUrl)}" data-metric="views"><span class="sched-count">${schedViewsOrders}</span><span class="processing-count" style="color: #f59e0b;"></span></td>
                         <td style="padding: 4px 3px; text-align: center; color: ${timeToNext === 'READY' ? '#10b981' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-time-next data-video-url="${escapeTemplateLiteral(videoUrl)}" data-target-time="${target_completion || ''}" data-target-views="${target_views}" data-real-views="${real_views}" data-avg-units="${avgViewsUnits || MIN_VIEWS_ORDER}">${timeToNext}</td>
                         <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${avgViewsUnits > 0 ? formatNumber(avgViewsUnits) : '-'}</td>
                         <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${avgViewsCostPerUnit > 0 ? '$' + avgViewsCostPerUnit.toFixed(4) : '-'}</td>
                         <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-real-likes data-video-url="${escapeTemplateLiteral(videoUrl)}">${formatNumber(real_likes)}</td>
                         <td style="padding: 4px 3px; text-align: right; color: ${real_likes >= expected_likes ? '#10b981' : '#f59e0b'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(expected_likes)}</td>
                         <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-manual-likes-orders data-video-url="${escapeTemplateLiteral(videoUrl)}"><span class="manual-order-link" data-video-url="${escapeTemplateLiteral(videoUrl)}" data-metric="likes" style="cursor: pointer; text-decoration: underline; color: #667eea;">${manualLikesOrders}</span></td>
-                        <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-sched-likes-orders data-video-url="${escapeTemplateLiteral(videoUrl)}">${schedLikesOrders}</td>
+                        <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-sched-likes-orders data-video-url="${escapeTemplateLiteral(videoUrl)}" data-metric="likes"><span class="sched-count">${schedLikesOrders}</span><span class="processing-count" style="color: #f59e0b;"></span></td>
                         <td style="padding: 4px 3px; text-align: center; color: ${likesTimeToNext === 'READY' ? '#10b981' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-likes-next data-video-url="${escapeTemplateLiteral(videoUrl)}" data-target-time="${target_completion || ''}" data-target-likes="${target_likes}" data-real-likes="${real_likes}" data-avg-units="${avgLikesUnits || MIN_LIKES_ORDER}">${likesTimeToNext}</td>
                         <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${avgLikesUnits > 0 ? formatNumber(avgLikesUnits) : '-'}</td>
                         <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px;">${avgLikesCostPerUnit > 0 ? '$' + avgLikesCostPerUnit.toFixed(4) : '-'}</td>
@@ -7850,6 +7850,23 @@ class DashboardHandler(BaseHTTPRequestHandler):
         // ORDER QUEUE: Prevent multiple simultaneous orders from crashing server
         window.orderQueue = window.orderQueue || [];
         window.processingOrder = false;
+        
+        // Helper: Count orders in queue for a specific video
+        function getQueuedOrdersCount(videoUrl, metric) {
+            return window.orderQueue.filter(o => 
+                o.videoUrl === videoUrl && o.metric === metric
+            ).length;
+        }
+        
+        // Helper: Get total processing + queued orders
+        function getTotalProcessingOrders(videoUrl, metric) {
+            const queued = getQueuedOrdersCount(videoUrl, metric);
+            const isProcessing = window.processingOrder && 
+                                 window.orderQueue.length > 0 && 
+                                 window.orderQueue[0].videoUrl === videoUrl && 
+                                 window.orderQueue[0].metric === metric;
+            return queued + (isProcessing ? 1 : 0);
+        }
         
         // FETCH WITH RETRY: Automatic retry on 503 errors
         async function fetchWithRetry(url, options = {}, maxRetries = 3) {
@@ -9084,23 +9101,23 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                     <table style="width: 100%; border-collapse: collapse; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); font-family: monospace; font-size: 10px;">
                                         <thead>
                                             <tr style="background: #252525; border-bottom: 2px solid rgba(255,255,255,0.1);">
-                                                <th style="padding: 6px 4px; text-align: left; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">VIDEO ID</th>
-                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">DATE POSTED</th>
-                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">TIME LEFT</th>
-                                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">CURR VIEWS</th>
-                                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">EXP VIEWS</th>
-                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">MANUAL ORD</th>
-                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">SCHED ORD</th>
-                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">TIME NEXT</th>
-                                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">UNITS/ORD</th>
-                                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">$/UNIT</th>
-                                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">CURR LIKES</th>
-                                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">EXP LIKES</th>
-                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">LIKES MAN</th>
-                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">LIKES SCH</th>
-                                                <th style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">LIKES NEXT</th>
-                                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">LIKES UNITS</th>
-                                                <th style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px;">LIKES $/U</th>
+                                                <th data-sort="video-id" style="padding: 6px 4px; text-align: left; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; user-select: none;">VIDEO ID ▼</th>
+                                                <th data-sort="date" style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; user-select: none;">DATE POSTED ▼</th>
+                                                <th data-sort="time-left" style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; user-select: none;">TIME LEFT ▼</th>
+                                                <th data-sort="curr-views" style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; user-select: none;">CURR VIEWS ▼</th>
+                                                <th data-sort="exp-views" style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; user-select: none;">EXP VIEWS ▼</th>
+                                                <th data-sort="manual-ord" style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; user-select: none;">MANUAL ORD ▼</th>
+                                                <th data-sort="sched-ord" style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; user-select: none;">SCHED ORD ▼</th>
+                                                <th data-sort="time-next" style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; user-select: none;">TIME NEXT ▼</th>
+                                                <th data-sort="units-ord" style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; user-select: none;">UNITS/ORD ▼</th>
+                                                <th data-sort="cost-unit" style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; user-select: none;">$/UNIT ▼</th>
+                                                <th data-sort="curr-likes" style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; user-select: none;">CURR LIKES ▼</th>
+                                                <th data-sort="exp-likes" style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; user-select: none;">EXP LIKES ▼</th>
+                                                <th data-sort="likes-man" style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; user-select: none;">LIKES MAN ▼</th>
+                                                <th data-sort="likes-sch" style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; user-select: none;">LIKES SCH ▼</th>
+                                                <th data-sort="likes-next" style="padding: 6px 4px; text-align: center; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; user-select: none;">LIKES NEXT ▼</th>
+                                                <th data-sort="likes-units" style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05); cursor: pointer; user-select: none;">LIKES UNITS ▼</th>
+                                                <th data-sort="likes-cost" style="padding: 6px 4px; text-align: right; color: #fff; font-weight: 600; font-size: 9px; cursor: pointer; user-select: none;">LIKES $/U ▼</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -9296,14 +9313,14 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                             <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-real-views data-video-url="${escapeTemplateLiteral(videoUrl)}">${formatNumber(real_views)}</td>
                                             <td style="padding: 4px 3px; text-align: right; color: ${real_views >= expected_views ? '#10b981' : '#f59e0b'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(expected_views)}</td>
                                             <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-manual-views-orders data-video-url="${escapeTemplateLiteral(videoUrl)}"><span class="manual-order-link" data-video-url="${escapeTemplateLiteral(videoUrl)}" data-metric="views" style="cursor: pointer; text-decoration: underline; color: #667eea;">${manualViewsOrders}</span></td>
-                                            <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-sched-views-orders data-video-url="${escapeTemplateLiteral(videoUrl)}">${schedViewsOrders}</td>
+                                            <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-sched-views-orders data-video-url="${escapeTemplateLiteral(videoUrl)}" data-metric="views"><span class="sched-count">${schedViewsOrders}</span><span class="processing-count" style="color: #f59e0b;"></span></td>
                                             <td style="padding: 4px 3px; text-align: center; color: ${timeToNext === 'READY' ? '#10b981' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-time-next data-video-url="${escapeTemplateLiteral(videoUrl)}" data-target-time="${target_completion || ''}" data-target-views="${target_views}" data-real-views="${real_views}" data-avg-units="${avgViewsUnits || MIN_VIEWS_ORDER}">${timeToNext}</td>
                                             <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${avgViewsUnits > 0 ? formatNumber(avgViewsUnits) : '-'}</td>
                                             <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${avgViewsCostPerUnit > 0 ? '$' + avgViewsCostPerUnit.toFixed(4) : '-'}</td>
                                             <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-real-likes data-video-url="${escapeTemplateLiteral(videoUrl)}">${formatNumber(real_likes)}</td>
                                             <td style="padding: 4px 3px; text-align: right; color: ${real_likes >= expected_likes ? '#10b981' : '#f59e0b'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(expected_likes)}</td>
                                             <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-manual-likes-orders data-video-url="${escapeTemplateLiteral(videoUrl)}"><span class="manual-order-link" data-video-url="${escapeTemplateLiteral(videoUrl)}" data-metric="likes" style="cursor: pointer; text-decoration: underline; color: #667eea;">${manualLikesOrders}</span></td>
-                                            <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-sched-likes-orders data-video-url="${escapeTemplateLiteral(videoUrl)}">${schedLikesOrders}</td>
+                                            <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-sched-likes-orders data-video-url="${escapeTemplateLiteral(videoUrl)}" data-metric="likes"><span class="sched-count">${schedLikesOrders}</span><span class="processing-count" style="color: #f59e0b;"></span></td>
                                             <td style="padding: 4px 3px; text-align: center; color: ${likesTimeToNext === 'READY' ? '#10b981' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-likes-next data-video-url="${escapeTemplateLiteral(videoUrl)}" data-target-time="${target_completion || ''}" data-target-likes="${target_likes}" data-real-likes="${real_likes}" data-avg-units="${avgLikesUnits || MIN_LIKES_ORDER}">${likesTimeToNext}</td>
                                             <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${avgLikesUnits > 0 ? formatNumber(avgLikesUnits) : '-'}</td>
                                             <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px;">${avgLikesCostPerUnit > 0 ? '$' + avgLikesCostPerUnit.toFixed(4) : '-'}</td>
@@ -10729,6 +10746,105 @@ class DashboardHandler(BaseHTTPRequestHandler):
         
         // Initialize charts after a short delay to ensure Chart.js is loaded
         setTimeout(initializeGrowthCharts, 500);
+        
+        // REAL-TIME: Update processing order counts every second
+        function updateProcessingCounts() {
+            document.querySelectorAll('[data-sched-views-orders], [data-sched-likes-orders]').forEach(cell => {
+                const videoUrl = cell.getAttribute('data-video-url');
+                const metric = cell.getAttribute('data-metric');
+                if (!videoUrl || !metric) return;
+                
+                const processingCount = getTotalProcessingOrders(videoUrl, metric);
+                const processingSpan = cell.querySelector('.processing-count');
+                
+                if (processingSpan) {
+                    if (processingCount > 0) {
+                        processingSpan.textContent = ' (' + processingCount + ')';
+                        processingSpan.title = processingCount + ' order(s) processing/queued';
+                    } else {
+                        processingSpan.textContent = '';
+                        processingSpan.title = '';
+                    }
+                }
+            });
+        }
+        
+        // Update processing counts every second for real-time feedback
+        setInterval(updateProcessingCounts, 1000);
+        
+        // TABLE SORTING: Click column headers to sort
+        document.addEventListener('click', function(e) {
+            const th = e.target.closest('th[data-sort]');
+            if (!th) return;
+            
+            const table = th.closest('table');
+            if (!table) return;
+            
+            const tbody = table.querySelector('tbody');
+            if (!tbody) return;
+            
+            const sortKey = th.getAttribute('data-sort');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            
+            // Determine sort direction
+            const currentDir = th.getAttribute('data-sort-dir') || 'asc';
+            const newDir = currentDir === 'asc' ? 'desc' : 'asc';
+            
+            // Update all headers to show default arrow
+            table.querySelectorAll('th[data-sort]').forEach(h => {
+                const text = h.textContent.replace(/[▲▼]/g, '').trim();
+                h.textContent = text + ' ▼';
+                h.removeAttribute('data-sort-dir');
+            });
+            
+            // Update clicked header
+            const text = th.textContent.replace(/[▲▼]/g, '').trim();
+            th.textContent = text + (newDir === 'asc' ? ' ▲' : ' ▼');
+            th.setAttribute('data-sort-dir', newDir);
+            
+            // Sort rows
+            rows.sort((a, b) => {
+                const cellA = a.children[Array.from(th.parentElement.children).indexOf(th)];
+                const cellB = b.children[Array.from(th.parentElement.children).indexOf(th)];
+                
+                let valA = cellA ? cellA.textContent.trim() : '';
+                let valB = cellB ? cellB.textContent.trim() : '';
+                
+                // Try to parse as numbers
+                const numA = parseFloat(valA.replace(/[^0-9.-]/g, ''));
+                const numB = parseFloat(valB.replace(/[^0-9.-]/g, ''));
+                
+                let result = 0;
+                if (!isNaN(numA) && !isNaN(numB)) {
+                    result = numA - numB;
+                } else {
+                    result = valA.localeCompare(valB);
+                }
+                
+                return newDir === 'asc' ? result : -result;
+            });
+            
+            // Reappend sorted rows
+            rows.forEach(row => tbody.appendChild(row));
+        });
+        
+        // FAST REFRESH when orders are processing
+        setInterval(() => {
+            if (window.orderQueue.length > 0 || window.processingOrder) {
+                // Orders are being processed - refresh more frequently
+                const route = getCurrentRoute();
+                if (route.type === 'home' || route.type === 'campaign') {
+                    fetchWithRetry('/api/progress', {}, 1)
+                        .then(response => response.json())
+                        .then(data => {
+                            cachedProgressData = data;
+                            lastProgressFetch = Date.now();
+                            console.log('[Fast Refresh] Updated while processing orders');
+                        })
+                        .catch(error => console.error('[Fast Refresh] Error:', error));
+                }
+            }
+        }, 5000); // Check every 5 seconds when orders are processing
         
         // Background cache update with retry - timers run independently, no UI rebuilds
         setInterval(() => {

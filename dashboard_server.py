@@ -10008,10 +10008,52 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     amount: amount,
                     onSuccess: (data) => {
                         console.log('[Auto Order] ✓ Order ' + data.order_id + ' completed');
+                        
+                        // REAL-TIME UPDATE: Increment scheduled count immediately
+                        const schedCell = document.querySelector(
+                            metric === 'views' 
+                                ? `[data-sched-views-orders][data-video-url="${videoUrl}"]`
+                                : `[data-sched-likes-orders][data-video-url="${videoUrl}"]`
+                        );
+                        
+                        if (schedCell) {
+                            const countSpan = schedCell.querySelector('.sched-count');
+                            if (countSpan) {
+                                const currentCount = parseInt(countSpan.textContent) || 0;
+                                const newCount = currentCount + 1;
+                                countSpan.textContent = newCount;
+                                console.log('[Real-Time Update] Scheduled ' + metric + ' count: ' + currentCount + ' → ' + newCount);
+                                
+                                // Flash the cell to show update
+                                schedCell.style.backgroundColor = '#10b981';
+                                setTimeout(() => {
+                                    schedCell.style.backgroundColor = '';
+                                }, 500);
+                            }
+                        }
+                        
+                        // Invalidate cache to fetch fresh data on next load
+                        invalidateCache();
+                        
                         resolve(true);
                     },
                     onError: (error) => {
                         console.error('[Auto Order] ✗ Failed: ' + error);
+                        
+                        // Flash error on the cell
+                        const schedCell = document.querySelector(
+                            metric === 'views' 
+                                ? `[data-sched-views-orders][data-video-url="${videoUrl}"]`
+                                : `[data-sched-likes-orders][data-video-url="${videoUrl}"]`
+                        );
+                        
+                        if (schedCell) {
+                            schedCell.style.backgroundColor = '#ef4444';
+                            setTimeout(() => {
+                                schedCell.style.backgroundColor = '';
+                            }, 500);
+                        }
+                        
                         resolve(false);
                     }
                 });
@@ -10840,6 +10882,41 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             cachedProgressData = data;
                             lastProgressFetch = Date.now();
                             console.log('[Fast Refresh] Updated while processing orders');
+                            
+                            // UPDATE VISIBLE DATA: Refresh scheduled counts from server
+                            for (const [videoUrl, videoData] of Object.entries(data)) {
+                                if (!videoData.order_history) continue;
+                                
+                                // Count views orders
+                                const viewsOrders = videoData.order_history.filter(o => o.service === 'views');
+                                const schedViewsCount = viewsOrders.filter(o => 
+                                    o.type === 'scheduled' || (!o.type && !o.manual)
+                                ).length;
+                                
+                                // Update views count in table
+                                const viewsCell = document.querySelector(`[data-sched-views-orders][data-video-url="${videoUrl}"]`);
+                                if (viewsCell) {
+                                    const countSpan = viewsCell.querySelector('.sched-count');
+                                    if (countSpan) {
+                                        countSpan.textContent = schedViewsCount;
+                                    }
+                                }
+                                
+                                // Count likes orders
+                                const likesOrders = videoData.order_history.filter(o => o.service === 'likes');
+                                const schedLikesCount = likesOrders.filter(o => 
+                                    o.type === 'scheduled' || (!o.type && !o.manual)
+                                ).length;
+                                
+                                // Update likes count in table
+                                const likesCell = document.querySelector(`[data-sched-likes-orders][data-video-url="${videoUrl}"]`);
+                                if (likesCell) {
+                                    const countSpan = likesCell.querySelector('.sched-count');
+                                    if (countSpan) {
+                                        countSpan.textContent = schedLikesCount;
+                                    }
+                                }
+                            }
                         })
                         .catch(error => console.error('[Fast Refresh] Error:', error));
                 }

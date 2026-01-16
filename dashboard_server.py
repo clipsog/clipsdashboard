@@ -7827,9 +7827,16 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 return;
             }
             
-            // Just render the current view instantly, trigger full reload in background
-            // This gives instant perceived performance
-            setTimeout(() => loadDashboard(false, true), 100);
+            // Trigger a proper full render immediately (cache makes it fast)
+            // This avoids double-rendering and uses the cached data
+            setTimeout(() => {
+                const route = getCurrentRoute();
+                const content = document.getElementById('dashboard-content');
+                if (content) {
+                    // Quick render using cached data (no flicker)
+                    loadDashboard(false, false);
+                }
+            }, 10);
         }
         
         // Loading indicator functions
@@ -8854,10 +8861,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
             // Show subtle loading only if not using cache
             if (showLoadingIndicator) {
                 showLoading('Loading...');
-            } else if (content && !cachedProgressData) {
-                // Only dim if no cache available
-                content.style.opacity = '0.7';
             }
+            // Skip dimming for faster perceived performance
+            // Content updates instantly with no visual interruption
             
             try {
                 const response = await fetch('/api/progress');
@@ -9321,9 +9327,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     html = renderHomepage(progress);
                 }
                 
-                // Smooth update without full reload
+                // Fast update - use innerHTML but keep opacity at 1 (no flicker)
                 content.innerHTML = html;
-                content.style.opacity = '1';
                 
                 // Table is now rendered directly in HTML, no async rendering needed
                 
@@ -9441,7 +9446,6 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     // For auto-refresh, just use empty state silently
                     allVideosData = {};
                 }
-                if (content) content.style.opacity = '1';
             } finally {
                 // Always reset refreshing flag and hide loading, even on error
                 hideLoading();

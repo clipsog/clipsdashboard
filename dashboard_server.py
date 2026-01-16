@@ -1506,11 +1506,13 @@ class DashboardHandler(BaseHTTPRequestHandler):
             for video_url, video_data in progress.items():
                 campaign_id = video_data.get('campaign_id')
                 if campaign_id:
-                    # Ensure campaign exists (create if missing)
+                    # Skip if campaign doesn't exist and looks deleted (avoid recreating deleted campaigns)
+                    # But allow creating if it's a genuinely missing campaign (e.g., from progress.json)
                     if campaign_id not in campaigns:
-                        print(f"[REBUILD] Creating missing campaign {campaign_id}")
-                        campaigns[campaign_id] = {'videos': []}
-                        campaigns_changed = True
+                        # Don't auto-create campaigns - this prevents recreating deleted campaigns
+                        # The video should be reassigned to a new campaign or removed from progress
+                        print(f"[REBUILD] Warning: Video {video_url[:50]}... references non-existent campaign {campaign_id}, skipping")
+                        continue
                     
                     # Initialize videos list if it doesn't exist
                     if 'videos' not in campaigns[campaign_id]:
@@ -1703,7 +1705,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     print(f"[REBUILD] Verified campaigns (no changes needed)")
             except Exception as e:
                 print(f"⚠️ Failed to save campaigns after rebuild: {e}")
+                import traceback
+                traceback.print_exc()
                 # Continue anyway - at least return the data
+                # Don't crash the whole request if save fails
             
             # LOG: Report campaign video counts for debugging
             for campaign_id, campaign_data in campaigns.items():

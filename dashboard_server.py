@@ -10144,8 +10144,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 window.tableCountdownIntervals.push(interval);
             });
             
-            // Update TIME NEXT cells
-            document.querySelectorAll('[data-time-next][data-target-time]').forEach(cell => {
+            // Update TIME NEXT cells (VIEWS)
+            document.querySelectorAll('[data-time-next][data-target-time][data-target-views]').forEach(cell => {
                 const targetTimeStr = cell.getAttribute('data-target-time');
                 const targetViews = parseFloat(cell.getAttribute('data-target-views')) || 0;
                 let avgUnits = parseFloat(cell.getAttribute('data-avg-units')) || 50;
@@ -10155,6 +10155,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 let nextOrderTime = null; // Fixed time when next order should be placed
                 let lastRecalcTime = Date.now(); // Track when we last recalculated
                 const MIN_VIEWS_ORDER = 50; // Minimum order size for views
+                const OVERTIME_INTERVAL_MS = 20000; // 20 seconds between orders in OVERTIME
                 
                 if (!targetTimeStr || targetViews <= 0) return;
                 
@@ -10188,8 +10189,16 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     const targetTime = new Date(targetTimeStr);
                     const remainingMs = targetTime - now;
                     
+                    // OVERTIME MODE: Place orders every 20 seconds until goal reached
                     if (remainingMs <= 0) {
-                        nextOrderTime = null;
+                        const viewsNeeded = Math.max(0, targetViews - realViews);
+                        if (viewsNeeded <= 0) {
+                            nextOrderTime = null; // Goal reached
+                            return;
+                        }
+                        // In OVERTIME and goal not reached: set 20-second interval
+                        nextOrderTime = now.getTime() + 20000; // 20 seconds from now
+                        lastRecalcTime = now.getTime();
                         return;
                     }
                     

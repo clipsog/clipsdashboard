@@ -66,8 +66,11 @@ MINIMUMS = {
 
 # SERVER-SIDE ANALYTICS CACHE: Prevent redundant TikTok fetching
 ANALYTICS_CACHE = {}
-CACHE_DURATION_SECONDS = 300  # 5 minutes
+CACHE_DURATION_SECONDS = 300  # 5 minutes (but can be bypassed with force_refresh)
 CACHE_LOCK = threading.Lock()
+
+# Track failed analytics fetches to avoid repeated failures
+ANALYTICS_FAILURES = {}  # {video_url: (failure_count, last_attempt_time)}
 
 class DashboardHandler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -484,30 +487,46 @@ class DashboardHandler(BaseHTTPRequestHandler):
             traceback.print_exc()
             progress = {}  # Return empty progress on error
         
+        # Check if force_refresh parameter is set
+        parsed_path = urllib.parse.urlparse(self.path)
+        query_params = urllib.parse.parse_qs(parsed_path.query)
+        force_refresh = query_params.get('force_refresh', ['false'])[0].lower() == 'true'
+        
+        if force_refresh:
+            print(f"[FORCE REFRESH] Clearing analytics cache and fetching fresh data...")
+            with CACHE_LOCK:
+                ANALYTICS_CACHE.clear()
+        
         # Fetch analytics with caching to prevent server overload
         for video_url in list(progress.keys()):
             try:
-                # Check cache first
+                # Check cache first (unless force_refresh)
                 cache_key = video_url
                 current_time = time.time()
+                should_fetch_fresh = force_refresh
                 
                 with CACHE_LOCK:
-                    if cache_key in ANALYTICS_CACHE:
+                    if not force_refresh and cache_key in ANALYTICS_CACHE:
                         cached_data, cached_time = ANALYTICS_CACHE[cache_key]
                         cache_age = current_time - cached_time
                         if cache_age < CACHE_DURATION_SECONDS:
                             analytics = cached_data
-                            print(f"[CACHE HIT] Using cached analytics for {video_url} (age: {int(cache_age)}s)")
+                            print(f"[CACHE HIT] Using cached analytics for {video_url[:50]}... (age: {int(cache_age)}s)")
+                            should_fetch_fresh = False
                         else:
-                            # Cache expired, fetch fresh
-                            analytics = self.fetch_real_analytics_for_video(video_url)
-                            ANALYTICS_CACHE[cache_key] = (analytics, current_time)
-                            print(f"[CACHE REFRESH] Fetched fresh analytics for {video_url}")
+                            should_fetch_fresh = True  # Cache expired
                     else:
-                        # Not in cache, fetch fresh
+                        should_fetch_fresh = True  # Not in cache
+                    
+                    if should_fetch_fresh:
+                        # Fetch fresh analytics
                         analytics = self.fetch_real_analytics_for_video(video_url)
                         ANALYTICS_CACHE[cache_key] = (analytics, current_time)
-                        print(f"[CACHE MISS] Fetched and cached analytics for {video_url}")
+                        
+                        if force_refresh:
+                            print(f"[FORCE REFRESH] Fetched analytics for {video_url[:50]}...: {analytics['views']} views, {analytics['likes']} likes")
+                        else:
+                            print(f"[CACHE REFRESH] Fetched fresh analytics for {video_url[:50]}...")
                 
                 # Always update real analytics (even if 0, to ensure we're always fetching)
                 # Initialize historical data if not exists
@@ -4251,9 +4270,14 @@ class DashboardHandler(BaseHTTPRequestHandler):
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1 style="cursor: pointer;" onclick="navigateToHome();" title="Click to go home">Campaign Dashboard</h1>
-            <p>Monitor your videos and set target completion times</p>
+        <div class="header" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1 style="cursor: pointer;" onclick="navigateToHome();" title="Click to go home">Campaign Dashboard</h1>
+                <p>Monitor your videos and set target completion times</p>
+            </div>
+            <button id="force-refresh-btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); transition: all 0.3s ease;" title="Force refresh all analytics (bypasses 5-min cache)">
+                🔄 Refresh Analytics
+            </button>
         </div>
         
         <div id="summary-stats-container"></div>
@@ -10593,6 +10617,56 @@ class DashboardHandler(BaseHTTPRequestHandler):
         // Event delegation for all buttons
         console.log('[Event Setup] Setting up event delegation listener');
         document.addEventListener('click', function(e) {
+            // Handle force refresh button
+            if (e.target.id === 'force-refresh-btn' || e.target.closest('#force-refresh-btn')) {
+                e.preventDefault();
+                const btn = e.target.id === 'force-refresh-btn' ? e.target : e.target.closest('#force-refresh-btn');
+                
+                // Show loading state
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '🔄 Refreshing...';
+                btn.disabled = true;
+                btn.style.opacity = '0.6';
+                
+                console.log('[Force Refresh] Clearing cache and fetching fresh analytics...');
+                showNotification('Refreshing all analytics...', 'info');
+                
+                // Call API with force_refresh parameter
+                fetchWithRetry('/api/progress?force_refresh=true', {}, 3)
+                    .then(response => response.json())
+                    .then(freshData => {
+                        // Update cache with fresh data
+                        cachedProgressData = freshData;
+                        lastProgressFetch = Date.now();
+                        
+                        // Count how many videos have views
+                        let videosWithViews = 0;
+                        let totalVideos = Object.keys(freshData).length;
+                        
+                        for (const url in freshData) {
+                            if (freshData[url].real_views > 0) {
+                                videosWithViews++;
+                            }
+                        }
+                        
+                        showNotification(`✓ Analytics refreshed! ${videosWithViews}/${totalVideos} videos have view data`, 'success');
+                        
+                        // Reload dashboard with fresh data
+                        return loadDashboard(true);
+                    })
+                    .catch(error => {
+                        console.error('[Force Refresh] Error:', error);
+                        showNotification('Error refreshing analytics', 'error');
+                    })
+                    .finally(() => {
+                        // Restore button state
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                        btn.style.opacity = '1';
+                    });
+                return;
+            }
+            
             // Find the button element (could be clicked directly or on child text)
             let btn = e.target;
             let attempts = 0;

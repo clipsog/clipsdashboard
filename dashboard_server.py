@@ -9859,122 +9859,96 @@ class DashboardHandler(BaseHTTPRequestHandler):
         }
         
         // Function to place automatic orders when TIME NEXT reaches 0
-        async function placeAutomaticOrder(videoUrl, metric, amount) {
-            // Create unique key for this video+metric combination
-            const orderKey = `${videoUrl}|${metric}`;
-            
-            // Check if order is already being placed
-            if (window.placingOrders.has(orderKey)) {
-                console.log(`[Auto Order] Order already in progress for ${orderKey}, skipping...`);
-                return false;
+        // ORDER QUEUE PROCESSOR: Process one order at a time to prevent server overload
+        async function processOrderQueue() {
+            if (window.processingOrder || window.orderQueue.length === 0) {
+                return;
             }
             
-            // Add to lock
-            window.placingOrders.add(orderKey);
+            window.processingOrder = true;
+            const order = window.orderQueue.shift(); // Get first order from queue
+            
+            console.log('[Order Queue] Processing (' + window.orderQueue.length + ' queued): ' + 
+                        order.amount + ' ' + order.metric + ' for ' + order.videoUrl);
             
             try {
-                console.log(`[Auto Order] Placing ${amount} ${metric} for ${videoUrl}`);
                 const params = new URLSearchParams();
-                params.append('video_url', videoUrl);
-                params.append('metric', metric);
-                params.append('amount', amount);
-                params.append('automatic', 'true');  // Flag to mark as automatic/scheduled order
+                params.append('video_url', order.videoUrl);
+                params.append('metric', order.metric);
+                params.append('amount', order.amount);
+                params.append('automatic', 'true');
                 
                 const response = await fetch('/api/manual-order', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: params.toString()
                 });
                 
-                // Handle server errors (502, 503) without trying to parse JSON
                 if (!response.ok) {
-                    const statusText = response.statusText || 'Unknown error';
-                    console.error(`[Auto Order] Server error ${response.status}: ${statusText}`);
-                    // Remove from lock after a delay to allow retry
-                    setTimeout(() => {
-                        window.placingOrders.delete(orderKey);
-                    }, 10000); // Wait 10 seconds before allowing retry
-                    return false;
-                }
-                
-                // Try to parse JSON, but handle empty/invalid responses
-                let data;
-                try {
-                    const text = await response.text();
-                    if (!text || text.trim() === '') {
-                        console.error('[Auto Order] Empty response from server');
-                        setTimeout(() => {
-                            window.placingOrders.delete(orderKey);
-                        }, 10000);
-                        return false;
-                    }
-                    data = JSON.parse(text);
-                } catch (parseError) {
-                    console.error('[Auto Order] Failed to parse JSON response:', parseError);
-                    setTimeout(() => {
-                        window.placingOrders.delete(orderKey);
-                    }, 10000);
-                    return false;
-                }
-                
-                if (data.success && data.order_id) {
-                    console.log(`[Auto Order] Success! Order ID: ${data.order_id}, Amount: ${data.amount}`);
-                    
-                    // Verify order was actually saved by checking order history (with retry)
-                    let verified = false;
-                    for (let attempt = 0; attempt < 3; attempt++) {
-                        try {
-                            await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1))); // Wait before each attempt
-                            const progressResponse = await fetch('/api/progress');
-                            if (!progressResponse.ok) {
-                                continue; // Try again
-                            }
-                            const progressData = await progressResponse.json();
-                            
-                            if (progressData && progressData[videoUrl] && progressData[videoUrl].order_history) {
-                                const recentOrder = progressData[videoUrl].order_history
-                                    .filter(o => o.service === metric)
-                                    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0];
-                                
-                                if (recentOrder && recentOrder.order_id === String(data.order_id)) {
-                                    console.log(`[Auto Order] Verified! Order ${data.order_id} found in order history`);
-                                    verified = true;
-                                    break;
-                                }
-                            }
-                        } catch (verifyError) {
-                            console.warn(`[Auto Order] Verification attempt ${attempt + 1} failed:`, verifyError);
-                        }
-                    }
-                    
-                    if (!verified) {
-                        console.warn(`[Auto Order] Could not verify order ${data.order_id} after 3 attempts, but API reported success`);
-                    }
-                    
-                    // Remove from lock after successful order
-                    setTimeout(() => {
-                        window.placingOrders.delete(orderKey);
-                    }, 5000); // Keep lock for 5 seconds to prevent immediate duplicate
-                    
-                    return true;
+                    console.error('[Order Queue] Server error ' + response.status);
+                    if (order.onError) order.onError('Server error ' + response.status);
                 } else {
-                    console.error(`[Auto Order] Failed: ${data.error || 'Unknown error'}`);
-                    // Remove from lock after error
-                    setTimeout(() => {
-                        window.placingOrders.delete(orderKey);
-                    }, 30000); // Wait 30 seconds before allowing retry on error
-                    return false;
+                    const text = await response.text();
+                    if (text && text.trim()) {
+                        const data = JSON.parse(text);
+                        if (data.success && data.order_id) {
+                            console.log('[Order Queue] ✓ Success! Order ID: ' + data.order_id);
+                            if (order.onSuccess) order.onSuccess(data);
+                        } else {
+                            console.error('[Order Queue] ✗ Failed: ' + (data.error || 'Unknown'));
+                            if (order.onError) order.onError(data.error || 'Unknown error');
+                        }
+                    } else {
+                        console.error('[Order Queue] ✗ Empty response');
+                        if (order.onError) order.onError('Empty response');
+                    }
                 }
             } catch (error) {
-                console.error('[Auto Order] Exception:', error);
-                // Remove from lock after exception
-                setTimeout(() => {
-                    window.placingOrders.delete(orderKey);
-                }, 30000); // Wait 30 seconds before allowing retry
+                console.error('[Order Queue] ✗ Exception:', error);
+                if (order.onError) order.onError(error.message);
+            }
+            
+            // Wait 3 seconds between orders to prevent server overload
+            setTimeout(() => {
+                window.processingOrder = false;
+                processOrderQueue(); // Process next order in queue
+            }, 3000);
+        }
+        
+        async function placeAutomaticOrder(videoUrl, metric, amount) {
+            const orderKey = videoUrl + '|' + metric;
+            
+            // Check if this order is already in the queue
+            const alreadyQueued = window.orderQueue.some(o => 
+                o.videoUrl === videoUrl && o.metric === metric
+            );
+            
+            if (alreadyQueued) {
+                console.log('[Auto Order] Already queued for ' + orderKey + ', skipping...');
                 return false;
             }
+            
+            console.log('[Auto Order] Adding to queue: ' + amount + ' ' + metric + ' for ' + videoUrl);
+            
+            // Return a promise that resolves when the order completes
+            return new Promise((resolve) => {
+                window.orderQueue.push({
+                    videoUrl: videoUrl,
+                    metric: metric,
+                    amount: amount,
+                    onSuccess: (data) => {
+                        console.log('[Auto Order] ✓ Order ' + data.order_id + ' completed');
+                        resolve(true);
+                    },
+                    onError: (error) => {
+                        console.error('[Auto Order] ✗ Failed: ' + error);
+                        resolve(false);
+                    }
+                });
+                
+                // Start processing if not already running
+                processOrderQueue();
+            });
         }
         
         // Start countdown timers for table cells (TIME LEFT, TIME NEXT, LIKES NEXT)

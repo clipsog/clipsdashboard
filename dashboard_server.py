@@ -9185,15 +9185,19 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                         }
                                     }
                                     
-                                    // Order counts
+                                    // Order counts - BOTH historic and needed
                                     const orderHistory = videoData.order_history || [];
                                     const viewsOrders = orderHistory.filter(o => o.service === 'views');
                                     const manualViewsOrders = viewsOrders.filter(o => o.type === 'manual' || (!o.type && o.manual)).length;
-                                    const schedViewsOrders = viewsOrders.filter(o => o.type === 'scheduled' || (!o.type && !o.manual)).length;
+                                    const schedViewsOrdersPlaced = viewsOrders.filter(o => o.type === 'scheduled' || (!o.type && !o.manual)).length;
                                     
                                     const likesOrders = orderHistory.filter(o => o.service === 'likes');
                                     const manualLikesOrders = likesOrders.filter(o => o.type === 'manual' || (!o.type && o.manual)).length;
-                                    const schedLikesOrders = likesOrders.filter(o => o.type === 'scheduled' || (!o.type && !o.manual)).length;
+                                    const schedLikesOrdersPlaced = likesOrders.filter(o => o.type === 'scheduled' || (!o.type && !o.manual)).length;
+                                    
+                                    // Calculate how many orders are still NEEDED
+                                    let schedViewsOrdersNeeded = 0;
+                                    let schedLikesOrdersNeeded = 0;
                                     
                                     // Units and cost per unit (average of scheduled orders only)
                                     let avgViewsUnits = 0;

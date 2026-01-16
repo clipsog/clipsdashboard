@@ -7660,15 +7660,19 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     }
                 }
                 
-                // Order counts - MUST be calculated BEFORE TIME NEXT calculation
+                // Order counts - BOTH historic and needed
                 const orderHistory = videoData.order_history || [];
                 const viewsOrders = orderHistory.filter(o => o.service === 'views');
                 const manualViewsOrders = viewsOrders.filter(o => o.type === 'manual' || (!o.type && o.manual)).length;
-                const schedViewsOrders = viewsOrders.filter(o => o.type === 'scheduled' || (!o.type && !o.manual)).length;
+                const schedViewsOrdersPlaced = viewsOrders.filter(o => o.type === 'scheduled' || (!o.type && !o.manual)).length;
                 
                 const likesOrders = orderHistory.filter(o => o.service === 'likes');
                 const manualLikesOrders = likesOrders.filter(o => o.type === 'manual' || (!o.type && o.manual)).length;
-                const schedLikesOrders = likesOrders.filter(o => o.type === 'scheduled' || (!o.type && !o.manual)).length;
+                const schedLikesOrdersPlaced = likesOrders.filter(o => o.type === 'scheduled' || (!o.type && !o.manual)).length;
+                
+                // Calculate how many orders are still NEEDED
+                let schedViewsOrdersNeeded = 0;
+                let schedLikesOrdersNeeded = 0;
                 
                 // Time to next order - calculate based on remaining time divided by orders needed
                 let timeToNext = 'N/A';
@@ -7690,6 +7694,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         
                         if (viewsNeeded <= 0) {
                             timeToNext = 'DONE';
+                            schedViewsOrdersNeeded = 0;
                         } else {
                             // Calculate average units per scheduled order, or use minimum if no orders
                             const schedViewsOrdersList = viewsOrders.filter(o => o.type === 'scheduled' || (!o.type && !o.manual));
@@ -7705,6 +7710,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             
                             // Calculate orders needed based on units per order
                             const ordersNeeded = Math.ceil(viewsNeeded / unitsPerOrder);
+                            schedViewsOrdersNeeded = ordersNeeded;
                             
                             if (ordersNeeded > 0) {
                                 const timePerOrder = remainingMs / ordersNeeded;
@@ -7737,6 +7743,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         
                         if (likesNeeded <= 0) {
                             likesTimeToNext = 'DONE';
+                            schedLikesOrdersNeeded = 0;
                         } else {
                             // Calculate average units per scheduled order, or use minimum if no orders
                             const schedLikesOrdersList = likesOrders.filter(o => o.type === 'scheduled' || (!o.type && !o.manual));
@@ -7752,6 +7759,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             
                             // Calculate orders needed based on units per order
                             const ordersNeeded = Math.ceil(likesNeeded / unitsPerOrder);
+                            schedLikesOrdersNeeded = ordersNeeded;
                             
                             if (ordersNeeded > 0) {
                                 const timePerOrder = remainingMs / ordersNeeded;
@@ -7814,14 +7822,14 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-real-views data-video-url="${escapeTemplateLiteral(videoUrl)}">${formatNumber(real_views)}</td>
                         <td style="padding: 4px 3px; text-align: right; color: ${real_views >= expected_views ? '#10b981' : '#f59e0b'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(expected_views)}</td>
                         <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-manual-views-orders data-video-url="${escapeTemplateLiteral(videoUrl)}"><span class="manual-order-link" data-video-url="${escapeTemplateLiteral(videoUrl)}" data-metric="views" style="cursor: pointer; text-decoration: underline; color: #667eea;">${manualViewsOrders}</span></td>
-                        <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-sched-views-orders data-video-url="${escapeTemplateLiteral(videoUrl)}" data-metric="views"><span class="sched-count">${schedViewsOrders}</span><span class="processing-count" style="color: #f59e0b;"></span></td>
+                        <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-sched-views-orders data-video-url="${escapeTemplateLiteral(videoUrl)}" data-metric="views" title="Placed / Needed"><span class="sched-count">${schedViewsOrdersPlaced}/${schedViewsOrdersNeeded}</span><span class="processing-count" style="color: #f59e0b;"></span></td>
                         <td style="padding: 4px 3px; text-align: center; color: ${timeToNext === 'READY' ? '#10b981' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-time-next data-video-url="${escapeTemplateLiteral(videoUrl)}" data-target-time="${target_completion || ''}" data-target-views="${target_views}" data-real-views="${real_views}" data-avg-units="${avgViewsUnits || MIN_VIEWS_ORDER}">${timeToNext}</td>
                         <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${avgViewsUnits > 0 ? formatNumber(avgViewsUnits) : '-'}</td>
                         <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${avgViewsCostPerUnit > 0 ? '$' + avgViewsCostPerUnit.toFixed(4) : '-'}</td>
                         <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-real-likes data-video-url="${escapeTemplateLiteral(videoUrl)}">${formatNumber(real_likes)}</td>
                         <td style="padding: 4px 3px; text-align: right; color: ${real_likes >= expected_likes ? '#10b981' : '#f59e0b'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(expected_likes)}</td>
                         <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-manual-likes-orders data-video-url="${escapeTemplateLiteral(videoUrl)}"><span class="manual-order-link" data-video-url="${escapeTemplateLiteral(videoUrl)}" data-metric="likes" style="cursor: pointer; text-decoration: underline; color: #667eea;">${manualLikesOrders}</span></td>
-                        <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-sched-likes-orders data-video-url="${escapeTemplateLiteral(videoUrl)}" data-metric="likes"><span class="sched-count">${schedLikesOrders}</span><span class="processing-count" style="color: #f59e0b;"></span></td>
+                        <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-sched-likes-orders data-video-url="${escapeTemplateLiteral(videoUrl)}" data-metric="likes" title="Placed / Needed"><span class="sched-count">${schedLikesOrdersPlaced}/${schedLikesOrdersNeeded}</span><span class="processing-count" style="color: #f59e0b;"></span></td>
                         <td style="padding: 4px 3px; text-align: center; color: ${likesTimeToNext === 'READY' ? '#10b981' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-likes-next data-video-url="${escapeTemplateLiteral(videoUrl)}" data-target-time="${target_completion || ''}" data-target-likes="${target_likes}" data-real-likes="${real_likes}" data-avg-units="${avgLikesUnits || MIN_LIKES_ORDER}">${likesTimeToNext}</td>
                         <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${avgLikesUnits > 0 ? formatNumber(avgLikesUnits) : '-'}</td>
                         <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px;">${avgLikesCostPerUnit > 0 ? '$' + avgLikesCostPerUnit.toFixed(4) : '-'}</td>
@@ -9313,14 +9321,14 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                             <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-real-views data-video-url="${escapeTemplateLiteral(videoUrl)}">${formatNumber(real_views)}</td>
                                             <td style="padding: 4px 3px; text-align: right; color: ${real_views >= expected_views ? '#10b981' : '#f59e0b'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(expected_views)}</td>
                                             <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-manual-views-orders data-video-url="${escapeTemplateLiteral(videoUrl)}"><span class="manual-order-link" data-video-url="${escapeTemplateLiteral(videoUrl)}" data-metric="views" style="cursor: pointer; text-decoration: underline; color: #667eea;">${manualViewsOrders}</span></td>
-                                            <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-sched-views-orders data-video-url="${escapeTemplateLiteral(videoUrl)}" data-metric="views"><span class="sched-count">${schedViewsOrders}</span><span class="processing-count" style="color: #f59e0b;"></span></td>
+                                            <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-sched-views-orders data-video-url="${escapeTemplateLiteral(videoUrl)}" data-metric="views" title="Placed / Needed"><span class="sched-count">${schedViewsOrdersPlaced}/${schedViewsOrdersNeeded}</span><span class="processing-count" style="color: #f59e0b;"></span></td>
                                             <td style="padding: 4px 3px; text-align: center; color: ${timeToNext === 'READY' ? '#10b981' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-time-next data-video-url="${escapeTemplateLiteral(videoUrl)}" data-target-time="${target_completion || ''}" data-target-views="${target_views}" data-real-views="${real_views}" data-avg-units="${avgViewsUnits || MIN_VIEWS_ORDER}">${timeToNext}</td>
                                             <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${avgViewsUnits > 0 ? formatNumber(avgViewsUnits) : '-'}</td>
                                             <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${avgViewsCostPerUnit > 0 ? '$' + avgViewsCostPerUnit.toFixed(4) : '-'}</td>
                                             <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-real-likes data-video-url="${escapeTemplateLiteral(videoUrl)}">${formatNumber(real_likes)}</td>
                                             <td style="padding: 4px 3px; text-align: right; color: ${real_likes >= expected_likes ? '#10b981' : '#f59e0b'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${formatNumber(expected_likes)}</td>
                                             <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-manual-likes-orders data-video-url="${escapeTemplateLiteral(videoUrl)}"><span class="manual-order-link" data-video-url="${escapeTemplateLiteral(videoUrl)}" data-metric="likes" style="cursor: pointer; text-decoration: underline; color: #667eea;">${manualLikesOrders}</span></td>
-                                            <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-sched-likes-orders data-video-url="${escapeTemplateLiteral(videoUrl)}" data-metric="likes"><span class="sched-count">${schedLikesOrders}</span><span class="processing-count" style="color: #f59e0b;"></span></td>
+                                            <td style="padding: 4px 3px; text-align: center; color: #b0b0b0; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-sched-likes-orders data-video-url="${escapeTemplateLiteral(videoUrl)}" data-metric="likes" title="Placed / Needed"><span class="sched-count">${schedLikesOrdersPlaced}/${schedLikesOrdersNeeded}</span><span class="processing-count" style="color: #f59e0b;"></span></td>
                                             <td style="padding: 4px 3px; text-align: center; color: ${likesTimeToNext === 'READY' ? '#10b981' : '#fff'}; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);" data-likes-next data-video-url="${escapeTemplateLiteral(videoUrl)}" data-target-time="${target_completion || ''}" data-target-likes="${target_likes}" data-real-likes="${real_likes}" data-avg-units="${avgLikesUnits || MIN_LIKES_ORDER}">${likesTimeToNext}</td>
                                             <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px; border-right: 1px solid rgba(255,255,255,0.05);">${avgLikesUnits > 0 ? formatNumber(avgLikesUnits) : '-'}</td>
                                             <td style="padding: 4px 3px; text-align: right; color: #fff; font-size: 9px;">${avgLikesCostPerUnit > 0 ? '$' + avgLikesCostPerUnit.toFixed(4) : '-'}</td>
@@ -10009,7 +10017,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     onSuccess: (data) => {
                         console.log('[Auto Order] ✓ Order ' + data.order_id + ' completed');
                         
-                        // REAL-TIME UPDATE: Increment scheduled count immediately
+                        // Flash the cell green to show success
                         const schedCell = document.querySelector(
                             metric === 'views' 
                                 ? `[data-sched-views-orders][data-video-url="${videoUrl}"]`
@@ -10017,23 +10025,28 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         );
                         
                         if (schedCell) {
-                            const countSpan = schedCell.querySelector('.sched-count');
-                            if (countSpan) {
-                                const currentCount = parseInt(countSpan.textContent) || 0;
-                                const newCount = currentCount + 1;
-                                countSpan.textContent = newCount;
-                                console.log('[Real-Time Update] Scheduled ' + metric + ' count: ' + currentCount + ' → ' + newCount);
-                                
-                                // Flash the cell to show update
-                                schedCell.style.backgroundColor = '#10b981';
-                                setTimeout(() => {
-                                    schedCell.style.backgroundColor = '';
-                                }, 500);
-                            }
+                            schedCell.style.backgroundColor = '#10b981';
+                            setTimeout(() => {
+                                schedCell.style.backgroundColor = '';
+                            }, 500);
                         }
                         
-                        // Invalidate cache to fetch fresh data on next load
+                        // Invalidate cache and trigger fast refresh to update counts
                         invalidateCache();
+                        setTimeout(() => {
+                            if (window.orderQueue.length === 0) {
+                                // Last order done, refresh to show updated counts
+                                const route = getCurrentRoute();
+                                if (route.type === 'home' || route.type === 'campaign') {
+                                    fetchWithRetry('/api/progress', {}, 1)
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            cachedProgressData = data;
+                                            lastProgressFetch = Date.now();
+                                        });
+                                }
+                            }
+                        }, 1000);
                         
                         resolve(true);
                     },

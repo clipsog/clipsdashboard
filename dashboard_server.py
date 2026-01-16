@@ -6350,7 +6350,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             // Calculate next purchase info for each metric
             function calculateNextPurchase(metricName, needed, hoursRemaining, combinedPerHour, minOrder) {
                 // In overtime mode, continue ordering until goal is reached (ignore time limit)
-                const isOvertimeStopped = video.overtime_stopped === true;
+                // Use isOvertimeStopped from outer scope
                 if (needed <= 0 || isOvertimeStopped) {
                     return null;
                 }
@@ -6402,8 +6402,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             let hoursToCommentsGoal = 0;
             let hoursToCommentLikesGoal = 0;
             
-            // Check if overtime is stopped
-            const isOvertimeStopped = video.overtime_stopped === true;
+            // isOvertimeStopped already declared above at line 6332
             
             if (isTargetOverdue && !isOvertimeStopped) {
                 // Target is overdue - OVERTIME MODE: Continue ordering until goal reached

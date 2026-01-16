@@ -4568,9 +4568,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
             function escapeForTemplate(str) {
                 if (!str) return '';
                 return String(str)
-                    .replace(/\\\\\\\\/g, '\\\\\\\\\\\\\\\\')  // Escape backslashes first
+                    .replace(/\\\\/g, '\\\\\\\\')  // Escape backslashes first
                     .replace(/'/g, "\\\\'")           // Escape single quotes
-                    .replace(/`/g, '\\\\\\\\`')         // Escape backticks
+                    .replace(/`/g, '\\\\`')         // Escape backticks
                     .replace(/\\$/g, '\\\\$');      // Escape dollar signs
             }
             if (!confirm(`Are you sure you want to remove this video from the process?\\n\\nVideo: ${escapeForTemplate(videoUrl)}\\n\\nThis will stop tracking but won't cancel existing orders.`)) {
@@ -6113,9 +6113,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
             function escapeTemplateLiteral(str) {
                 if (!str) return '';
                 return String(str)
-                    .replace(/\\\\\\\\/g, '\\\\\\\\\\\\\\\\')  // Escape backslashes first
+                    .replace(/\\\\/g, '\\\\\\\\')  // Escape backslashes first
                     .replace(/'/g, "\\\\'")           // Escape single quotes
-                    .replace(/`/g, '\\\\\\\\`')         // Escape backticks
+                    .replace(/`/g, '\\\\`')         // Escape backticks
                     .replace(/\\$/g, '\\\\$');      // Escape dollar signs
             }
             

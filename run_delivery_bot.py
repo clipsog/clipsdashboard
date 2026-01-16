@@ -395,7 +395,11 @@ class DeliveryBot:
             return purchases
     
     def check_and_place_due_orders(self):
-        """Check if any orders are due and place them immediately (non-blocking)"""
+        """Check if any orders are due and place them immediately (non-blocking)
+        
+        OVERTIME MODE: If deadline has passed and overtime not stopped, continue ordering
+        until goal is reached, generating new orders dynamically beyond the original schedule.
+        """
         try:
             # Load progress to get start time and completed purchases
             progress = self.load_progress()
@@ -403,6 +407,20 @@ class DeliveryBot:
                 return False
             
             video_progress = progress[self.video_url]
+            
+            # Check if in OVERTIME mode
+            target_completion_time = video_progress.get('target_completion_time') or video_progress.get('target_completion_datetime')
+            overtime_stopped = video_progress.get('overtime_stopped', False)
+            is_in_overtime = False
+            
+            if target_completion_time and not overtime_stopped:
+                try:
+                    target_dt = datetime.fromisoformat(target_completion_time.replace('Z', '+00:00'))
+                    is_in_overtime = datetime.now() > target_dt.replace(tzinfo=None)
+                    if is_in_overtime:
+                        print(f"{Fore.MAGENTA}[OVERTIME MODE] Deadline passed, continuing until goal reached{Style.RESET_ALL}")
+                except:
+                    pass
             
             # FIRST: Check explicit next purchase timers (set by previous orders or manually)
             # These timers should be respected immediately when they expire
@@ -657,10 +675,95 @@ class DeliveryBot:
                 else:
                     print(f"  {Fore.RED}✗ Failed to place order{Style.RESET_ALL}")
             
-            return True
+            # OVERTIME MODE: If in overtime and no scheduled orders were due, generate new orders dynamically
+            if is_in_overtime and len(due_orders) == 0:
+                print(f"{Fore.MAGENTA}[OVERTIME] Checking if additional orders needed to reach goal...{Style.RESET_ALL}")
+                overtime_orders_placed = self._place_overtime_orders(video_progress)
+                if overtime_orders_placed:
+                    return True
+            
+            return len(due_orders) > 0
             
         except Exception as e:
             print(f"{Fore.RED}Error checking due orders: {e}{Style.RESET_ALL}")
+            import traceback
+            traceback.print_exc()
+            return False
+    
+    def _place_overtime_orders(self, video_progress):
+        """Place dynamically calculated orders in OVERTIME mode"""
+        try:
+            # Get targets and current progress
+            target_views = video_progress.get('target_views', 4000)
+            target_likes = video_progress.get('target_likes', 125)
+            
+            # Get initial counts
+            initial_views = video_progress.get('real_views', 0) or video_progress.get('initial_views', 0)
+            initial_likes = video_progress.get('real_likes', 0) or video_progress.get('initial_likes', 0)
+            
+            # Get orders placed
+            orders_placed = video_progress.get('orders_placed', {})
+            ordered_views = orders_placed.get('views', 0)
+            ordered_likes = orders_placed.get('likes', 0)
+            
+            # Fetch current analytics to check delivered counts
+            current_analytics = self.fetch_all_analytics()
+            current_real_views = current_analytics.get('views', 0)
+            current_real_likes = current_analytics.get('likes', 0)
+            
+            # Calculate delivered (current - initial)
+            delivered_views = max(0, current_real_views - initial_views)
+            delivered_likes = max(0, current_real_likes - initial_likes)
+            
+            # Calculate what's still needed
+            views_needed = max(0, target_views - delivered_views)
+            likes_needed = max(0, target_likes - delivered_likes)
+            
+            print(f"{Fore.CYAN}[OVERTIME] Status:{Style.RESET_ALL}")
+            print(f"  Views: {delivered_views}/{target_views} delivered (need {views_needed} more)")
+            print(f"  Likes: {delivered_likes}/{target_likes} delivered (need {likes_needed} more)")
+            
+            orders_placed_count = 0
+            now = datetime.now()
+            
+            # Place views if needed
+            if views_needed > 0:
+                quantity = max(MINIMUMS['views'], min(views_needed, 100))  # Order in chunks of 50-100
+                print(f"{Fore.MAGENTA}[OVERTIME] Placing {quantity} views to reach goal...{Style.RESET_ALL}")
+                success, order_id = self.create_order(SERVICES['views'], quantity, 'Views')
+                if success:
+                    print(f"  {Fore.GREEN}✓ Overtime order placed! ID: {order_id}{Style.RESET_ALL}")
+                    self.update_progress('views', quantity, order_id)
+                    orders_placed_count += 1
+                    
+                    # Set next purchase time (30 seconds from now for overtime orders)
+                    progress = self.load_progress()
+                    if self.video_url in progress:
+                        next_time = now + timedelta(seconds=30)
+                        progress[self.video_url]['next_views_purchase_time'] = next_time.isoformat()
+                        self.save_progress(progress)
+            
+            # Place likes if needed
+            if likes_needed > 0:
+                quantity = max(MINIMUMS['likes'], min(likes_needed, 50))  # Order in chunks of 10-50
+                print(f"{Fore.MAGENTA}[OVERTIME] Placing {quantity} likes to reach goal...{Style.RESET_ALL}")
+                success, order_id = self.create_order(SERVICES['likes'], quantity, 'Likes')
+                if success:
+                    print(f"  {Fore.GREEN}✓ Overtime order placed! ID: {order_id}{Style.RESET_ALL}")
+                    self.update_progress('likes', quantity, order_id)
+                    orders_placed_count += 1
+                    
+                    # Set next purchase time (30 seconds from now for overtime orders)
+                    progress = self.load_progress()
+                    if self.video_url in progress:
+                        next_time = now + timedelta(seconds=30)
+                        progress[self.video_url]['next_likes_purchase_time'] = next_time.isoformat()
+                        self.save_progress(progress)
+            
+            return orders_placed_count > 0
+            
+        except Exception as e:
+            print(f"{Fore.RED}[OVERTIME] Error placing overtime orders: {e}{Style.RESET_ALL}")
             import traceback
             traceback.print_exc()
             return False

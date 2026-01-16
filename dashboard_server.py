@@ -9283,7 +9283,19 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             
                             // Ensure progress data exists
                             if (!progress || typeof progress !== 'object') {
+                                console.warn('[Campaign Table] No progress data available, using empty object');
                                 progress = {};
+                            } else {
+                                console.log('[Campaign Table] Progress data available for', Object.keys(progress).length, 'videos');
+                                // Log a sample video to see data structure
+                                const sampleUrl = Object.keys(progress)[0];
+                                if (sampleUrl) {
+                                    console.log('[Campaign Table] Sample video data:', sampleUrl.substring(0, 50), '...', {
+                                        real_views: progress[sampleUrl].real_views,
+                                        real_likes: progress[sampleUrl].real_likes,
+                                        target_views: progress[sampleUrl].target_views
+                                    });
+                                }
                             }
                             
                             let tableHtml = `
@@ -9317,7 +9329,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             for (const videoUrl of campaignVideos) {
                                 if (!videoUrl) continue; // Skip invalid URLs
                                 const videoData = progress[videoUrl];
-                                if (!videoData) continue; // Skip if video data not found
+                                if (!videoData) {
+                                    console.warn('[Campaign Table] No data found for video:', videoUrl.substring(0, 50), '...');
+                                    continue; // Skip if video data not found
+                                }
                                 
                                 try {
                                     // Extract video ID
@@ -10869,27 +10884,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         
                         showNotification(`✓ Analytics refreshed! ${videosWithViews}/${totalVideos} videos have view data`, 'success');
                         
-                        // Reload current view with fresh data (dashboard, campaign, or video)
-                        const currentHash = window.location.hash;
-                        if (currentHash.startsWith('#campaign/')) {
-                            // Reload campaign view
-                            const campaignId = currentHash.split('/')[1];
-                            if (campaignId) {
-                                console.log('[Force Refresh] Reloading campaign view:', campaignId);
-                                renderCampaignDetail(campaignId);
-                            }
-                        } else if (currentHash.startsWith('#video/')) {
-                            // Reload video view
-                            const videoUrl = decodeURIComponent(currentHash.split('/')[1]);
-                            if (videoUrl) {
-                                console.log('[Force Refresh] Reloading video view:', videoUrl);
-                                renderVideoDetail(videoUrl);
-                            }
-                        } else {
-                            // Reload main dashboard
-                            console.log('[Force Refresh] Reloading main dashboard');
-                            return loadDashboard(true);
-                        }
+                        // Reload dashboard with fresh data - this handles all views (dashboard, campaign, video)
+                        console.log('[Force Refresh] Reloading current view with fresh data');
+                        return loadDashboard(true);
                     })
                     .catch(error => {
                         console.error('[Force Refresh] Error:', error);

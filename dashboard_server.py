@@ -5286,6 +5286,17 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 
                 if (data.success) {
                     campaignsData = data.campaigns || {};
+                    
+                    // Update paused campaigns Set
+                    window.pausedCampaigns = window.pausedCampaigns || new Set();
+                    window.pausedCampaigns.clear();
+                    for (const campaignId in campaignsData) {
+                        if (campaignsData[campaignId].paused === true) {
+                            window.pausedCampaigns.add(campaignId);
+                            console.log(`[Campaigns] Campaign ${campaignId} is PAUSED`);
+                        }
+                    }
+                    
                     updateCampaignSelector();
                     renderCampaignsSummary();
                     updateCampaignNames();
@@ -10452,6 +10463,18 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     } else {
                         // Time reached 0 - place order automatically
                         if (!orderPlaced) {
+                            // Check if campaign is paused before placing order
+                            const videoData = cachedProgressData ? cachedProgressData[videoUrl] : null;
+                            const campaignId = videoData ? videoData.campaign_id : null;
+                            
+                            if (campaignId && window.pausedCampaigns && window.pausedCampaigns.has(campaignId)) {
+                                console.log(`[Auto Order] Campaign ${campaignId} is PAUSED - skipping order for ${videoUrl}`);
+                                cell.textContent = 'PAUSED';
+                                cell.style.color = '#f59e0b';
+                                // Don't set orderPlaced, so it will retry if resumed
+                                return;
+                            }
+                            
                             orderPlaced = true;
                             orderPlacedTime = Date.now();
                             cell.textContent = 'PLACING...';
@@ -10660,6 +10683,18 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     } else {
                         // Time reached 0 - place order automatically
                         if (!orderPlaced) {
+                            // Check if campaign is paused before placing order
+                            const videoData = cachedProgressData ? cachedProgressData[videoUrl] : null;
+                            const campaignId = videoData ? videoData.campaign_id : null;
+                            
+                            if (campaignId && window.pausedCampaigns && window.pausedCampaigns.has(campaignId)) {
+                                console.log(`[Auto Order] Campaign ${campaignId} is PAUSED - skipping order for ${videoUrl}`);
+                                cell.textContent = 'PAUSED';
+                                cell.style.color = '#f59e0b';
+                                // Don't set orderPlaced, so it will retry if resumed
+                                return;
+                            }
+                            
                             orderPlaced = true;
                             orderPlacedTime = Date.now();
                             cell.textContent = 'PLACING...';

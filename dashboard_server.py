@@ -10869,8 +10869,27 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         
                         showNotification(`✓ Analytics refreshed! ${videosWithViews}/${totalVideos} videos have view data`, 'success');
                         
-                        // Reload dashboard with fresh data
-                        return loadDashboard(true);
+                        // Reload current view with fresh data (dashboard, campaign, or video)
+                        const currentHash = window.location.hash;
+                        if (currentHash.startsWith('#campaign/')) {
+                            // Reload campaign view
+                            const campaignId = currentHash.split('/')[1];
+                            if (campaignId) {
+                                console.log('[Force Refresh] Reloading campaign view:', campaignId);
+                                renderCampaignDetail(campaignId);
+                            }
+                        } else if (currentHash.startsWith('#video/')) {
+                            // Reload video view
+                            const videoUrl = decodeURIComponent(currentHash.split('/')[1]);
+                            if (videoUrl) {
+                                console.log('[Force Refresh] Reloading video view:', videoUrl);
+                                renderVideoDetail(videoUrl);
+                            }
+                        } else {
+                            // Reload main dashboard
+                            console.log('[Force Refresh] Reloading main dashboard');
+                            return loadDashboard(true);
+                        }
                     })
                     .catch(error => {
                         console.error('[Force Refresh] Error:', error);

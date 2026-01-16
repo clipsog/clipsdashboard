@@ -695,9 +695,12 @@ class DeliveryBot:
             return len(due_orders) > 0
             
         except Exception as e:
-            print(f"{Fore.RED}Error checking due orders: {e}{Style.RESET_ALL}")
+            print(f"{Fore.RED}❌ CRITICAL ERROR in check_and_place_due_orders: {e}{Style.RESET_ALL}")
+            print(f"{Fore.RED}Video URL: {self.video_url[:80]}{Style.RESET_ALL}")
             import traceback
+            print(f"{Fore.RED}{'='*80}")
             traceback.print_exc()
+            print(f"{'='*80}{Style.RESET_ALL}")
             return False
     
     def _place_overtime_orders(self, video_progress):

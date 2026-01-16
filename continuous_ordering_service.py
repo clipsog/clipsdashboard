@@ -7,10 +7,18 @@ Runs 24/7 to ensure goals are reached, especially in OVERTIME mode
 import time
 import json
 import sys
+import traceback
 from pathlib import Path
 from datetime import datetime
 from colorama import Fore, Style, init
-from run_delivery_bot import DeliveryBot
+
+# Import with error handling
+try:
+    from run_delivery_bot import DeliveryBot
+except ImportError as e:
+    print(f"Error importing DeliveryBot: {e}")
+    print("Make sure run_delivery_bot.py is in the same directory")
+    sys.exit(1)
 
 init(autoreset=True)
 
@@ -55,24 +63,32 @@ class ContinuousOrderingService:
                     try:
                         target_dt = datetime.fromisoformat(target_time.replace('Z', '+00:00'))
                         in_overtime = datetime.now() > target_dt.replace(tzinfo=None)
-                    except:
-                        pass
+                    except Exception as dt_error:
+                        print(f"{Fore.YELLOW}Warning: Could not parse target time: {dt_error}{Style.RESET_ALL}")
                 
                 # Create bot instance and check for due orders
-                bot = DeliveryBot(video_url)
-                placed = bot.check_and_place_due_orders()
-                
-                if placed:
-                    orders_placed += 1
-                    if in_overtime:
-                        print(f"{Fore.MAGENTA}[OVERTIME] Orders placed for: {video_url[:50]}...{Style.RESET_ALL}")
-                    else:
-                        print(f"{Fore.GREEN}✓ Orders placed for: {video_url[:50]}...{Style.RESET_ALL}")
-                
-                videos_processed += 1
+                try:
+                    bot = DeliveryBot(video_url)
+                    placed = bot.check_and_place_due_orders()
+                    
+                    if placed:
+                        orders_placed += 1
+                        if in_overtime:
+                            print(f"{Fore.MAGENTA}[OVERTIME] Orders placed for: {video_url[:50]}...{Style.RESET_ALL}")
+                        else:
+                            print(f"{Fore.GREEN}✓ Orders placed for: {video_url[:50]}...{Style.RESET_ALL}")
+                    
+                    videos_processed += 1
+                    
+                except Exception as bot_error:
+                    print(f"{Fore.RED}Error in DeliveryBot for {video_url[:50]}...{Style.RESET_ALL}")
+                    print(f"{Fore.RED}Error details: {str(bot_error)}{Style.RESET_ALL}")
+                    traceback.print_exc()
+                    continue
                 
             except Exception as e:
                 print(f"{Fore.RED}Error processing {video_url[:50]}...: {e}{Style.RESET_ALL}")
+                traceback.print_exc()
                 continue
         
         return videos_processed, orders_placed

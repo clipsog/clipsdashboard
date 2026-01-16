@@ -10419,15 +10419,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
             }
             
             window.tableDataRefreshInterval = setInterval(function() {
-                // Only refresh if we're on dashboard or campaign view and not already refreshing
-                if (isRefreshing) {
-                    return; // Skip if already refreshing
-                }
-                
                 const route = getCurrentRoute();
                 if (route.type === 'home' || route.type === 'campaign') {
-                    // Refresh progress data to update order counts and views/likes
-                    loadDashboard(false).then(() => {
+                    // Fast refresh using cache - much more responsive
+                    loadDashboard(false, false).then(() => {
                         // Restart countdowns after refresh
                         startTableCountdowns();
                     }).catch(error => {

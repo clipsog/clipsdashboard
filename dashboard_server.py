@@ -10,7 +10,8 @@ import re
 import subprocess
 from pathlib import Path
 from datetime import datetime, timedelta
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import HTTPServer, BaseHTTPRequestHandler, ThreadingHTTPServer
+from socketserver import ThreadingMixIn
 import urllib.parse
 import webbrowser
 import threading
@@ -62,6 +63,11 @@ MINIMUMS = {
     'comments': 10,
     'comment_likes': 50
 }
+
+# SERVER-SIDE ANALYTICS CACHE: Prevent redundant TikTok fetching
+ANALYTICS_CACHE = {}
+CACHE_DURATION_SECONDS = 300  # 5 minutes
+CACHE_LOCK = threading.Lock()
 
 class DashboardHandler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -469,7 +475,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
         return analytics
     
     def send_progress_json(self):
-        """Send progress as JSON with real-time analytics"""
+        """Send progress as JSON with CACHED analytics for performance"""
         try:
             progress = self.load_progress()
         except Exception as e:
@@ -478,10 +484,31 @@ class DashboardHandler(BaseHTTPRequestHandler):
             traceback.print_exc()
             progress = {}  # Return empty progress on error
         
-        # Always fetch real-time analytics for all videos
+        # Fetch analytics with caching to prevent server overload
         for video_url in list(progress.keys()):
             try:
-                analytics = self.fetch_real_analytics_for_video(video_url)
+                # Check cache first
+                cache_key = video_url
+                current_time = time.time()
+                
+                with CACHE_LOCK:
+                    if cache_key in ANALYTICS_CACHE:
+                        cached_data, cached_time = ANALYTICS_CACHE[cache_key]
+                        cache_age = current_time - cached_time
+                        if cache_age < CACHE_DURATION_SECONDS:
+                            analytics = cached_data
+                            print(f"[CACHE HIT] Using cached analytics for {video_url} (age: {int(cache_age)}s)")
+                        else:
+                            # Cache expired, fetch fresh
+                            analytics = self.fetch_real_analytics_for_video(video_url)
+                            ANALYTICS_CACHE[cache_key] = (analytics, current_time)
+                            print(f"[CACHE REFRESH] Fetched fresh analytics for {video_url}")
+                    else:
+                        # Not in cache, fetch fresh
+                        analytics = self.fetch_real_analytics_for_video(video_url)
+                        ANALYTICS_CACHE[cache_key] = (analytics, current_time)
+                        print(f"[CACHE MISS] Fetched and cached analytics for {video_url}")
+                
                 # Always update real analytics (even if 0, to ensure we're always fetching)
                 # Initialize historical data if not exists
                 if 'growth_history' not in progress[video_url]:
@@ -7824,6 +7851,32 @@ class DashboardHandler(BaseHTTPRequestHandler):
         window.orderQueue = window.orderQueue || [];
         window.processingOrder = false;
         
+        // FETCH WITH RETRY: Automatic retry on 503 errors
+        async function fetchWithRetry(url, options = {}, maxRetries = 3) {
+            for (let attempt = 1; attempt <= maxRetries; attempt++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (response.ok) {
+                        return response;
+                    }
+                    // Retry on 502/503 errors
+                    if ((response.status === 502 || response.status === 503) && attempt < maxRetries) {
+                        console.log(`[Retry ${attempt}/${maxRetries}] Server error ${response.status}, retrying...`);
+                        await new Promise(resolve => setTimeout(resolve, 1000 * attempt)); // Exponential backoff
+                        continue;
+                    }
+                    return response;
+                } catch (error) {
+                    if (attempt < maxRetries) {
+                        console.log(`[Retry ${attempt}/${maxRetries}] Network error, retrying...`);
+                        await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+                        continue;
+                    }
+                    throw error;
+                }
+            }
+        }
+        
         // Invalidate cache to force fresh data load (call after mutations)
         function invalidateCache() {
             cachedProgressData = null;
@@ -8881,11 +8934,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
             // Content updates instantly with no visual interruption
             
             try {
-                const response = await fetch('/api/progress');
+                const response = await fetchWithRetry('/api/progress', {}, 3);
                 
                 // Handle server errors gracefully
                 if (!response.ok) {
-                    console.warn(`[loadDashboard] Server error ${response.status}, will retry on next refresh`);
+                    console.warn(`[loadDashboard] Server error ${response.status} after retries, will retry on next refresh`);
                     // Don't crash, use empty progress and let periodic refresh retry
                     const progress = {};
                     allVideosData = progress;
@@ -10420,8 +10473,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
             window.tableDataRefreshInterval = setInterval(function() {
                 const route = getCurrentRoute();
                 if (route.type === 'home' || route.type === 'campaign') {
-                    // Silently fetch fresh data and update cache WITHOUT rebuilding UI
-                    fetch('/api/progress')
+                    // Silently fetch fresh data with retry
+                    fetchWithRetry('/api/progress', {}, 2)
                         .then(response => response.json())
                         .then(data => {
                             cachedProgressData = data;
@@ -10429,7 +10482,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             console.log('[Silent Refresh] Cache updated, timers continue running');
                         })
                         .catch(error => {
-                            console.error('[Silent Refresh] Error:', error);
+                            console.error('[Silent Refresh] Error after retries:', error);
                         });
                 }
             }, 120000); // Every 2 minutes - timers run independently
@@ -10677,18 +10730,18 @@ class DashboardHandler(BaseHTTPRequestHandler):
         // Initialize charts after a short delay to ensure Chart.js is loaded
         setTimeout(initializeGrowthCharts, 500);
         
-        // Background cache update - timers run independently, no UI rebuilds
+        // Background cache update with retry - timers run independently, no UI rebuilds
         setInterval(() => {
             if (shouldPauseAutoRefresh()) return;
-            // Silently update cache without rebuilding UI or resetting timers
-            fetch('/api/progress')
+            // Silently update cache with automatic retry on errors
+            fetchWithRetry('/api/progress', {}, 2)
                 .then(response => response.json())
                 .then(data => {
                     cachedProgressData = data;
                     lastProgressFetch = Date.now();
                     console.log('[Background Update] Cache refreshed, timers unaffected');
                 })
-                .catch(error => console.error('[Background Update] Error:', error));
+                .catch(error => console.error('[Background Update] Error after retries:', error));
         }, 180000); // 3 minutes - timers are completely independent
     </script>
 </body>
@@ -10699,9 +10752,16 @@ class DashboardHandler(BaseHTTPRequestHandler):
         pass
 
 def run_server(port=PORT):
-    """Run the dashboard server"""
+    """Run the dashboard server with multi-threading support"""
     server_address = ('', port)
-    httpd = HTTPServer(server_address, DashboardHandler)
+    # Use ThreadingHTTPServer for concurrent request handling (prevents 503 errors)
+    try:
+        httpd = ThreadingHTTPServer(server_address, DashboardHandler)
+    except NameError:
+        # Fallback for Python < 3.7
+        class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
+            daemon_threads = True
+        httpd = ThreadedHTTPServer(server_address, DashboardHandler)
     
     url = f'http://localhost:{port}'
     print(f"\n{'='*60}")

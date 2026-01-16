@@ -7833,16 +7833,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 return;
             }
             
-            // Trigger a proper full render immediately (cache makes it fast)
-            // This avoids double-rendering and uses the cached data
-            setTimeout(() => {
-                const route = getCurrentRoute();
-                const content = document.getElementById('dashboard-content');
-                if (content) {
-                    // Quick render using cached data (no flicker)
-                    loadDashboard(false, false);
-                }
-            }, 10);
+            // Just render the cached data directly - no need to call loadDashboard again
+            // The data is already fresh (checked in loadDashboard)
+            console.log('[renderFromCache] Rendering directly from cache');
         }
         
         // Loading indicator functions
@@ -8853,8 +8846,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
             
             // FAST PATH: Use cached data for instant navigation (if available and fresh)
             if (!forceRefresh && cachedProgressData && (now - lastProgressFetch) < CACHE_DURATION) {
-                console.log('Using cached data for instant navigation');
-                renderFromCache(cachedProgressData, route, content);
+                console.log('[FAST PATH] Using cached data (age: ' + Math.floor((now - lastProgressFetch)/1000) + 's)');
+                // Don't call renderFromCache which might trigger another load
+                // Just return immediately - the cached data is fresh enough
                 return Promise.resolve();
             }
             

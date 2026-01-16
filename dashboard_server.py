@@ -4568,10 +4568,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
             function escapeForTemplate(str) {
                 if (!str) return '';
                 return String(str)
-                    .replace(/\\\\\\\\\\\\\\\\/g, '\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\')  // Escape backslashes first
-                    .replace(/'/g, "\\\\'")           // Escape single quotes
-                    .replace(/`/g, '\\\\\\\\`')         // Escape backticks
-                    .replace(/\\$/g, '\\\\$');      // Escape dollar signs
+                    .split('\\\\').join('\\\\\\\\')  // Escape backslashes first
+                    .split("'").join("\\\\'")
+                    .split('`').join('\\\\`')
+                    .split('$').join('\\\\$');
             }
             if (!confirm(`Are you sure you want to remove this video from the process?\\n\\nVideo: ${escapeForTemplate(videoUrl)}\\n\\nThis will stop tracking but won't cancel existing orders.`)) {
                 return;
@@ -5362,11 +5362,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
             function escapeForConfirm(str) {
                 if (!str) return '';
                 return String(str)
-                    .replace(/\\/g, '\\\\')  // Escape backslashes first
-                    .replace(/"/g, '\\"')     // Escape double quotes
-                    .replace(/'/g, "\\'")     // Escape single quotes
-                    .replace(/\n/g, '\\n')    // Escape newlines
-                    .replace(/\r/g, '\\r');   // Escape carriage returns
+                    .split('\\\\').join('\\\\\\\\')  // Escape backslashes first
+                    .split('"').join('\\\\\"')     // Escape double quotes
+                    .split("'").join("\\\\'")     // Escape single quotes
+                    .split('\\n').join('\\\\n')    // Escape newlines
+                    .split('\\r').join('\\\\r');   // Escape carriage returns
             }
             const safeName = escapeForConfirm(campaignName || 'Unnamed Campaign');
             if (!confirm(`Are you sure you want to DELETE "${safeName}"?\\n\\nThis action cannot be undone. All campaign data will be permanently removed.`)) {
@@ -5599,10 +5599,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     function escapeTemplateLiteral(str) {
                         if (!str) return '';
                         return String(str)
-                            .replace(/\\\\\\\\\\\\\\\\/g, '\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\')  // Escape backslashes first
-                            .replace(/'/g, "\\\\'")           // Escape single quotes
-                            .replace(/`/g, '\\\\\\\\`')         // Escape backticks
-                            .replace(/\\$/g, '\\\\$');      // Escape dollar signs
+                            .split('\\\\').join('\\\\\\\\')  // Escape backslashes first
+                            .split("'").join("\\\\'")
+                            .split('`').join('\\\\`')
+                            .split('$').join('\\\\$');
                     }
                     const safeVideoUrlAttr = escapeTemplateLiteral(videoUrl);
                     
@@ -6113,10 +6113,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
             function escapeTemplateLiteral(str) {
                 if (!str) return '';
                 return String(str)
-                    .replace(/\\\\\\\\\\\\\\\\/g, '\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\')  // Escape backslashes first
-                    .replace(/'/g, "\\\\'")           // Escape single quotes
-                    .replace(/`/g, '\\\\\\\\`')         // Escape backticks
-                    .replace(/\\$/g, '\\\\$');      // Escape dollar signs
+                    .split('\\\\').join('\\\\\\\\')  // Escape backslashes first
+                    .split("'").join("\\\\'")
+                    .split('`').join('\\\\`')
+                    .split('$').join('\\\\$');
             }
             
             const displayName = username ? `@${escapeTemplateLiteral(username)}` : 'Unknown';
@@ -6926,7 +6926,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                     try {
                                         const date = new Date(t);
                                         const label = date.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-                                        return String(label || '').replace(/`/g, '\\`').replace(/\$/g, '\\$');
+                                        return String(label || '').split('`').join('\\`').split('$').join('\\$');
                                     } catch (e) {
                                         return '';
                                     }
@@ -7513,10 +7513,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 function escapeTemplateLiteral(str) {
                     if (!str) return '';
                     return String(str)
-                        .replace(/\\\\\\\\\\\\\\\\/g, '\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\')  // Escape backslashes first
-                        .replace(/'/g, "\\\\'")           // Escape single quotes
-                        .replace(/`/g, '\\\\\\\\`')         // Escape backticks
-                        .replace(/\\$/g, '\\\\$');      // Escape dollar signs
+                        .split('\\\\').join('\\\\\\\\')  // Escape backslashes first
+                        .split("'").join("\\\\'")
+                        .split('`').join('\\\\`')
+                        .split('$').join('\\\\$');
                 }
                 
                 // Get start time (date posted) and calculate time left
@@ -7763,10 +7763,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
         function escapeTemplateLiteral(str) {
             if (!str) return '';
             return String(str)
-                .replace(/\\\\\\\\/g, '\\\\\\\\\\\\\\\\')  // Escape backslashes first
-                .replace(/'/g, "\\\\'")           // Escape single quotes
-                .replace(/`/g, '\\\\\\\\`')         // Escape backticks
-                .replace(/\\$/g, '\\\\$');      // Escape dollar signs
+                .split('\\\\').join('\\\\\\\\')  // Escape backslashes first
+                .split("'").join("\\\\'")
+                .split('`').join('\\\\`')
+                .split('$').join('\\\\$');
         }
         
         function getCurrentRoute() {
@@ -8892,10 +8892,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             function escapeTemplateLiteral(str) {
                                 if (!str) return '';
                                 return String(str)
-                                    .replace(/\\\\/g, '\\\\\\\\')  // Escape backslashes first
-                                    .replace(/'/g, "\\'")           // Escape single quotes
-                                    .replace(/`/g, '\\\\`')         // Escape backticks
-                                    .replace(/\\$/g, '\\\\$');      // Escape dollar signs
+                                    .split('\\\\').join('\\\\\\\\')  // Escape backslashes first
+                                    .split("'").join("\\\\'")
+                                    .split('`').join('\\\\`')
+                                    .split('$').join('\\\\$');
                             }
                             
                             // Ensure progress data exists
@@ -9317,10 +9317,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         function escapeTemplateLiteral(str) {
                             if (!str) return '';
                             return String(str)
-                                .replace(/\\\\/g, '\\\\\\\\')  // Escape backslashes first
-                                .replace(/'/g, "\\'")           // Escape single quotes
-                                .replace(/`/g, '\\\\`')         // Escape backticks
-                                .replace(/\\$/g, '\\\\$');      // Escape dollar signs
+                                .split('\\\\').join('\\\\\\\\')  // Escape backslashes first
+                                .split("'").join("\\\\'")
+                                .split('`').join('\\\\`')
+                                .split('$').join('\\\\$');
                         }
                         const errorMsg = error && error.message ? error.message : String(error);
                         content.innerHTML = `

@@ -10458,14 +10458,17 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 if (route.type === 'home' || route.type === 'campaign') {
                     // Fast refresh using cache - much more responsive
                     loadDashboard(false, false).then(() => {
-                        // Restart countdowns after refresh
-                        startTableCountdowns();
+                        // DON'T restart countdowns - let them continue counting down!
+                        // Only restart if they don't exist yet
+                        if (!window.tableCountdownIntervals || window.tableCountdownIntervals.length === 0) {
+                            startTableCountdowns();
+                        }
                     }).catch(error => {
                         console.error('[startTableDataRefresh] Refresh error:', error);
                         // Don't crash on refresh errors
                     });
                 }
-            }, 30000); // Refresh every 30 seconds
+            }, 60000); // Refresh every 60 seconds (increased from 30s to let timers count down)
         }
         
         // Event delegation for all buttons
@@ -10710,11 +10713,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
         // Initialize charts after a short delay to ensure Chart.js is loaded
         setTimeout(initializeGrowthCharts, 500);
         
-        // Auto-refresh every 30 seconds - uses cache so very fast
+        // Auto-refresh every 2 minutes - let timers count down to 0 first
         setInterval(() => {
             if (shouldPauseAutoRefresh()) return;
             loadDashboard(false, false); // Don't force refresh, use cache if available
-        }, 30000);
+        }, 120000); // 2 minutes - gives timers time to reach 0
     </script>
 </body>
 </html>"""

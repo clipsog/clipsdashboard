@@ -10411,6 +10411,16 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         return; // Keep showing PLACING... or ORDERED status
                     }
                     
+                    // CHECK IF CAMPAIGN IS PAUSED - Show "PAUSED" immediately
+                    const videoData = cachedProgressData ? cachedProgressData[videoUrl] : null;
+                    const campaignId = videoData ? videoData.campaign_id : null;
+                    
+                    if (campaignId && window.pausedCampaigns && window.pausedCampaigns.has(campaignId)) {
+                        cell.textContent = 'PAUSED';
+                        cell.style.color = '#f59e0b';
+                        return; // Skip all countdown logic
+                    }
+                    
                     const now = Date.now();
                     const targetTime = new Date(targetTimeStr).getTime();
                     const inOvertime = targetTime <= now;
@@ -10629,6 +10639,16 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     // Skip updates if we're waiting for order confirmation (within 3 seconds of placing)
                     if (orderPlaced && (Date.now() - orderPlacedTime) < 3000) {
                         return; // Keep showing PLACING... or ORDERED status
+                    }
+                    
+                    // CHECK IF CAMPAIGN IS PAUSED - Show "PAUSED" immediately
+                    const videoData = cachedProgressData ? cachedProgressData[videoUrl] : null;
+                    const campaignId = videoData ? videoData.campaign_id : null;
+                    
+                    if (campaignId && window.pausedCampaigns && window.pausedCampaigns.has(campaignId)) {
+                        cell.textContent = 'PAUSED';
+                        cell.style.color = '#f59e0b';
+                        return; // Skip all countdown logic
                     }
                     
                     const now = Date.now();

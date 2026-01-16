@@ -7660,7 +7660,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             }
                         }
                     } else {
-                        timeToNext = 'OVERDUE';
+                        timeToNext = 'OVERTIME';
                     }
                 }
                 
@@ -7707,7 +7707,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             }
                         }
                     } else {
-                        likesTimeToNext = 'OVERDUE';
+                        likesTimeToNext = 'OVERTIME';
                     }
                 }
                 
@@ -9094,7 +9094,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                                 }
                                             }
                                         } else {
-                                            timeToNext = 'OVERDUE';
+                                            timeToNext = 'OVERTIME';
                                         }
                                     }
                                     
@@ -9132,7 +9132,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                                 }
                                             }
                                         } else {
-                                            likesTimeToNext = 'OVERDUE';
+                                            likesTimeToNext = 'OVERTIME';
                                         }
                                     }
                                     
@@ -9903,7 +9903,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             
             // Format time with seconds
             function formatTimeWithSeconds(totalSeconds) {
-                if (totalSeconds < 0) return 'OVERDUE';
+                if (totalSeconds < 0) return 'OVERTIME';
                 if (totalSeconds <= 0 || !isFinite(totalSeconds)) return 'N/A';
                 const hours = Math.floor(totalSeconds / 3600);
                 const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -9929,7 +9929,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     const remainingSeconds = Math.floor(remainingMs / 1000);
                     
                     if (remainingSeconds <= 0) {
-                        cell.textContent = 'OVERDUE';
+                        cell.textContent = 'OVERTIME';
                         cell.style.color = '#ef4444';
                         clearInterval(interval);
                         return;
@@ -9946,7 +9946,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 if (remainingSeconds > 0) {
                     cell.textContent = formatTimeWithSeconds(remainingSeconds);
                 } else {
-                    cell.textContent = 'OVERDUE';
+                    cell.textContent = 'OVERTIME';
                     cell.style.color = '#ef4444';
                 }
                 
@@ -10033,7 +10033,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     const targetTime = new Date(targetTimeStr).getTime();
                     
                     if (targetTime <= now) {
-                        cell.textContent = 'OVERDUE';
+                        cell.textContent = 'OVERTIME';
                         cell.style.color = '#ef4444';
                         clearInterval(interval);
                         return;
@@ -10239,7 +10239,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     const targetTime = new Date(targetTimeStr).getTime();
                     
                     if (targetTime <= now) {
-                        cell.textContent = 'OVERDUE';
+                        cell.textContent = 'OVERTIME';
                         cell.style.color = '#ef4444';
                         clearInterval(interval);
                         return;

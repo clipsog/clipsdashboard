@@ -4772,7 +4772,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     showNotification(`Manual order placed! ID: ${data.order_id}`, 'success');
                     invalidateCache();
                     loadDashboard(false, true); // Background refresh
-                } else{
+                } else {
                     alert('Error: ' + (data.error || 'Failed to place manual order'));
                     if (button) {
                         button.disabled = false;

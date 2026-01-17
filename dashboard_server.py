@@ -123,6 +123,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 self.handle_stop_overtime()
             elif path == '/api/stop-video':
                 self.handle_stop_video()
+            elif path == '/api/emergency-delete-all':
+                self.handle_emergency_delete_all()
             elif path == '/api/video-details':
                 self.handle_video_details()
             elif path == '/health' or path == '/api/health':
@@ -187,6 +189,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 self.handle_stop_overtime()
             elif path == '/api/stop-video':
                 self.handle_stop_video()
+            elif path == '/api/emergency-delete-all':
+                self.handle_emergency_delete_all()
             elif path == '/api/video-details':
                 self.handle_video_details()
             elif path == '/health' or path == '/api/health':
@@ -3010,6 +3014,88 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(response_data.encode())
     
+    def handle_emergency_delete_all(self):
+        """EMERGENCY: Delete ALL videos and campaigns from database"""
+        try:
+            print("\n" + "="*60)
+            print("🚨 EMERGENCY DELETE ALL - Starting...")
+            print("="*60)
+            
+            if not DATABASE_AVAILABLE:
+                response_data = json.dumps({'success': False, 'error': 'Database not available'})
+                self.send_response(500)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(response_data.encode())
+                return
+            
+            import database
+            
+            with database.get_db_connection() as conn:
+                if not conn:
+                    response_data = json.dumps({'success': False, 'error': 'Failed to connect to database'})
+                    self.send_response(500)
+                    self.send_header('Content-type', 'application/json')
+                    self.send_header('Access-Control-Allow-Origin', '*')
+                    self.end_headers()
+                    self.wfile.write(response_data.encode())
+                    return
+                
+                cursor = conn.cursor()
+                
+                # Count before deletion
+                cursor.execute("SELECT COUNT(*) FROM videos")
+                video_count = cursor.fetchone()[0]
+                
+                cursor.execute("SELECT COUNT(*) FROM campaigns")
+                campaign_count = cursor.fetchone()[0]
+                
+                print(f"📊 Deleting:")
+                print(f"   - {video_count} videos")
+                print(f"   - {campaign_count} campaigns")
+                
+                # Delete all videos
+                cursor.execute("DELETE FROM videos")
+                print(f"✓ Deleted {video_count} videos")
+                
+                # Delete all campaigns
+                cursor.execute("DELETE FROM campaigns")
+                print(f"✓ Deleted {campaign_count} campaigns")
+                
+                # Clear cache to prevent stale data
+                with CACHE_LOCK:
+                    ANALYTICS_CACHE.clear()
+                    print("✓ Cleared analytics cache")
+                
+                conn.commit()
+                
+                print("\n✅ EMERGENCY DELETE COMPLETE!")
+                print("="*60 + "\n")
+                
+                response_data = json.dumps({
+                    'success': True,
+                    'message': f'Deleted {video_count} videos and {campaign_count} campaigns',
+                    'videos_deleted': video_count,
+                    'campaigns_deleted': campaign_count
+                })
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(response_data.encode())
+                
+        except Exception as e:
+            print(f"❌ EXCEPTION in handle_emergency_delete_all: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            response_data = json.dumps({'success': False, 'error': str(e)})
+            self.send_response(500)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(response_data.encode())
+    
     def handle_assign_videos(self):
         """Assign videos to a campaign"""
         try:
@@ -4541,9 +4627,14 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 <h1 style="cursor: pointer;" onclick="navigateToHome();" title="Click to go home">Campaign Dashboard</h1>
                 <p>Monitor your videos and set target completion times</p>
             </div>
-            <button id="force-refresh-btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); transition: all 0.3s ease;" title="Force refresh all analytics (bypasses 5-min cache)">
-                🔄 Refresh Analytics
-            </button>
+            <div style="display: flex; gap: 10px;">
+                <button id="force-refresh-btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); transition: all 0.3s ease;" title="Force refresh all analytics (bypasses 5-min cache)">
+                    🔄 Refresh Analytics
+                </button>
+                <button id="emergency-delete-all-btn" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); transition: all 0.3s ease; animation: pulse 2s infinite;" title="🚨 EMERGENCY: Delete ALL videos and campaigns">
+                    🚨 DELETE ALL
+                </button>
+            </div>
         </div>
         
         <div id="summary-stats-container"></div>
@@ -4823,6 +4914,16 @@ class DashboardHandler(BaseHTTPRequestHandler):
     <style>
         @keyframes spin {
             to { transform: rotate(360deg); }
+        }
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 6px 25px rgba(239, 68, 68, 0.8);
+                transform: scale(1.05);
+            }
         }
         .spinner {
             animation: spin 0.8s linear infinite;
@@ -10699,7 +10800,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 // Don't set orderPlaced, so it will retry if resumed
                                 return;
                             } else if (!campaignId) {
-                                console.warn(`[ORDER CHECK VIEWS] Video ${videoUrl.substring(0, 50)}... has NO campaign_id - placing order anyway!`);
+                                console.warn(`[ORDER CHECK VIEWS] Video ${videoUrl.substring(0, 50)}... has NO campaign_id - SKIPPING ORDER (orphaned video)`);
+                                cell.textContent = 'NO CAMPAIGN';
+                                cell.style.color = '#ef4444';
+                                return; // Don't place orders for orphaned videos
                             }
                             
                             orderPlaced = true;
@@ -10933,11 +11037,16 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             const campaignId = videoData ? videoData.campaign_id : null;
                             
                             if (campaignId && window.pausedCampaigns && window.pausedCampaigns.has(campaignId)) {
-                                console.log(`[Auto Order] Campaign ${campaignId} is PAUSED - skipping order for ${videoUrl}`);
+                                console.log(`[Auto Order LIKES] Campaign ${campaignId} is PAUSED - skipping order for ${videoUrl.substring(0, 50)}...`);
                                 cell.textContent = 'PAUSED';
                                 cell.style.color = '#f59e0b';
                                 // Don't set orderPlaced, so it will retry if resumed
                                 return;
+                            } else if (!campaignId) {
+                                console.warn(`[Auto Order LIKES] Video ${videoUrl.substring(0, 50)}... has NO campaign_id - SKIPPING ORDER (orphaned video)`);
+                                cell.textContent = 'NO CAMPAIGN';
+                                cell.style.color = '#ef4444';
+                                return; // Don't place orders for orphaned videos
                             }
                             
                             orderPlaced = true;
@@ -11052,6 +11161,70 @@ class DashboardHandler(BaseHTTPRequestHandler):
         // Event delegation for all buttons
         console.log('[Event Setup] Setting up event delegation listener');
         document.addEventListener('click', function(e) {
+            // Handle emergency delete all button
+            if (e.target.id === 'emergency-delete-all-btn' || e.target.closest('#emergency-delete-all-btn')) {
+                e.preventDefault();
+                const btn = e.target.id === 'emergency-delete-all-btn' ? e.target : e.target.closest('#emergency-delete-all-btn');
+                
+                // Triple confirmation for safety
+                const confirm1 = window.confirm('🚨 EMERGENCY DELETE ALL\n\nThis will DELETE ALL videos and campaigns from the database.\n\nAre you ABSOLUTELY sure?');
+                if (!confirm1) return;
+                
+                const confirm2 = window.confirm('⚠️ FINAL WARNING\n\nThis action CANNOT be undone!\n\nAll campaigns, videos, and progress will be PERMANENTLY deleted.\n\nContinue?');
+                if (!confirm2) return;
+                
+                const confirm3 = window.confirm('🛑 LAST CHANCE\n\nType "DELETE" to proceed (case-sensitive).\n\nClick OK to type, or CANCEL to abort.');
+                if (!confirm3) return;
+                
+                const userInput = window.prompt('Type exactly: DELETE');
+                if (userInput !== 'DELETE') {
+                    alert('❌ Operation cancelled - text did not match.');
+                    return;
+                }
+                
+                // Show loading state
+                btn.innerHTML = '🚨 DELETING...';
+                btn.disabled = true;
+                btn.style.opacity = '0.6';
+                btn.style.animation = 'none';
+                
+                console.log('[Emergency Delete] Starting...');
+                
+                fetchWithRetry('/api/emergency-delete-all', { method: 'POST' }, 2)
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.success) {
+                            console.log(`[Emergency Delete] ✓ Deleted ${result.videos_deleted} videos and ${result.campaigns_deleted} campaigns`);
+                            showNotification(`✅ Deleted ${result.videos_deleted} videos and ${result.campaigns_deleted} campaigns`, 'success');
+                            
+                            // Invalidate cache
+                            invalidateCache();
+                            
+                            // Reload dashboard
+                            setTimeout(() => {
+                                window.location.href = '/';
+                            }, 1500);
+                        } else {
+                            console.error('[Emergency Delete] ✗ Failed:', result.error);
+                            showNotification(`❌ Delete failed: ${result.error}`, 'error');
+                            btn.innerHTML = '🚨 DELETE ALL';
+                            btn.disabled = false;
+                            btn.style.opacity = '1';
+                            btn.style.animation = 'pulse 2s infinite';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('[Emergency Delete] ✗ Network error:', error);
+                        showNotification('❌ Network error during delete', 'error');
+                        btn.innerHTML = '🚨 DELETE ALL';
+                        btn.disabled = false;
+                        btn.style.opacity = '1';
+                        btn.style.animation = 'pulse 2s infinite';
+                    });
+                
+                return;
+            }
+            
             // Handle force refresh button
             if (e.target.id === 'force-refresh-btn' || e.target.closest('#force-refresh-btn')) {
                 e.preventDefault();

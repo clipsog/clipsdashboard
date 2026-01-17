@@ -235,6 +235,22 @@ class DashboardHandler(BaseHTTPRequestHandler):
         """Fetch real-time analytics for a single video"""
         analytics = {'views': 0, 'likes': 0, 'comments': 0}
         
+        # CRITICAL: Resolve shortened URLs (vt.tiktok.com) to full URLs first
+        resolved_url = video_url
+        if 'vt.tiktok.com' in video_url or video_url.startswith('https://vm.tiktok.com'):
+            try:
+                print(f"[URL RESOLVE] Resolving shortened URL: {video_url[:60]}...")
+                headers = {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                }
+                # Follow redirects to get the full URL
+                resolve_response = requests.head(video_url, headers=headers, allow_redirects=True, timeout=10)
+                resolved_url = resolve_response.url
+                print(f"[URL RESOLVE] Resolved to: {resolved_url[:80]}...")
+            except Exception as resolve_error:
+                print(f"[URL RESOLVE] Failed to resolve {video_url[:60]}...: {resolve_error}")
+                # Continue with original URL if resolution fails
+        
         # Method 1: Try direct TikTok scraping with BeautifulSoup
         try:
             headers = {
@@ -245,7 +261,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 'Connection': 'keep-alive',
                 'Upgrade-Insecure-Requests': '1',
             }
-            response = requests.get(video_url, headers=headers, timeout=20, allow_redirects=True)
+            response = requests.get(resolved_url, headers=headers, timeout=20, allow_redirects=True)
             if response.status_code == 200:
                 html = response.text
                 soup = BeautifulSoup(html, 'html.parser')

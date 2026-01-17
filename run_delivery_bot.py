@@ -112,6 +112,24 @@ class DeliveryBot:
         
         analytics = {'views': 0, 'likes': 0, 'comments': 0}
         
+        # CRITICAL: Resolve shortened URLs (vt.tiktok.com) to full URLs first
+        resolved_url = self.video_url
+        if 'vt.tiktok.com' in self.video_url or self.video_url.startswith('https://vm.tiktok.com'):
+            try:
+                if print_analytics:
+                    print(f"{Fore.YELLOW}[URL RESOLVE] Resolving shortened URL: {self.video_url[:60]}...{Style.RESET_ALL}")
+                headers = {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                }
+                # Follow redirects to get the full URL
+                resolve_response = requests.head(self.video_url, headers=headers, allow_redirects=True, timeout=10)
+                resolved_url = resolve_response.url
+                if print_analytics:
+                    print(f"{Fore.GREEN}[URL RESOLVE] Resolved to: {resolved_url[:80]}...{Style.RESET_ALL}")
+            except Exception as resolve_error:
+                print(f"{Fore.RED}[URL RESOLVE] Failed to resolve {self.video_url[:60]}...: {resolve_error}{Style.RESET_ALL}")
+                # Continue with original URL if resolution fails
+        
         # Method 1: Try direct TikTok scraping (most accurate for current state)
         try:
             headers = {
@@ -122,7 +140,7 @@ class DeliveryBot:
                 'Connection': 'keep-alive',
                 'Upgrade-Insecure-Requests': '1',
             }
-            response = requests.get(self.video_url, headers=headers, timeout=20, allow_redirects=True)
+            response = requests.get(resolved_url, headers=headers, timeout=20, allow_redirects=True)
             if response.status_code == 200:
                 html = response.text
                 

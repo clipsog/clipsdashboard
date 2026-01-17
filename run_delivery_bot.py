@@ -14,6 +14,15 @@ from pathlib import Path
 from colorama import Fore, Style, init
 from bs4 import BeautifulSoup
 
+# Import database module
+try:
+    import database
+    DATABASE_AVAILABLE = True
+    print("[INIT] ✓ Database module available")
+except ImportError as e:
+    print(f"[INIT] ❌ Database import failed: {e}")
+    DATABASE_AVAILABLE = False
+
 init(autoreset=True)
 
 API_KEY = "3327db2d9f02b8c241b200a40fe3d12d"
@@ -36,6 +45,8 @@ MINIMUMS = {
 class DeliveryBot:
     def __init__(self, video_url):
         self.video_url = video_url
+        # DEPRECATED: File-based storage is no longer used - database is now the single source of truth
+        # Keep these for backwards compatibility but they won't be used
         self.progress_file = Path.home() / '.smmfollows_bot' / 'progress.json'
         self.orders_file = Path.home() / '.smmfollows_bot' / 'orders.json'
         self.progress_file.parent.mkdir(exist_ok=True)
@@ -64,22 +75,33 @@ class DeliveryBot:
         self.save_progress(progress)
         
     def load_progress(self):
-        """Load progress for this video"""
-        if self.progress_file.exists():
+        """Load progress from database ONLY - Supabase is the single source of truth"""
+        if DATABASE_AVAILABLE:
             try:
-                with open(self.progress_file, 'r') as f:
-                    return json.load(f)
-            except:
+                progress = database.load_progress()
+                return progress or {}
+            except Exception as e:
+                print(f"{Fore.RED}❌ Database load failed: {e}{Style.RESET_ALL}")
+                import traceback
+                traceback.print_exc()
                 return {}
+        
+        print(f"{Fore.RED}❌ Database module not available - cannot load data!{Style.RESET_ALL}")
         return {}
     
     def save_progress(self, progress):
-        """Save progress"""
-        try:
-            with open(self.progress_file, 'w') as f:
-                json.dump(progress, f, indent=2)
-        except Exception as e:
-            print(f"{Fore.RED}Error saving progress: {e}{Style.RESET_ALL}")
+        """Save progress to database ONLY - Supabase is the single source of truth"""
+        if DATABASE_AVAILABLE:
+            try:
+                database.save_progress(progress)
+                return
+            except Exception as e:
+                print(f"{Fore.RED}❌ Database save failed: {e}{Style.RESET_ALL}")
+                import traceback
+                traceback.print_exc()
+                raise  # Re-raise to prevent silent data loss
+        
+        raise Exception("Database module not available - cannot save data!")
     
     def fetch_all_analytics(self):
         """Fetch ALL real-time analytics: views, likes, comments - BEFORE every action"""
@@ -411,17 +433,16 @@ class DeliveryBot:
             # Check if campaign is paused
             campaign_id = video_progress.get('campaign_id')
             if campaign_id:
-                campaigns_file = self.progress_file.parent / 'campaigns.json'
-                if campaigns_file.exists():
+                if DATABASE_AVAILABLE:
                     try:
-                        with open(campaigns_file, 'r') as f:
-                            campaigns = json.load(f)
-                        
+                        campaigns = database.load_campaigns()
                         if campaign_id in campaigns and campaigns[campaign_id].get('paused', False):
                             print(f"{Fore.YELLOW}⏸ Campaign {campaign_id} is PAUSED - skipping orders for {self.video_url}{Style.RESET_ALL}")
                             return False
                     except Exception as e:
-                        print(f"Warning: Could not check campaign pause status: {e}")
+                        print(f"Warning: Could not check campaign pause status from database: {e}")
+                else:
+                    print(f"Warning: Database not available - cannot check campaign pause status")
             
             # Check if in OVERTIME mode
             target_completion_time = video_progress.get('target_completion_time') or video_progress.get('target_completion_datetime')

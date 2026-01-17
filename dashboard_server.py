@@ -560,14 +560,15 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         history.pop(0)
                 
                 # Always update real analytics (even if 0)
+                old_views = progress[video_url].get('real_views', 'NOT_SET')
                 progress[video_url]['real_views'] = analytics['views']
                 progress[video_url]['real_likes'] = analytics['likes']
                 progress[video_url]['real_comments'] = analytics['comments']
                 
                 if force_refresh or analytics['views'] > 0:
-                    print(f"✓ Updated analytics for {video_url[:60]}...: views={analytics['views']}, likes={analytics['likes']}, comments={analytics['comments']}")
+                    print(f"✓ Updated analytics for {video_url[:60]}...: views={analytics['views']}, likes={analytics['likes']}, comments={analytics['comments']} (was: {old_views})")
                 elif analytics['views'] == 0:
-                    print(f"⚠️ ZERO VIEWS returned for {video_url[:60]}... - TikTok might be blocking or video is private!")
+                    print(f"⚠️ ZERO VIEWS returned for {video_url[:60]}... - TikTok might be blocking or video is private! (was: {old_views})")
             except Exception as e:
                 print(f"Error fetching analytics for {video_url}: {e}")
                 import traceback
@@ -577,9 +578,27 @@ class DashboardHandler(BaseHTTPRequestHandler):
         videos_with_views = sum(1 for v in progress.values() if v.get('real_views', 0) > 0)
         print(f"[ANALYTICS SUMMARY] Fetched {len(progress)} videos, {videos_with_views} have views > 0")
         
+        # Log a few sample videos BEFORE saving
+        sample_urls = list(progress.keys())[:3]
+        print(f"[PRE-SAVE CHECK] Sample videos BEFORE saving to DB:")
+        for url in sample_urls:
+            views = progress[url].get('real_views', 'NOT_SET')
+            print(f"  {url[:50]}... real_views = {views}")
+        
         try:
             self.save_progress(progress)
             print(f"✓ Saved progress to database with updated analytics")
+            
+            # VERIFICATION: Load it back immediately to verify
+            verification_progress = self.load_progress()
+            print(f"[POST-SAVE CHECK] Sample videos AFTER loading from DB:")
+            for url in sample_urls:
+                if url in verification_progress:
+                    views = verification_progress[url].get('real_views', 'NOT_SET')
+                    print(f"  {url[:50]}... real_views = {views}")
+                else:
+                    print(f"  {url[:50]}... NOT FOUND IN DB!")
+                    
         except Exception as e:
             print(f"⚠️ Failed to save progress after analytics update: {e}")
             import traceback

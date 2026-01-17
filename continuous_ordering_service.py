@@ -20,21 +20,37 @@ except ImportError as e:
     print("Make sure run_delivery_bot.py is in the same directory")
     sys.exit(1)
 
+# Import database module
+try:
+    import database
+    DATABASE_AVAILABLE = True
+    print("[INIT] ✓ Database module available in continuous_ordering_service")
+except ImportError as e:
+    print(f"[INIT] ❌ Database import failed: {e}")
+    DATABASE_AVAILABLE = False
+    sys.exit(1)  # Can't run without database
+
 init(autoreset=True)
 
 class ContinuousOrderingService:
     def __init__(self):
+        # DEPRECATED: File-based storage no longer used
         self.progress_file = Path.home() / '.smmfollows_bot' / 'progress.json'
         self.check_interval = 30  # Check every 30 seconds
         
     def load_progress(self):
-        """Load progress for all videos"""
-        if self.progress_file.exists():
+        """Load progress from database ONLY - Supabase is the single source of truth"""
+        if DATABASE_AVAILABLE:
             try:
-                with open(self.progress_file, 'r') as f:
-                    return json.load(f)
-            except:
+                progress = database.load_progress()
+                return progress or {}
+            except Exception as e:
+                print(f"{Fore.RED}❌ Database load failed: {e}{Style.RESET_ALL}")
+                import traceback
+                traceback.print_exc()
                 return {}
+        
+        print(f"{Fore.RED}❌ Database module not available - cannot load data!{Style.RESET_ALL}")
         return {}
     
     def process_all_videos(self):

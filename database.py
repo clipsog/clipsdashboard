@@ -276,8 +276,14 @@ def load_progress() -> Dict:
             rows = cursor.fetchall()
             
             progress = {}
+            loaded_count = 0
             for row in rows:
                 progress[row['video_url']] = dict(row['data'])
+                # Log first 3 videos loaded
+                if loaded_count < 3:
+                    real_views_value = progress[row['video_url']].get('real_views', 'NOT_IN_DATA')
+                    print(f"[DB LOAD] Loaded {row['video_url'][:50]}... with real_views={real_views_value}")
+                loaded_count += 1
             
             return progress
     except Exception as e:
@@ -307,7 +313,13 @@ def save_progress(progress: Dict):
             # Update or insert each video
             # CRITICAL: Never delete videos - they might be in campaigns
             # Only update existing ones or add new ones
+            saved_count = 0
             for video_url, video_data in progress.items():
+                # Log WHAT we're saving for first 3 videos
+                if saved_count < 3:
+                    real_views_value = video_data.get('real_views', 'NOT_IN_DATA')
+                    print(f"[DB SAVE] Saving {video_url[:50]}... with real_views={real_views_value}")
+                
                 cursor.execute("""
                     INSERT INTO videos (video_url, data, updated_at)
                     VALUES (%s, %s, CURRENT_TIMESTAMP)
@@ -316,6 +328,7 @@ def save_progress(progress: Dict):
                         data = EXCLUDED.data,
                         updated_at = CURRENT_TIMESTAMP
                 """, (video_url, json.dumps(video_data)))
+                saved_count += 1
             
             # DO NOT DELETE videos - they may still be referenced in campaigns
             # Videos should only be removed via explicit delete API call

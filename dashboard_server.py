@@ -262,9 +262,14 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 'Upgrade-Insecure-Requests': '1',
             }
             response = requests.get(resolved_url, headers=headers, timeout=20, allow_redirects=True)
+            print(f"[FETCH DEBUG] {video_url[:50]}... status_code={response.status_code}, final_url={response.url[:80]}...")
             if response.status_code == 200:
                 html = response.text
                 soup = BeautifulSoup(html, 'html.parser')
+                
+                # Log if we found any script tags
+                all_scripts = soup.find_all('script')
+                print(f"[FETCH DEBUG] {video_url[:50]}... found {len(all_scripts)} script tags total")
                 
                 # Try multiple script tag patterns
                 script_patterns = [
@@ -277,6 +282,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 for pattern in script_patterns:
                     script_match = re.search(pattern, html, re.DOTALL)
                     if script_match:
+                        print(f"[FETCH DEBUG] {video_url[:50]}... matched pattern: {pattern[:60]}...")
                         try:
                             script_content = script_match.group(1)
                             # Clean up the content - remove any leading/trailing whitespace
@@ -324,9 +330,13 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                                     if analytics['views'] > 0 or analytics['likes'] > 0:
                                                         print(f"DEBUG: Method 1 success via path {path}: views={analytics['views']}, likes={analytics['likes']}, comments={analytics['comments']}")
                                                         return analytics
+                                                    else:
+                                                        print(f"[FETCH DEBUG] {video_url[:50]}... found stats but all zeros: views={views}, likes={likes}, comments={comments}")
                                     except Exception as e:
+                                        print(f"[FETCH DEBUG] {video_url[:50]}... error parsing path {path}: {e}")
                                         continue
                         except json.JSONDecodeError as e:
+                            print(f"[FETCH DEBUG] {video_url[:50]}... JSON decode error: {e}")
                             continue
                         except Exception as e:
                             continue

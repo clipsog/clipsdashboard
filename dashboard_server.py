@@ -20,6 +20,15 @@ import requests
 from bs4 import BeautifulSoup
 from colorama import Fore, Style, init
 
+# Import RapidAPI TikTok integration
+try:
+    from rapidapi_tiktok import fetch_tiktok_analytics_rapidapi, RapidAPITikTok
+    RAPIDAPI_AVAILABLE = True
+    print("[INIT] ✅ RapidAPI TikTok integration loaded")
+except ImportError:
+    RAPIDAPI_AVAILABLE = False
+    print("[INIT] ⚠️ RapidAPI TikTok integration not available (rapidapi_tiktok.py not found)")
+
 # Import database module for PostgreSQL support
 try:
     import database
@@ -242,6 +251,32 @@ class DashboardHandler(BaseHTTPRequestHandler):
     def fetch_real_analytics_for_video(self, video_url):
         """Fetch real-time analytics for a single video"""
         analytics = {'views': 0, 'likes': 0, 'comments': 0}
+        
+        # ====================================================================
+        # METHOD 0: Try RapidAPI first (most reliable)
+        # ====================================================================
+        if RAPIDAPI_AVAILABLE and os.getenv('RAPIDAPI_KEY'):
+            try:
+                print(f"[RapidAPI] 🚀 Attempting RapidAPI fetch for {video_url[:60]}...")
+                rapidapi_result = fetch_tiktok_analytics_rapidapi(video_url)
+                
+                if rapidapi_result.get('views', 0) > 0:
+                    analytics['views'] = rapidapi_result.get('views', 0)
+                    analytics['likes'] = rapidapi_result.get('likes', 0)
+                    analytics['comments'] = rapidapi_result.get('comments', 0)
+                    print(f"[RapidAPI] ✅ SUCCESS: {analytics['views']} views, {analytics['likes']} likes")
+                    return analytics
+                else:
+                    print(f"[RapidAPI] ⚠️ RapidAPI returned 0 views, falling back to web scraping")
+            except Exception as e:
+                print(f"[RapidAPI] ❌ Error: {e}, falling back to web scraping")
+        elif RAPIDAPI_AVAILABLE:
+            print(f"[RapidAPI] ⚠️ No RAPIDAPI_KEY found in environment, skipping RapidAPI (using web scraping)")
+        
+        # ====================================================================
+        # FALLBACK: Web Scraping (if RapidAPI fails or unavailable)
+        # ====================================================================
+        print(f"[WEB SCRAPE] 🕷️ Using web scraping for {video_url[:60]}...")
         
         # CRITICAL: Resolve shortened URLs (vt.tiktok.com) to full URLs first
         resolved_url = video_url

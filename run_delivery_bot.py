@@ -14,6 +14,15 @@ from pathlib import Path
 from colorama import Fore, Style, init
 from bs4 import BeautifulSoup
 
+# Import RapidAPI TikTok integration
+try:
+    from rapidapi_tiktok import fetch_tiktok_analytics_rapidapi
+    RAPIDAPI_AVAILABLE = True
+    print("[INIT] ✓ RapidAPI TikTok integration available")
+except ImportError:
+    RAPIDAPI_AVAILABLE = False
+    print("[INIT] ⚠️ RapidAPI TikTok integration not available")
+
 # Import database module
 try:
     import database
@@ -111,6 +120,35 @@ class DeliveryBot:
             print(f"{Fore.CYAN}📊 Fetching real-time analytics...{Style.RESET_ALL}")
         
         analytics = {'views': 0, 'likes': 0, 'comments': 0}
+        
+        # ====================================================================
+        # METHOD 0: Try RapidAPI first (most reliable)
+        # ====================================================================
+        if RAPIDAPI_AVAILABLE:
+            try:
+                if print_analytics:
+                    print(f"{Fore.CYAN}[RapidAPI] 🚀 Attempting RapidAPI fetch for {self.video_url[:60]}...{Style.RESET_ALL}")
+                rapidapi_result = fetch_tiktok_analytics_rapidapi(self.video_url)
+                
+                if rapidapi_result.get('views', 0) > 0:
+                    analytics['views'] = rapidapi_result.get('views', 0)
+                    analytics['likes'] = rapidapi_result.get('likes', 0)
+                    analytics['comments'] = rapidapi_result.get('comments', 0)
+                    if print_analytics:
+                        print(f"{Fore.GREEN}[RapidAPI] ✅ SUCCESS: {analytics['views']} views, {analytics['likes']} likes{Style.RESET_ALL}")
+                    return analytics
+                else:
+                    if print_analytics:
+                        print(f"{Fore.YELLOW}[RapidAPI] ⚠️ RapidAPI returned 0 views, falling back to web scraping{Style.RESET_ALL}")
+            except Exception as e:
+                if print_analytics:
+                    print(f"{Fore.RED}[RapidAPI] ❌ Error: {e}, falling back to web scraping{Style.RESET_ALL}")
+        
+        # ====================================================================
+        # FALLBACK: Web Scraping (if RapidAPI fails or unavailable)
+        # ====================================================================
+        if print_analytics:
+            print(f"{Fore.CYAN}[WEB SCRAPE] 🕷️ Using web scraping for {self.video_url[:60]}...{Style.RESET_ALL}")
         
         # CRITICAL: Resolve shortened URLs (vt.tiktok.com) to full URLs first
         resolved_url = self.video_url

@@ -121,6 +121,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 self.handle_update_video_time()
             elif path == '/api/stop-overtime':
                 self.handle_stop_overtime()
+            elif path == '/api/stop-video':
+                self.handle_stop_video()
             elif path == '/api/video-details':
                 self.handle_video_details()
             elif path == '/health' or path == '/api/health':
@@ -183,6 +185,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 self.handle_update_video_time()
             elif path == '/api/stop-overtime':
                 self.handle_stop_overtime()
+            elif path == '/api/stop-video':
+                self.handle_stop_video()
             elif path == '/api/video-details':
                 self.handle_video_details()
             elif path == '/health' or path == '/api/health':
@@ -2777,6 +2781,30 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 self.wfile.write(response_data.encode())
                 return
             
+            # CRITICAL: Delete all videos that belong to this campaign
+            progress = self.load_progress()
+            campaign_videos = campaigns[campaign_id].get('videos', [])
+            videos_deleted = 0
+            
+            for video_url in campaign_videos:
+                if video_url in progress:
+                    del progress[video_url]
+                    videos_deleted += 1
+                    print(f"[DELETE] Deleted video {video_url[:50]}...")
+            
+            # Also clean campaign_id from any remaining videos (in case of orphans)
+            videos_cleaned = 0
+            for video_url, video_data in progress.items():
+                if video_data.get('campaign_id') == campaign_id:
+                    # Option 1: Delete the video entirely
+                    # Option 2: Just remove campaign_id (keep video for reuse)
+                    # Going with Option 1 for cleaner state
+                    pass  # Already handled above
+            
+            if videos_deleted > 0 or videos_cleaned > 0:
+                self.save_progress(progress)
+                print(f"[DELETE] Deleted {videos_deleted} video(s) from campaign {campaign_id}")
+            
             # Delete campaign from database
             if DATABASE_AVAILABLE:
                 try:
@@ -2784,9 +2812,13 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     with database.get_db_connection() as conn:
                         if conn:
                             cursor = conn.cursor()
+                            # Delete the campaign
                             cursor.execute("DELETE FROM campaigns WHERE campaign_id = %s", (campaign_id,))
+                            # Delete all videos that belonged to this campaign
+                            for video_url in campaign_videos:
+                                cursor.execute("DELETE FROM videos WHERE video_url = %s", (video_url,))
                             conn.commit()
-                            print(f"[DELETE] Deleted campaign {campaign_id} from database")
+                            print(f"[DELETE] Deleted campaign {campaign_id} and {len(campaign_videos)} videos from database")
                         else:
                             print(f"❌ No database connection available")
                 except Exception as e:
@@ -2803,29 +2835,15 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     self.wfile.write(response_data.encode())
                     return
             
-            # Remove campaign from in-memory dict and save
+            # Remove campaign from in-memory dict after successful database delete
             if campaign_id in campaigns:
                 del campaigns[campaign_id]
                 self.save_campaigns(campaigns)
-                print(f"[DELETE] Removed campaign {campaign_id} from in-memory dict")
-            
-            # CRITICAL: Clean up campaign_id from all videos in progress.json
-            # This prevents orphaned references that cause crashes when loading campaigns
-            progress = self.load_progress()
-            videos_cleaned = 0
-            for video_url, video_data in progress.items():
-                if video_data.get('campaign_id') == campaign_id:
-                    video_data['campaign_id'] = None
-                    videos_cleaned += 1
-                    print(f"[DELETE] Cleaned campaign_id from video {video_url[:50]}...")
-            
-            if videos_cleaned > 0:
-                self.save_progress(progress)
-                print(f"[DELETE] Cleaned {videos_cleaned} video(s) from deleted campaign")
+                print(f"[DELETE] Removed campaign {campaign_id} from campaigns list")
             
             response_data = json.dumps({
                 'success': True,
-                'message': 'Campaign deleted successfully'
+                'message': f'Campaign and {videos_deleted} video(s) deleted successfully'
             })
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
@@ -2892,6 +2910,96 @@ class DashboardHandler(BaseHTTPRequestHandler):
             
         except Exception as e:
             print(f"EXCEPTION in handle_stop_overtime: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            response_data = json.dumps({'success': False, 'error': str(e)})
+            self.send_response(500)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Content-Length', str(len(response_data)))
+            self.end_headers()
+            self.wfile.write(response_data.encode())
+    
+    def handle_stop_video(self):
+        """Stop/delete an individual video and remove it from database"""
+        try:
+            parsed_path = urllib.parse.urlparse(self.path)
+            query_string = parsed_path.query
+            params = urllib.parse.parse_qs(query_string)
+            
+            video_url = params.get('video_url', [None])[0]
+            if not video_url:
+                response_data = json.dumps({'success': False, 'error': 'Missing video_url'})
+                self.send_response(400)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Content-Length', str(len(response_data)))
+                self.end_headers()
+                self.wfile.write(response_data.encode())
+                return
+            
+            # URL decode if needed
+            video_url = urllib.parse.unquote(video_url)
+            
+            # Load progress and check if video exists
+            progress = self.load_progress()
+            if video_url not in progress:
+                response_data = json.dumps({'success': False, 'error': 'Video not found'})
+                self.send_response(404)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Content-Length', str(len(response_data)))
+                self.end_headers()
+                self.wfile.write(response_data.encode())
+                return
+            
+            # Get campaign_id before deleting
+            campaign_id = progress[video_url].get('campaign_id')
+            
+            # Delete video from progress
+            del progress[video_url]
+            self.save_progress(progress)
+            print(f"[STOP VIDEO] Deleted video {video_url[:50]}... from progress")
+            
+            # Remove video from campaign if it belongs to one
+            if campaign_id:
+                campaigns = self.load_campaigns()
+                if campaign_id in campaigns:
+                    campaign = campaigns[campaign_id]
+                    if 'videos' in campaign and video_url in campaign['videos']:
+                        campaign['videos'].remove(video_url)
+                        campaigns[campaign_id] = campaign
+                        self.save_campaigns(campaigns)
+                        print(f"[STOP VIDEO] Removed video from campaign {campaign_id}")
+            
+            # Delete from database
+            if DATABASE_AVAILABLE:
+                try:
+                    import database
+                    with database.get_db_connection() as conn:
+                        if conn:
+                            cursor = conn.cursor()
+                            cursor.execute("DELETE FROM videos WHERE video_url = %s", (video_url,))
+                            conn.commit()
+                            print(f"[STOP VIDEO] Deleted video from database")
+                except Exception as e:
+                    print(f"❌ Error deleting video from database: {e}")
+                    import traceback
+                    traceback.print_exc()
+            
+            response_data = json.dumps({
+                'success': True,
+                'message': 'Video stopped and deleted successfully'
+            })
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.send_header('Content-Length', str(len(response_data)))
+            self.end_headers()
+            self.wfile.write(response_data.encode())
+            
+        except Exception as e:
+            print(f"EXCEPTION in handle_stop_video: {str(e)}")
             import traceback
             traceback.print_exc()
             response_data = json.dumps({'success': False, 'error': str(e)})

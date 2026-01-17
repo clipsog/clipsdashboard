@@ -3088,58 +3088,77 @@ class DashboardHandler(BaseHTTPRequestHandler):
             
             import database
             
-            with database.get_db_connection() as conn:
-                if not conn:
-                    response_data = json.dumps({'success': False, 'error': 'Failed to connect to database'})
-                    self.send_response(500)
-                    self.send_header('Content-type', 'application/json')
-                    self.send_header('Access-Control-Allow-Origin', '*')
-                    self.end_headers()
-                    self.wfile.write(response_data.encode())
-                    return
-                
-                cursor = conn.cursor()
-                
-                # Count before deletion
-                cursor.execute("SELECT COUNT(*) FROM videos")
-                video_count = cursor.fetchone()[0]
-                
-                cursor.execute("SELECT COUNT(*) FROM campaigns")
-                campaign_count = cursor.fetchone()[0]
-                
-                print(f"📊 Deleting:")
-                print(f"   - {video_count} videos")
-                print(f"   - {campaign_count} campaigns")
-                
-                # Delete all videos
-                cursor.execute("DELETE FROM videos")
-                print(f"✓ Deleted {video_count} videos")
-                
-                # Delete all campaigns
-                cursor.execute("DELETE FROM campaigns")
-                print(f"✓ Deleted {campaign_count} campaigns")
-                
-                # Clear cache to prevent stale data
-                with CACHE_LOCK:
-                    ANALYTICS_CACHE.clear()
-                    print("✓ Cleared analytics cache")
-                
-                conn.commit()
-                
-                print("\n✅ EMERGENCY DELETE COMPLETE!")
-                print("="*60 + "\n")
-                
-                response_data = json.dumps({
-                    'success': True,
-                    'message': f'Deleted {video_count} videos and {campaign_count} campaigns',
-                    'videos_deleted': video_count,
-                    'campaigns_deleted': campaign_count
-                })
-                self.send_response(200)
-                self.send_header('Content-type', 'application/json')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                self.wfile.write(response_data.encode())
+            # Retry logic for deadlocks
+            max_retries = 3
+            retry_count = 0
+            
+            while retry_count < max_retries:
+                try:
+                    with database.get_db_connection() as conn:
+                        if not conn:
+                            response_data = json.dumps({'success': False, 'error': 'Failed to connect to database'})
+                            self.send_response(500)
+                            self.send_header('Content-type', 'application/json')
+                            self.send_header('Access-Control-Allow-Origin', '*')
+                            self.end_headers()
+                            self.wfile.write(response_data.encode())
+                            return
+                        
+                        cursor = conn.cursor()
+                        
+                        # Count before deletion
+                        cursor.execute("SELECT COUNT(*) FROM videos")
+                        video_count = cursor.fetchone()[0]
+                        
+                        cursor.execute("SELECT COUNT(*) FROM campaigns")
+                        campaign_count = cursor.fetchone()[0]
+                        
+                        print(f"📊 Deleting:")
+                        print(f"   - {video_count} videos")
+                        print(f"   - {campaign_count} campaigns")
+                        
+                        # Delete in order to avoid foreign key issues
+                        cursor.execute("DELETE FROM videos")
+                        print(f"✓ Deleted {video_count} videos")
+                        
+                        cursor.execute("DELETE FROM campaigns")
+                        print(f"✓ Deleted {campaign_count} campaigns")
+                        
+                        # Clear cache to prevent stale data
+                        with CACHE_LOCK:
+                            ANALYTICS_CACHE.clear()
+                            print("✓ Cleared analytics cache")
+                        
+                        conn.commit()
+                        
+                        print("\n✅ EMERGENCY DELETE COMPLETE!")
+                        print("="*60 + "\n")
+                        
+                        response_data = json.dumps({
+                            'success': True,
+                            'message': f'Deleted {video_count} videos and {campaign_count} campaigns',
+                            'videos_deleted': video_count,
+                            'campaigns_deleted': campaign_count
+                        })
+                        self.send_response(200)
+                        self.send_header('Content-type', 'application/json')
+                        self.send_header('Access-Control-Allow-Origin', '*')
+                        self.end_headers()
+                        self.wfile.write(response_data.encode())
+                        return  # Success - exit retry loop
+                        
+                except Exception as db_error:
+                    # Check if it's a deadlock
+                    error_str = str(db_error).lower()
+                    if 'deadlock' in error_str and retry_count < max_retries - 1:
+                        retry_count += 1
+                        wait_time = (2 ** retry_count) * 0.1  # Exponential backoff
+                        print(f"⚠️ Deadlock detected, retry {retry_count}/{max_retries} after {wait_time}s")
+                        time.sleep(wait_time)
+                        continue
+                    else:
+                        # Not a deadlock or max retries reached
+                        raise db_error
                 
         except Exception as e:
             print(f"❌ EXCEPTION in handle_emergency_delete_all: {str(e)}")

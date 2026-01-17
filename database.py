@@ -293,53 +293,76 @@ def load_progress() -> Dict:
         raise  # Re-raise to prevent silent failures
 
 def save_progress(progress: Dict):
-    """Save video progress to database"""
+    """Save video progress to database with deadlock retry logic"""
     database_url = get_database_url()
     if not database_url:
         print("❌ No DATABASE_URL - cannot save progress! Data will be lost!")
         raise Exception("DATABASE_URL not configured - cannot persist data")
     
-    try:
-        with get_db_connection() as conn:
-            if not conn:
-                return
-            
-            cursor = conn.cursor()
-            
-            # Get all existing video URLs
-            cursor.execute("SELECT video_url FROM videos")
-            existing_urls = {row[0] for row in cursor.fetchall()}
-            
-            # Update or insert each video
-            # CRITICAL: Never delete videos - they might be in campaigns
-            # Only update existing ones or add new ones
-            saved_count = 0
-            for video_url, video_data in progress.items():
-                # Log WHAT we're saving for first 3 videos
-                if saved_count < 3:
-                    real_views_value = video_data.get('real_views', 'NOT_IN_DATA')
-                    print(f"[DB SAVE] Saving {video_url[:50]}... with real_views={real_views_value}")
+    max_retries = 3
+    retry_count = 0
+    
+    while retry_count < max_retries:
+        try:
+            with get_db_connection() as conn:
+                if not conn:
+                    return
                 
-                cursor.execute("""
-                    INSERT INTO videos (video_url, data, updated_at)
-                    VALUES (%s, %s, CURRENT_TIMESTAMP)
-                    ON CONFLICT (video_url)
-                    DO UPDATE SET 
-                        data = EXCLUDED.data,
-                        updated_at = CURRENT_TIMESTAMP
-                """, (video_url, json.dumps(video_data)))
-                saved_count += 1
-            
-            # DO NOT DELETE videos - they may still be referenced in campaigns
-            # Videos should only be removed via explicit delete API call
-            # This prevents videos from disappearing due to timing issues
-            
-            conn.commit()
-    except Exception as e:
-        print(f"❌ Error saving progress: {e}")
-        import traceback
-        traceback.print_exc()
-        raise
+                cursor = conn.cursor()
+                
+                # Get all existing video URLs
+                cursor.execute("SELECT video_url FROM videos")
+                existing_urls = {row[0] for row in cursor.fetchall()}
+                
+                # Update or insert each video
+                # CRITICAL: Never delete videos - they might be in campaigns
+                # Only update existing ones or add new ones
+                # IMPORTANT: Process videos in sorted order to prevent deadlocks
+                saved_count = 0
+                sorted_videos = sorted(progress.items(), key=lambda x: x[0])  # Sort by URL
+                
+                for video_url, video_data in sorted_videos:
+                    # Log WHAT we're saving for first 3 videos
+                    if saved_count < 3:
+                        real_views_value = video_data.get('real_views', 'NOT_IN_DATA')
+                        print(f"[DB SAVE] Saving {video_url[:50]}... with real_views={real_views_value}")
+                    
+                    cursor.execute("""
+                        INSERT INTO videos (video_url, data, updated_at)
+                        VALUES (%s, %s, CURRENT_TIMESTAMP)
+                        ON CONFLICT (video_url)
+                        DO UPDATE SET 
+                            data = EXCLUDED.data,
+                            updated_at = CURRENT_TIMESTAMP
+                    """, (video_url, json.dumps(video_data)))
+                    saved_count += 1
+                
+                # DO NOT DELETE videos - they may still be referenced in campaigns
+                # Videos should only be removed via explicit delete API call
+                # This prevents videos from disappearing due to timing issues
+                
+                conn.commit()
+                return  # Success - exit retry loop
+                
+        except psycopg2.errors.DeadlockDetected as deadlock_error:
+            retry_count += 1
+            if retry_count < max_retries:
+                # Exponential backoff with jitter
+                import random
+                wait_time = (2 ** retry_count) * 0.1 + random.uniform(0, 0.1)
+                print(f"⚠️ Deadlock detected on attempt {retry_count}/{max_retries}, retrying in {wait_time:.2f}s...")
+                import time
+                time.sleep(wait_time)
+            else:
+                print(f"❌ Error saving progress after {max_retries} attempts: {deadlock_error}")
+                import traceback
+                traceback.print_exc()
+                raise
+        except Exception as e:
+            print(f"❌ Error saving progress: {e}")
+            import traceback
+            traceback.print_exc()
+            raise
 
 def load_campaigns() -> Dict:
     """Load all campaigns from database ONLY - Supabase is source of truth"""
@@ -370,7 +393,7 @@ def load_campaigns() -> Dict:
         raise  # Re-raise to prevent silent failures
 
 def save_campaigns(campaigns: Dict):
-    """Save campaigns to database - MERGES with existing data to preserve videos"""
+    """Save campaigns to database with deadlock retry logic - MERGES with existing data to preserve videos"""
     database_url = get_database_url()
     if not database_url:
         print("❌ No DATABASE_URL - cannot save campaigns! Data will be lost!")
@@ -384,21 +407,28 @@ def save_campaigns(campaigns: Dict):
         print("   Set DATABASE_URL = postgresql://postgres.sthmpgvzdcmveihmqjpl:MJmCf99X$$$@aws-1-us-east-2.pooler.supabase.com:6543/postgres")
         raise Exception("DATABASE_URL contains placeholder - cannot persist data")
     
-    try:
-        with get_db_connection() as conn:
-            if not conn:
-                return
-            
-            cursor = conn.cursor(cursor_factory=RealDictCursor)
-            
-            # CRITICAL: Load existing campaigns FIRST to preserve video lists
-            cursor.execute("SELECT campaign_id, data FROM campaigns")
-            existing_campaigns = {}
-            for row in cursor.fetchall():
-                existing_campaigns[row['campaign_id']] = dict(row['data'])
-            
-            # MERGE: Preserve existing videos when updating campaigns
-            for campaign_id, campaign_data in campaigns.items():
+    max_retries = 3
+    retry_count = 0
+    
+    while retry_count < max_retries:
+        try:
+            with get_db_connection() as conn:
+                if not conn:
+                    return
+                
+                cursor = conn.cursor(cursor_factory=RealDictCursor)
+                
+                # CRITICAL: Load existing campaigns FIRST to preserve video lists
+                cursor.execute("SELECT campaign_id, data FROM campaigns")
+                existing_campaigns = {}
+                for row in cursor.fetchall():
+                    existing_campaigns[row['campaign_id']] = dict(row['data'])
+                
+                # MERGE: Preserve existing videos when updating campaigns
+                # IMPORTANT: Process campaigns in sorted order to prevent deadlocks
+                sorted_campaigns = sorted(campaigns.items(), key=lambda x: x[0])  # Sort by campaign_id
+                
+                for campaign_id, campaign_data in sorted_campaigns:
                 # Get existing campaign data if it exists
                 existing_data = existing_campaigns.get(campaign_id, {})
                 existing_videos = existing_data.get('videos', [])
@@ -430,11 +460,27 @@ def save_campaigns(campaigns: Dict):
             
             conn.commit()
             print(f"[DB SAVE] Saved {len(campaigns)} campaigns with merged video lists")
-    except Exception as e:
-        print(f"❌ Error saving campaigns: {e}")
-        import traceback
-        traceback.print_exc()
-        raise
+            return  # Success - exit retry loop
+            
+        except psycopg2.errors.DeadlockDetected as deadlock_error:
+            retry_count += 1
+            if retry_count < max_retries:
+                # Exponential backoff with jitter
+                import random
+                wait_time = (2 ** retry_count) * 0.1 + random.uniform(0, 0.1)
+                print(f"⚠️ Deadlock detected on campaign save, attempt {retry_count}/{max_retries}, retrying in {wait_time:.2f}s...")
+                import time
+                time.sleep(wait_time)
+            else:
+                print(f"❌ Error saving campaigns after {max_retries} attempts: {deadlock_error}")
+                import traceback
+                traceback.print_exc()
+                raise
+        except Exception as e:
+            print(f"❌ Error saving campaigns: {e}")
+            import traceback
+            traceback.print_exc()
+            raise
 
 def migrate_from_json():
     """Migrate existing JSON data to PostgreSQL - PRESERVES existing database data"""

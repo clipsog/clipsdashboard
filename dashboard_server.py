@@ -11194,28 +11194,28 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     .then(response => response.json())
                     .then(result => {
                         if (result.success) {
-                            console.log(`[Emergency Delete] ✓ Deleted ${result.videos_deleted} videos and ${result.campaigns_deleted} campaigns`);
-                            showNotification(`✅ Deleted ${result.videos_deleted} videos and ${result.campaigns_deleted} campaigns`, 'success');
+                            console.log('[Emergency Delete] Success - Deleted ' + result.videos_deleted + ' videos and ' + result.campaigns_deleted + ' campaigns');
+                            showNotification('Successfully deleted ' + result.videos_deleted + ' videos and ' + result.campaigns_deleted + ' campaigns', 'success');
                             
                             // Invalidate cache
                             invalidateCache();
                             
                             // Reload dashboard
-                            setTimeout(() => {
+                            setTimeout(function() {
                                 window.location.href = '/';
                             }, 1500);
                         } else {
-                            console.error('[Emergency Delete] ✗ Failed:', result.error);
-                            showNotification(`❌ Delete failed: ${result.error}`, 'error');
+                            console.error('[Emergency Delete] Failed:', result.error);
+                            showNotification('Delete failed: ' + result.error, 'error');
                             btn.innerHTML = '🚨 DELETE ALL';
                             btn.disabled = false;
                             btn.style.opacity = '1';
                             btn.style.animation = 'pulse 2s infinite';
                         }
                     })
-                    .catch(error => {
-                        console.error('[Emergency Delete] ✗ Network error:', error);
-                        showNotification('❌ Network error during delete', 'error');
+                    .catch(function(error) {
+                        console.error('[Emergency Delete] Network error:', error);
+                        showNotification('Network error during delete', 'error');
                         btn.innerHTML = '🚨 DELETE ALL';
                         btn.disabled = false;
                         btn.style.opacity = '1';

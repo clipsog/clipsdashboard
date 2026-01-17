@@ -429,31 +429,31 @@ def save_campaigns(campaigns: Dict):
                 sorted_campaigns = sorted(campaigns.items(), key=lambda x: x[0])  # Sort by campaign_id
                 
                 for campaign_id, campaign_data in sorted_campaigns:
-                # Get existing campaign data if it exists
-                existing_data = existing_campaigns.get(campaign_id, {})
-                existing_videos = existing_data.get('videos', [])
-                new_videos = campaign_data.get('videos', [])
-                
-                # MERGE video lists - combine existing and new, remove duplicates
-                merged_videos = list(set(existing_videos + new_videos))
-                
-                # Update campaign_data with merged videos
-                merged_campaign_data = campaign_data.copy()
-                merged_campaign_data['videos'] = merged_videos
-                
-                # Also preserve other important fields from existing data
-                for key in ['created_at', 'name']:
-                    if key in existing_data and key not in merged_campaign_data:
-                        merged_campaign_data[key] = existing_data[key]
-                
-                cursor.execute("""
-                    INSERT INTO campaigns (campaign_id, data, updated_at)
-                    VALUES (%s, %s, CURRENT_TIMESTAMP)
-                    ON CONFLICT (campaign_id)
-                    DO UPDATE SET 
-                        data = EXCLUDED.data,
-                        updated_at = CURRENT_TIMESTAMP
-                """, (campaign_id, json.dumps(merged_campaign_data)))
+                    # Get existing campaign data if it exists
+                    existing_data = existing_campaigns.get(campaign_id, {})
+                    existing_videos = existing_data.get('videos', [])
+                    new_videos = campaign_data.get('videos', [])
+                    
+                    # MERGE video lists - combine existing and new, remove duplicates
+                    merged_videos = list(set(existing_videos + new_videos))
+                    
+                    # Update campaign_data with merged videos
+                    merged_campaign_data = campaign_data.copy()
+                    merged_campaign_data['videos'] = merged_videos
+                    
+                    # Also preserve other important fields from existing data
+                    for key in ['created_at', 'name']:
+                        if key in existing_data and key not in merged_campaign_data:
+                            merged_campaign_data[key] = existing_data[key]
+                    
+                    cursor.execute("""
+                        INSERT INTO campaigns (campaign_id, data, updated_at)
+                        VALUES (%s, %s, CURRENT_TIMESTAMP)
+                        ON CONFLICT (campaign_id)
+                        DO UPDATE SET 
+                            data = EXCLUDED.data,
+                            updated_at = CURRENT_TIMESTAMP
+                    """, (campaign_id, json.dumps(merged_campaign_data)))
             
             # DO NOT DELETE campaigns - they may be referenced by videos
             # Only update/insert, never remove

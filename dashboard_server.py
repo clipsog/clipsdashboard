@@ -11167,18 +11167,18 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 const btn = e.target.id === 'emergency-delete-all-btn' ? e.target : e.target.closest('#emergency-delete-all-btn');
                 
                 // Triple confirmation for safety
-                const confirm1 = window.confirm('🚨 EMERGENCY DELETE ALL\n\nThis will DELETE ALL videos and campaigns from the database.\n\nAre you ABSOLUTELY sure?');
+                const confirm1 = window.confirm('EMERGENCY DELETE ALL\\n\\nThis will DELETE ALL videos and campaigns from the database.\\n\\nAre you ABSOLUTELY sure?');
                 if (!confirm1) return;
                 
-                const confirm2 = window.confirm('⚠️ FINAL WARNING\n\nThis action CANNOT be undone!\n\nAll campaigns, videos, and progress will be PERMANENTLY deleted.\n\nContinue?');
+                const confirm2 = window.confirm('FINAL WARNING\\n\\nThis action CANNOT be undone!\\n\\nAll campaigns, videos, and progress will be PERMANENTLY deleted.\\n\\nContinue?');
                 if (!confirm2) return;
                 
-                const confirm3 = window.confirm('🛑 LAST CHANCE\n\nType "DELETE" to proceed (case-sensitive).\n\nClick OK to type, or CANCEL to abort.');
+                const confirm3 = window.confirm('LAST CHANCE\\n\\nType DELETE to proceed (case-sensitive).\\n\\nClick OK to type, or CANCEL to abort.');
                 if (!confirm3) return;
                 
                 const userInput = window.prompt('Type exactly: DELETE');
                 if (userInput !== 'DELETE') {
-                    alert('❌ Operation cancelled - text did not match.');
+                    alert('Operation cancelled - text did not match.');
                     return;
                 }
                 

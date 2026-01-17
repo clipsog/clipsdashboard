@@ -977,16 +977,28 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     campaigns[campaign_id] = campaign
                     # CRITICAL: Save campaigns FIRST, then progress
                     # This ensures campaign has the video before progress.json is saved
-                    self.save_campaigns(campaigns)
-                    print(f"[ADD VIDEO] Saved campaign {campaign_id} with video")
+                    try:
+                        self.save_campaigns(campaigns)
+                        print(f"[ADD VIDEO] Saved campaign {campaign_id} with video")
+                    except Exception as save_error:
+                        print(f"[ADD VIDEO] ERROR saving campaigns: {save_error}")
+                        import traceback
+                        traceback.print_exc()
+                        raise Exception(f"Failed to save campaign: {save_error}")
                 else:
                     # Invalid campaign_id passed; ignore assignment
                     pass
             
             # CRITICAL: Save progress AFTER campaigns to ensure campaign_id is set
             # This ensures rebuild logic can restore videos if campaigns.json is lost
-            self.save_progress(progress)
-            print(f"[ADD VIDEO] Saved progress for {video_url[:50]}...")
+            try:
+                self.save_progress(progress)
+                print(f"[ADD VIDEO] Saved progress for {video_url[:50]}...")
+            except Exception as save_error:
+                print(f"[ADD VIDEO] ERROR saving progress: {save_error}")
+                import traceback
+                traceback.print_exc()
+                raise Exception(f"Failed to save video progress: {save_error}")
             
             print(f"SUCCESS: Added video {video_url} to campaign")
             
